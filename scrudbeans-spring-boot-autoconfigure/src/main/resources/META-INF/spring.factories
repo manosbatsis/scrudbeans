@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.github.manosbatsis.scrudbeans.autoconfigure.ScrudBeansAutoConfiguration
