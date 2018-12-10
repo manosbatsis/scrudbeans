@@ -23,8 +23,8 @@ package com.github.manosbatsis.scrudbeans.javassist;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
-import javassist.CannotCompileException;
 import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -82,31 +82,60 @@ public class JavassistBaseUtil {
 		return sig.toString();
 	}
 
-	public static Class<?> createInterface(String name, Class<?> superInterface, Collection<Class<?>> typeArgs) throws NotFoundException, CannotCompileException {
+	public static Class<?> createInterface(String name, Class<?> superInterface, Collection<Class<?>> typeArgs) {
 		return createInterface(name, superInterface, typeArgs, null);
 	}
 
-	public static Class<?> createInterface(String name, Class<?> superInterface, Collection<Class<?>> typeArgs, Map<Class<?>, Map<String, Object>> typeAnnotations) throws NotFoundException, CannotCompileException {
-		ClassPool pool = ClassPool.getDefault();
+	public static Class<?> createInterface(String name, Class<?> superInterface, Collection<Class<?>> typeArgs, Map<Class<?>, Map<String, Object>> typeAnnotations) {
+		Optional<Class> existing = getExistingClass(name);
+		Class<?> result = null;
 
-		// add classpaths
-		// pool.insertClassPath( new ClassClassPath(superInterface));
-		for (Class<?> c : typeArgs) {
-			pool.insertClassPath(new ClassClassPath(c));
+		if (existing.isPresent()) {
+			log.warn("Interface {} already exists, will reuse existing", name);
+			result = existing.get();
+		}
+		else {
+			result = createNewInterface(name, superInterface, typeArgs, typeAnnotations);
 		}
 
-		CtClass impl = pool.makeInterface(name);
-		if (MapUtils.isNotEmpty(typeAnnotations)) {
-			addTypeAnnotations(impl, typeAnnotations);
-		}
-		impl.setSuperclass(pool.get(superInterface.getName()));
-		impl.setGenericSignature(getGenericSignature(pool, superInterface, new ArrayList<Class<?>>(), typeArgs));
-
-		Class<?> result = impl.toClass();
 		return result;
 	}
 
+	private static Class<?> createNewInterface(String name, Class<?> superInterface, Collection<Class<?>> typeArgs, Map<Class<?>, Map<String, Object>> typeAnnotations) {
+		Class<?> result;
+		try {
+			ClassPool pool = ClassPool.getDefault();
+			// add classpaths
+			// pool.insertClassPath( new ClassClassPath(superInterface));
+			for (Class<?> c : typeArgs) {
+				pool.insertClassPath(new ClassClassPath(c));
+			}
 
+			CtClass impl = pool.makeInterface(name);
+			if (MapUtils.isNotEmpty(typeAnnotations)) {
+				addTypeAnnotations(impl, typeAnnotations);
+			}
+			impl.setSuperclass(pool.get(superInterface.getName()));
+			impl.setGenericSignature(getGenericSignature(pool, superInterface, new ArrayList<Class<?>>(), typeArgs));
+
+			result = impl.toClass();
+		}
+		catch (Exception e) {
+			throw new RuntimeException("Failed creating interface: " + e.getMessage(), e);
+		}
+		return result;
+	}
+
+	public static Optional<Class> getExistingClass(String name) {
+		Class c = null;
+		try {
+			c = Class.forName(name);
+		}
+		catch (Exception e) {
+			log.debug("Class does not exist: {}", name);
+		}
+		return Optional.ofNullable(c);
+	}
 	protected static void addTypeAnnotations(CtClass clazz, Map<Class<?>, Map<String, Object>> typeAnnotations) {
 		ClassFile ccFile = clazz.getClassFile();
 		AnnotationsAttribute attr = getAnnotationsAttribute(ccFile);
@@ -250,18 +279,26 @@ public class JavassistBaseUtil {
 
 
 	public static Class<?> createClass(CreateClassCommand command) {
-		try {
-
-			CtClass impl = createCtClass(command);
-
-
-			Class<?> result = impl.toClass();
-
-			return result;
+		Optional<Class> existing = getExistingClass(command.getSource());
+		Class<?> result = null;
+		if (existing.isPresent()) {
+			log.warn("Class {} already exists, will reuse existing", command.getSource());
+			result = existing.get();
 		}
-		catch (Exception e) {
-			throw new RuntimeException("Failed to create subclass: " + e.getMessage(), e);
+		else {
+			try {
+				CtClass impl = createCtClass(command);
+				result = impl.toClass();
+			}
+			catch (Exception e) {
+				throw new RuntimeException("Failed creating class: " + e.getMessage(), e);
+			}
 		}
+
+		return result;
+
+
+
 	}
 
 	public static CtClass createCtClass(CreateClassCommand command) {

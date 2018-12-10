@@ -1,25 +1,48 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.manosbatsis.scrudbeans</groupId>
+	<groupId>com.github.manosbatsis.scrudbeans</groupId>
 	<artifactId>scrudbeans</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>scrudbeans-pom</name>
 	<packaging>pom</packaging>
+	<inceptionYear>2016</inceptionYear>
+	<url>https://manosbatsis.github.io/scrudbeans</url>
+	<description>Model-driven development for Spring Boot hackers.</description>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<!--repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository-->
+	</distributionManagement>
 
+	<licenses>
+		<license>
+			<name>GNU LESSER GENERAL PUBLIC LICENSE Version 3</name>
+			<url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
+		</license>
+	</licenses>
+	<scm>
+		<connection>scm:git:git@github.com:manosbatsis/scrudbeans.git</connection>
+		<url>scm:git:git@github.com:manosbatsis/scrudbeans.git</url>
+		<developerConnection>scm:git:git@github.com:manosbatsis/scrudbeans.git</developerConnection>
+	</scm>
 	<properties>
-
 		<commons-lang3.version>3.5</commons-lang3.version>
 		<commons-beanutils.version>1.9.3</commons-beanutils.version>
 		<commons-fileupload.version>1.3.2</commons-fileupload.version>
 		<commons-io.version>2.4</commons-io.version>
 		<commons-collections4.version>4.1</commons-collections4.version>
+		<hibernate-core.version>5.2.17.Final</hibernate-core.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
 		<java.version>1.8</java.version>
-		<junit.jupiter.version>5.3.1</junit.jupiter.version>
-		<mockito.junit.jupiter.version>2.23.0</mockito.junit.jupiter.version>
-		<junit.platform.version>1.2.0</junit.platform.version>
-		<junit.vintage.version>5.2.0</junit.vintage.version>
+		<jaxb.api.version>2.3.0</jaxb.api.version>
+		<junit.version>5.3.2</junit.version>
+		<junit-platform.version>1.3.2</junit-platform.version>
 		<!-- javers auditing -->
 		<javers-spring-boot-starter-sql.version>5.0.0</javers-spring-boot-starter-sql.version>
 		<kotlin.version>1.2.71</kotlin.version>
@@ -31,10 +54,14 @@
 		<maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<!-- Use most recent failsafe and surefire plugin versions -->
+
+		<!-- Use most recent failsafe and surefire plugin versions-->
+		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
 		<maven-failsafe-plugin.version>2.22.0</maven-failsafe-plugin.version>
 		<maven-surefire-plugin.version>2.22.0</maven-surefire-plugin.version>
-		<spring-boot.version>2.0.6.RELEASE</spring-boot.version>
+		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+		<spring-boot.version>2.1.1.RELEASE</spring-boot.version>
+		<springfox-swagger.version>2.9.2</springfox-swagger.version>
 		<thin.version>1.0.11.RELEASE</thin.version>
 	</properties>
 
@@ -46,24 +73,13 @@
 		<module>scrudbeans-jpa</module>
 		<module>scrudbeans-spring-boot-autoconfigure</module>
 		<module>scrudbeans-spring-boot-starter</module>
-		<module>scrudbeans-spring-boot-sample-app</module>
+		<module>scrudbeans-spring-boot-starter-test</module>
 	</modules>
 
 	<dependencyManagement>
 		<dependencies>
-
 			<dependency>
-				<groupId>org.jetbrains.kotlin</groupId>
-				<artifactId>kotlin-stdlib-jdk8</artifactId>
-				<version>${kotlin.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jetbrains.kotlin</groupId>
-				<artifactId>kotlin-reflect</artifactId>
-				<version>${kotlin.version}</version>
-			</dependency>
-
-			<dependency>
+				<!-- Import dependency management from Spring Boot -->
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
 				<version>${spring-boot.version}</version>
@@ -73,7 +89,12 @@
 			<dependency>
 				<groupId>io.springfox</groupId>
 				<artifactId>springfox-swagger2</artifactId>
-				<version>2.9.2</version>
+				<version>${springfox-swagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-swagger-ui</artifactId>
+				<version>${springfox-swagger.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>
@@ -120,6 +141,11 @@
 			</dependency>
 			<!-- misc -->
 			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>${hibernate-core.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.imgscalr</groupId>
 				<artifactId>imgscalr-lib</artifactId>
 				<version>${imgscalr-lib.version}</version>
@@ -138,7 +164,7 @@
 			<dependency>
 				<groupId>org.javassist</groupId>
 				<artifactId>javassist</artifactId>
-				<version>3.24.0-GA</version>
+				<version>3.18.1-GA</version>
 			</dependency>
 			<dependency>
 				<groupId>net.jodah</groupId>
@@ -173,6 +199,22 @@
 				<version>${spring-boot.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.springframework.security</groupId>
+				<artifactId>spring-security-config</artifactId>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-starter</artifactId>
+				<version>${spring-boot.version}</version>
+				<exclusions>
+					<!-- remove conflict with restassured etc. -->
+					<exclusion>
+						<groupId>org.hamcrest</groupId>
+						<artifactId>hamcrest-core</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter-web</artifactId>
 				<version>${spring-boot.version}</version>
@@ -193,26 +235,15 @@
 			</dependency>
 			<!-- Provide JUnit 5 API -->
 			<dependency>
-				<groupId>org.junit.platform</groupId>
-				<artifactId>junit-platform-engine</artifactId>
-				<version>${junit.platform.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.junit.platform</groupId>
-				<artifactId>junit-platform-runner</artifactId>
-				<version>${junit.platform.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.junit.vintage</groupId>
-				<artifactId>junit-vintage-engine</artifactId>
-				<version>${junit.vintage.version}</version>
+				<groupId>org.junit.jupiter</groupId>
+				<artifactId>junit-jupiter-api</artifactId>
+				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.junit.jupiter</groupId>
-				<artifactId>junit-jupiter-migrationsupport</artifactId>
-				<version>${junit.vintage.version}</version>
+				<artifactId>junit-jupiter-engine</artifactId>
+				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
 		</dependencies>
@@ -221,26 +252,22 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-maven-plugin</artifactId>
-					<version>${spring-boot.version}</version>
-				</plugin>
-				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.22.1</version>
+					<version>${maven-surefire-plugin.version}</version>
 					<dependencies>
 						<dependency>
 							<groupId>org.junit.platform</groupId>
 							<artifactId>junit-platform-surefire-provider</artifactId>
-							<version>${junit.platform.version}</version>
+							<version>${junit-platform.version}</version>
 						</dependency>
 					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.22.1</version>
+					<version>${maven-failsafe-plugin.version}</version>
+					<!--version>3.0.0-M2</version-->
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -300,29 +327,58 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<!-- disable default maven deployment -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>${maven-deploy-plugin.version}</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<!-- replace with neust staging -->
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration>
+					<additionalparam>-Xdoclint:none</additionalparam>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>thin-jar</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
-						<dependencies>
-							<!-- The following enables the "thin jar" deployment option. -->
-							<dependency>
-								<groupId>org.springframework.boot.experimental</groupId>
-								<artifactId>spring-boot-thin-layout</artifactId>
-								<version>${thin.version}</version>
-							</dependency>
-						</dependencies>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
-
 
 </project>
