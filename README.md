@@ -1,4 +1,4 @@
-# scrudbeans
+# scrudbeans [![Build Status](https://travis-ci.org/manosbatsis/scrudbeans.svg?branch=master)](https://travis-ci.org/manosbatsis/scrudbeans)
 
 This project is work in progress. Currently cleaning up previous work from the 
 [restdude](https://manosbatsis.github.io/restdude/) sandbox project, migrating to Spring Boot 2,
