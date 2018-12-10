@@ -1,12 +1,9 @@
-### Relevant Articles: 
-- [Creating a Custom Starter with Spring Boot](http://www.baeldung.com/scrudbeans)
+# scrudbeans
 
-- **scrudbeans-library**: The sample library that we're creating the starter for.
+This project is work in progress. Currently cleaning up previous work from the 
+[restdude](https://manosbatsis.github.io/restdude/) sandbox project, migrating to Spring Boot 2,
+adding starters etc.
 
-- **scrudbeans-spring-boot-autoconfigure**: The project containing the auto-configuration for the library.
+This project ismeant to be a more flexible, featujre-rich and extensible alternative to Spring Data REST.
 
-- **scrudbeans-spring-boot-starter**: The custom starter for the library.
-
-- **scrudbeans-spring-boot-sample-app**: The sample project that uses the custom starter.
-
-- [Multi-Module Project With Spring Boot](http://www.baeldung.com/spring-boot-multiple-modules)
+ A sample project template can be fopund at [scrudbeans-template](https://github.com/manosbatsis/scrudbeans-template).
