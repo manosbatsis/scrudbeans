@@ -22,6 +22,7 @@ import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
+import io.swagger.annotations.Api;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,25 +38,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 class TypeSpecBuilder {
 
-	/**
-	 * Create a sub-interface {@link TypeSpec} of {@link PersistableModelService}
-	 * or {@link ModelService} depending on whether 
-	 * the mndel is an {@link Entity}
-	 *
-	 * @param descriptor The target model descriptor 
-	 * @return the resulting type spec
-	 */
-	static TypeSpec createServiceInterface(ScrudModelDescriptor descriptor) {
-		String className = descriptor.getSimpleName() + "Service";
-		return TypeSpec.interfaceBuilder(className)
-				.addSuperinterface(
-						ParameterizedTypeName.get(
-								ClassName.get(descriptor.getJpaEntity() ? PersistableModelService.class : ModelService.class),
-								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
-								ClassName.bestGuess(descriptor.getIdType())))
-				.addModifiers(Modifier.PUBLIC)
-				.build();
-	}
 
 	/**
 	 * Create a subclass {@link TypeSpec} of {@link AbstractPersistableModelController}
@@ -73,6 +55,14 @@ class TypeSpecBuilder {
 		// Get controller superclass from annotation if exists, fallback to defaults otherwise
 		Class controllerSuperClass;
 		String controllerSuperClassName = descriptor.getScrudResource().controllerSuperClass();
+		String apiName = descriptor.getScrudResource().apiName();
+		if (StringUtils.isBlank(apiName)) {
+			apiName = descriptor.getSimpleName() + " API";
+		}
+		String apiDescription = descriptor.getScrudResource().apiDescription();
+		if (StringUtils.isBlank(apiDescription)) {
+			apiDescription = "Search, create, update or delete " + descriptor.getSimpleName() + " entries";
+		}
 		if (StringUtils.isBlank(controllerSuperClassName)) {
 			controllerSuperClass = descriptor.getJpaEntity() ? AbstractPersistableModelController.class : AbstractModelServiceBackedController.class;
 		}
@@ -90,6 +80,10 @@ class TypeSpecBuilder {
 						AnnotationSpec.builder(RestController.class)
 								.addMember("value", beanName).build())
 				.addAnnotation(
+						AnnotationSpec.builder(Api.class)
+								.addMember("tags", "\"" + apiName + "\"")
+								.addMember("description", "\"" + apiDescription + "\"").build())
+				.addAnnotation(
 						AnnotationSpec.builder(RequestMapping.class)
 								.addMember("value", getRequestMappingPattern(descriptor))
 								.addMember("produces", mimes).build())
@@ -102,6 +96,26 @@ class TypeSpecBuilder {
 								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
 								ClassName.bestGuess(descriptor.getIdType()),
 								ClassName.get(descriptor.getParentPackageName() + ".service", descriptor.getSimpleName() + "Service")))
+				.addModifiers(Modifier.PUBLIC)
+				.build();
+	}
+
+	/**
+	 * Create a sub-interface {@link TypeSpec} of {@link PersistableModelService}
+	 * or {@link ModelService} depending on whether
+	 * the mndel is an {@link Entity}
+	 *
+	 * @param descriptor The target model descriptor
+	 * @return the resulting type spec
+	 */
+	static TypeSpec createServiceInterface(ScrudModelDescriptor descriptor) {
+		String className = descriptor.getSimpleName() + "Service";
+		return TypeSpec.interfaceBuilder(className)
+				.addSuperinterface(
+						ParameterizedTypeName.get(
+								ClassName.get(descriptor.getJpaEntity() ? PersistableModelService.class : ModelService.class),
+								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
+								ClassName.bestGuess(descriptor.getIdType())))
 				.addModifiers(Modifier.PUBLIC)
 				.build();
 	}

@@ -118,7 +118,7 @@ public final class ModelContext {
 
 
 	public Class getControllerSuperClass() {
-		Class sClass = this.scrudResource.controllerSuperClass();
+		Class sClass = ClassUtils.getClass(this.scrudResource.controllerSuperClass());
 		if (sClass == null || Object.class.equals(sClass)) {
 			sClass = this.modelInfo.isJpaEntity() ? AbstractPersistableModelController.class : AbstractModelServiceBackedController.class;
 		}
