@@ -29,8 +29,8 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.persistence.Entity;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.controller.ModelController;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ModelRelatedResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.ModelController;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedResource;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.repository.ModelRepository;
@@ -73,7 +73,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Generates <code>Repository</code>, <code>Service</code>,
  * <code>Controller</code> and other components for the given {@link ModelInfoImpl} entries
  * {@link ScrudResource} or
- * {@link ModelRelatedResource}.
+ * {@link ScrudRelatedResource}.
  */
 @Slf4j
 public class ModelBasedComponentGenerator {
@@ -136,7 +136,7 @@ public class ModelBasedComponentGenerator {
 			createPredicateFactory(modelContext);
 
 			// create repository, service, and controller components
-			if (modelContext.getModelInfo().getScrudResource() != null || model.isAnnotationPresent(ModelRelatedResource.class)) {
+			if (modelContext.getModelInfo().getScrudResource() != null || model.isAnnotationPresent(ScrudRelatedResource.class)) {
 				// TODO
 				if (modelContext.getModelInfo().isJpaEntity()) {
 					createRepository(modelContext);

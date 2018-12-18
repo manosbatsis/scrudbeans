@@ -3,13 +3,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.manosbatsis.scrudbeans</groupId>
 	<artifactId>scrudbeans-spring-boot-autoconfigure</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>scrudbeans-spring-boot-autoconfigure</name>
 
 	<parent>
 		<artifactId>scrudbeans</artifactId>
 		<groupId>com.github.manosbatsis.scrudbeans</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.2-SNAPSHOT</version>
 
 	</parent>
 
@@ -35,7 +35,7 @@
 
 		<dependency>
 			<groupId>com.github.manosbatsis.scrudbeans</groupId>
-			<artifactId>scrudbeans-jpa</artifactId>
+			<artifactId>scrudbeans-javapoet</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

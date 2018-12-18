@@ -64,7 +64,7 @@ public @interface ScrudResource {
 	/**
 	 * The superclass for the generated controller
 	 */
-	Class<?> controllerSuperClass() default Object.class;
+	String controllerSuperClass() default "";
 
 	/**
 	 * The default "parent" mapping part for annotated type

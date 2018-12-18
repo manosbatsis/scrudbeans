@@ -41,8 +41,7 @@ import com.github.manosbatsis.scrudbeans.jpa.specification.factory.LocalDatePred
 import com.github.manosbatsis.scrudbeans.jpa.specification.factory.LocalDateTimePredicateFactory;
 import com.github.manosbatsis.scrudbeans.jpa.specification.factory.NumberPredicateFactory;
 import com.github.manosbatsis.scrudbeans.jpa.specification.factory.StringPredicateFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.util.Assert;
 
@@ -50,10 +49,8 @@ import org.springframework.util.Assert;
  * A generic specifications class that builds predicates for any implementation
  * of org.springframework.data.domain.Persistable
  */
+@Slf4j
 public class SpecificationUtils<T extends PersistableModel<PK>, PK extends Serializable> {
-
-
-	static final Logger LOGGER = LoggerFactory.getLogger(SpecificationUtils.class);
 
 	private static final HashMap<String, Class> FIELD_TYPE_CACHE = new HashMap<String, Class>();
 
@@ -135,7 +132,7 @@ public class SpecificationUtils<T extends PersistableModel<PK>, PK extends Seria
 	public static void addFactoryForClass(Class clazz, IPredicateFactory factory) {
 		Assert.notNull(clazz, "clazz cannot be null");
 		Assert.notNull(factory, "factory cannot be null");
-		LOGGER.debug("addFactoryForClass, clazz: {}, factory: {}", clazz, factory);
+		log.debug("Registering entity predicate factory {} for entity type {}", factory, clazz);
 		factoryForClassMap.put(clazz, factory);
 	}
 
@@ -153,7 +150,7 @@ public class SpecificationUtils<T extends PersistableModel<PK>, PK extends Seria
 			factory = new EnumStringPredicateFactory(clazz);
 			addFactoryForClass(clazz, factory);
 		}
-		LOGGER.debug("getPredicateFactoryForClass, clazz: {}, factory: {}", clazz, factory);
+		log.debug("getPredicateFactoryForClass, clazz: {}, factory: {}", clazz, factory);
 
 		return factory;
 
@@ -181,22 +178,22 @@ public class SpecificationUtils<T extends PersistableModel<PK>, PK extends Seria
 					memberType = ClassUtils.getBeanPropertyType(clazz, memberPath, true);
 
 					if (memberType == null) {
-						LOGGER.warn("Caching empty result for field {}", key);
+						log.warn("Caching empty result for field {}", key);
 						// HashMap handles null values so we can use containsKey to cache
 						// invalid fields and skip the search altogether
 						FIELD_TYPE_CACHE.put(key, null);
 					}
 					else {
 						FIELD_TYPE_CACHE.put(key, memberType);
-						LOGGER.debug("getMemberType: added field in cache, key: {}, type: {}", key, memberType);
+						log.debug("getMemberType: added field in cache, key: {}, type: {}", key, memberType);
 					}
 				}
 				else {
-					LOGGER.warn("getMemberType: found empty field in cache, ignoring key: {}", key);
+					log.warn("getMemberType: found empty field in cache, ignoring key: {}", key);
 				}
 			}
 			else {
-				LOGGER.debug("getMemberType: found field in cache, key: {}, type: {}", key, memberType);
+				log.debug("getMemberType: found field in cache, key: {}, type: {}", key, memberType);
 			}
 		}
 
@@ -234,7 +231,7 @@ public class SpecificationUtils<T extends PersistableModel<PK>, PK extends Seria
 				} while (tmpClass != null && field == null);
 			}
 			if (field == null) {
-				LOGGER.warn("Field '" + fieldName + "' not found on class " + clazz);
+				log.warn("Field '" + fieldName + "' not found on class " + clazz);
 				// HashMap handles null values so we can use containsKey to cach
 				// invalid fields and hence skip the reflection scan
 				FIELD_CACHE.put(key, null);

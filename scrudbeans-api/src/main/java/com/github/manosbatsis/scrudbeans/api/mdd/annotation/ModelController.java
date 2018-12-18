@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.api.mdd.annotation.model;
+package com.github.manosbatsis.scrudbeans.api.mdd.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -27,18 +27,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks Model relationships
+ * Used to mark a model controller when not subclassing a restdude controller
  */
-@RestdudeModelAnnotation
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ModelRelatedResource {
+public @interface ModelController {
 
-	Class<?> beanClass() default Object.class;
+	/**
+	 * May indicate a suggestion for a logical component name
+	 */
+	String value() default "";
 
-	String parentProperty();
-
-	String path() default "";
+	Class<?> modelType() default Object.class;
 
 }

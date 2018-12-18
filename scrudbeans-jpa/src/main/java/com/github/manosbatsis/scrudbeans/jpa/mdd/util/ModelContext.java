@@ -31,7 +31,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ModelRelatedResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedResource;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
@@ -53,7 +53,7 @@ import org.springframework.util.ReflectionUtils;
 
 /**
  * Adapter-ish context class for classes with {@link ScrudResource}
- * and {@link ModelRelatedResource}
+ * and {@link ScrudRelatedResource}
  * annotations.
  */
 public final class ModelContext {
@@ -146,7 +146,7 @@ public final class ModelContext {
 			return false;
 		}
 		Class<?> modelType = this.modelInfo.getModelType();
-		ModelRelatedResource anr = modelType.getAnnotation(ModelRelatedResource.class);
+		ScrudRelatedResource anr = modelType.getAnnotation(ScrudRelatedResource.class);
 		Assert.notNull(anr, "Not a nested resource");
 
 		String parentProperty = anr.parentProperty();

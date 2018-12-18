@@ -30,12 +30,15 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
 import com.github.manosbatsis.scrudbeans.common.ScrudBeansProperties;
 import com.github.manosbatsis.scrudbeans.common.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.jpa.mdd.util.EntityUtil;
+import com.github.manosbatsis.scrudbeans.jpa.specification.SpecificationUtils;
+import com.github.manosbatsis.scrudbeans.jpa.specification.factory.AnyToOnePredicateFactory;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -138,6 +141,26 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
 		}
 	}
 
+	protected void scanForEntityPredicateFactories(Iterable<String> basePackages) {
+		// scan for models
+		for (String basePackage : basePackages) {
+			Set<BeanDefinition> entityBeanDefs = EntityUtil.findAllPredicateFactories(basePackage);
+			for (BeanDefinition beanDef : entityBeanDefs) {
+				Class<? extends AnyToOnePredicateFactory> predicateFactoryType =
+						(Class<? extends AnyToOnePredicateFactory>) ClassUtils.getClass(beanDef.getBeanClassName());
+				EntityPredicateFactory annotation = predicateFactoryType.getAnnotation(EntityPredicateFactory.class);
+				try {
+					Class entityClass = Class.forName(annotation.entityClass());
+					SpecificationUtils.addFactoryForClass(entityClass, ClassUtils.newInstance(predicateFactoryType));
+				}
+				catch (ClassNotFoundException e) {
+					log.error("Failed registering AnyToOnePredicateFactory type {}, target class not found: {}",
+							predicateFactoryType, annotation.entityClass());
+				}
+			}
+		}
+	}
+
 	/**
 	 * Set the reverse entity ModelInfo for each relationship field
 	 * @param modelInfo
@@ -186,6 +209,9 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
 		log.debug("postProcessBeanDefinitionRegistry, ScrudBeansProperties: {}", this.scrudBeansProperties);
 		Set<String> packagesToScan = scrudBeansProperties.getPackagesToScanAsSet();
+		// register predicate factories
+		this.scanForEntityPredicateFactories(packagesToScan);
+		// scan for and create the rest
 		this.scanPackages(packagesToScan);
 		ModelBasedComponentGenerator generator = new ModelBasedComponentGenerator(registry, this.modelEntries, packagesToScan, scrudBeansProperties.getBasePath(), scrudBeansProperties.getDefaultParentPath());
 		generator.createComponentsFor();

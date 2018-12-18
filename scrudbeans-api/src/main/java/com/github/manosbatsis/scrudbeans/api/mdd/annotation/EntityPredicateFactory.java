@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.api.mdd.annotation.controller;
+package com.github.manosbatsis.scrudbeans.api.mdd.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -26,19 +26,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.RestdudeModelAnnotation;
+
+
 /**
- * Used to mark a model controller when not subclassing a restdude controller
+ * <p>Marks a t6ype as predicate factory of a JPA entity type.
  */
-@Target(ElementType.TYPE)
+@RestdudeModelAnnotation
 @Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
 @Documented
-public @interface ModelController {
-
-	/**
-	 * May indicate a suggestion for a logical component name
-	 */
-	String value() default "";
-
-	Class<?> modelType() default Object.class;
-
+public @interface EntityPredicateFactory {
+	String entityClass();
 }

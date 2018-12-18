@@ -33,7 +33,8 @@ import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 
 import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ModelRelatedResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedResource;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
 import com.github.manosbatsis.scrudbeans.common.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.jpa.mdd.validation.CaseSensitive;
@@ -58,7 +59,7 @@ public class EntityUtil {
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getParentEntity(Object child) {
-		ModelRelatedResource anr = child.getClass().getAnnotation(ModelRelatedResource.class);
+		ScrudRelatedResource anr = child.getClass().getAnnotation(ScrudRelatedResource.class);
 		Assert.notNull(anr, "Given child object has no @RelatedEntity annotation");
 		Field field = ReflectionUtils.findField(child.getClass(), anr.parentProperty());
 		field.setAccessible(true);
@@ -72,7 +73,7 @@ public class EntityUtil {
 	}
 
 	public static Set<BeanDefinition> findModelResources(String scanPackage) {
-		ClassPathScanningCandidateComponentProvider provider = createComponentScanner(ScrudResource.class, ModelRelatedResource.class);
+		ClassPathScanningCandidateComponentProvider provider = createComponentScanner(ScrudResource.class, ScrudRelatedResource.class);
 		return provider.findCandidateComponents(scanPackage);
 	}
 
@@ -85,8 +86,16 @@ public class EntityUtil {
 		return entities;
 	}
 
+	public static Set<BeanDefinition> findAllPredicateFactories(String... basePackages) {
+		ClassPathScanningCandidateComponentProvider provider = createComponentScanner(EntityPredicateFactory.class);
+		Set<BeanDefinition> predicateFactories = new HashSet<>();
+		for (String basePackage : basePackages) {
+			predicateFactories.addAll(provider.findCandidateComponents(basePackage));
+		}
+		return predicateFactories;
+	}
 	public static Set<BeanDefinition> findAllModels(String... basePackages) {
-		ClassPathScanningCandidateComponentProvider provider = createComponentScanner(Entity.class, ScrudResource.class, ModelRelatedResource.class);
+		ClassPathScanningCandidateComponentProvider provider = createComponentScanner(Entity.class, ScrudResource.class, ScrudRelatedResource.class);
 		Set<BeanDefinition> entities = new HashSet<>();
 		for (String basePackage : basePackages) {
 			entities.addAll(provider.findCandidateComponents(basePackage));
