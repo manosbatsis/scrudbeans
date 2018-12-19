@@ -2,8 +2,8 @@ package com.github.manosbatsis.scrudbeans.autoconfigure;
 
 import javax.validation.Validator;
 
-import com.github.manosbatsis.scrudbeans.jpa.domain.fs.FilePersistenceConfigPostProcessor;
-import com.github.manosbatsis.scrudbeans.jpa.mdd.registry.JpaModelInfoRegistry;
+import com.github.manosbatsis.scrudbeans.jpa.fs.FilePersistenceConfigPostProcessor;
+import com.github.manosbatsis.scrudbeans.jpa.registry.JpaModelInfoRegistry;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
