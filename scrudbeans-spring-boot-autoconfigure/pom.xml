@@ -35,7 +35,7 @@
 
 		<dependency>
 			<groupId>com.github.manosbatsis.scrudbeans</groupId>
-			<artifactId>scrudbeans-javapoet</artifactId>
+			<artifactId>scrudbeans-annotation-processor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

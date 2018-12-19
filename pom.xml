@@ -8,7 +8,7 @@
 	<packaging>pom</packaging>
 	<inceptionYear>2016</inceptionYear>
 	<url>https://manosbatsis.github.io/scrudbeans</url>
-	<description>Model-driven development for Spring Boot hackers.</description>
+	<description>Model-driven apps for Spring Boot</description>
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
@@ -72,7 +72,7 @@
 		<module>scrudbeans-hypermedia</module>
 		<module>scrudbeans-javassist</module>
 		<module>scrudbeans-jpa</module>
-		<module>scrudbeans-javapoet</module>
+		<module>scrudbeans-annotation-processor</module>
 		<module>scrudbeans-spring-boot-autoconfigure</module>
 		<module>scrudbeans-spring-boot-starter</module>
 		<module>scrudbeans-spring-boot-starter-test</module>
