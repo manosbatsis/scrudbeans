@@ -67,12 +67,11 @@
 	</properties>
 
 	<modules>
+		<module>scrudbeans-annotation-processor</module>
 		<module>scrudbeans-api</module>
 		<module>scrudbeans-common</module>
 		<module>scrudbeans-hypermedia</module>
-		<module>scrudbeans-javassist</module>
 		<module>scrudbeans-jpa</module>
-		<module>scrudbeans-annotation-processor</module>
 		<module>scrudbeans-spring-boot-autoconfigure</module>
 		<module>scrudbeans-spring-boot-starter</module>
 		<module>scrudbeans-spring-boot-starter-test</module>

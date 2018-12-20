@@ -70,7 +70,8 @@ public class RsqlUtils {
 	}
 
 	/**
-	 * Parse  the given (request URL) parameters map into RSQL (NOTE that if RSQL is present under the "filter" key, all other <code>paramsMap</code> entries will be ignored
+	 * Parse  the given (request URL) parameters map into RSQL (NOTE that if RSQL is present under the "filter" key,
+	 * all other <code>paramsMap</code> entries will be ignored
 	 * @param modelInfo the root model info
 	 * @param conversionService the conversion service to use for values
 	 * @param paramsMap the (request URL) parameters map

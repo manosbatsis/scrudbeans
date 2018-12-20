@@ -60,7 +60,6 @@ import org.springframework.util.Assert;
  *  i.e. <code>Repository</code>, <code>Service</code> and
  * <code>Controller</code> mdd
  *
- * @see ModelBasedComponentGenerator
  */
 @Slf4j
 public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor, EnvironmentAware, ModelInfoRegistry {
@@ -74,35 +73,6 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
 
 	private Map<Class<?>, Class<?>> handlerModelTypes = new HashMap<>();
 
-
-	//public JpaModelInfoRegistry(){}
-
-	//public JpaModelInfoRegistry(){
-	//log.debug("JpaModelInfoRegistry()1, basePath: {}, defaultParentPath: {}, packages: {}", basePath, defaultParentPath, packages);
-	//final Set<String> packageNames = packages != null ? packages : new HashSet<>();
-	//if(CollectionUtils.isEmpty(packageNames)) {
-	// enhance packages to scan
-	//applicationContext.getBeansWithAnnotation(ComponentScan.class).forEach((name, instance) -> {
-	//    Set<ComponentScan> scans = AnnotatedElementUtils.getMergedRepeatableAnnotations(instance.getClass(), ComponentScan.class);
-	//    for (ComponentScan scan : scans) {
-	//        packageNames.addAll(Arrays.asList(scan.basePackages()));
-	//    }
-	//});
-	//packageNames.add("om.github.manosbatsis.scrudbeans.sample");
-	//}
-	//log.debug("JpaModelInfoRegistry()2, basePath: {}, defaultParentPath: {}, packagesToScan: {}", basePath, defaultParentPath, packageNames);
-
-	//this.basePath = basePath;
-	//this.defaultParentPath = defaultParentPath;
-	// this.packagesToScan = packageNames;
-	//}
-
-	//@Getter
-	//private EntityDictionary entityDictionary = new EntityDictionary(new ConcurrentHashMap());
-
-	//public void setApplicationContext(ApplicationContext appContext) throws BeansException {
-	//    applicationContext = appContext;
-	//}
 
 	@Override
 	public ModelInfo getEntryFor(Class<?> modelClass) {
@@ -213,8 +183,6 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
 		this.scanForEntityPredicateFactories(packagesToScan);
 		// scan for and create the rest
 		this.scanPackages(packagesToScan);
-		ModelBasedComponentGenerator generator = new ModelBasedComponentGenerator(registry, this.modelEntries, packagesToScan, scrudBeansProperties.getBasePath(), scrudBeansProperties.getDefaultParentPath());
-		generator.createComponentsFor();
 
 		for (ModelInfo info : this.getEntries()) {
 			this.resolveInverseFields(info);

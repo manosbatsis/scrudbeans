@@ -15,11 +15,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.github.manosbatsis.scrudbeans</groupId>
-			<artifactId>scrudbeans-javassist</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.manosbatsis.scrudbeans</groupId>
 			<artifactId>scrudbeans-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
