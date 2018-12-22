@@ -46,7 +46,27 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A base class for {@link Embeddable}s used as composite IDs in model based on a many-to-many table.
- * Conveniently mapped from/to JSON via {@link EmbeddableManyToManyIdSerializer},  {@link EmbeddableManyToManyIdDeserializer} and  {@link StringToEmbeddableManyToManyIdConverterFactory}
+ * Conveniently mapped from/to JSON via {@link EmbeddableManyToManyIdSerializer},
+ * {@link EmbeddableManyToManyIdDeserializer} and
+ * {@link StringToEmbeddableManyToManyIdConverterFactory}. Example:
+ *
+ * <code>
+ * @Embeddable
+ * public class FriendshipIdentifier
+ * 		extends AbstractEmbeddableManyToManyIdentifier<User, String, User, String>
+ * 		implements Serializable {
+ *
+ *     @Override
+ *     public User buildLeft(Serializable left) {
+ *         return new User(left.toString());
+ *     }
+ *
+ *     @Override
+ *     public User buildRight(Serializable right) {
+ *         return new User(right.toString());
+ *     }
+ * }
+ * </code>
  *
  * @param <L>   The type of the left MenyToOne relationship entity
  * @param <LPK> The type of the left MenyToOne relationship entity ID
@@ -61,7 +81,6 @@ import org.slf4j.LoggerFactory;
 @JsonDeserialize(using = EmbeddableManyToManyIdDeserializer.class)
 public abstract class AbstractEmbeddableManyToManyIdentifier<L extends PersistableModel<LPK>, LPK extends Serializable, R extends PersistableModel<RPK>, RPK extends Serializable> implements Serializable, EmbeddableManyToManyIdentifier<L, LPK, R, RPK> {
 
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEmbeddableManyToManyIdentifier.class);
 
 	public static final String SPLIT_CHAR = "_";
@@ -69,13 +88,13 @@ public abstract class AbstractEmbeddableManyToManyIdentifier<L extends Persistab
 
 	@NotNull
 	@ApiModelProperty(required = true, example = "{id: '[id]'}")
-	@JoinColumn(name = "owner_id", nullable = false, updatable = false)
+	@JoinColumn(name = "left_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private L left;
 
 	@NotNull
 	@ApiModelProperty(required = true, example = "{id: '[id]'}")
-	@JoinColumn(name = "friend_id", nullable = false, updatable = false)
+	@JoinColumn(name = "right_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private R right;
 

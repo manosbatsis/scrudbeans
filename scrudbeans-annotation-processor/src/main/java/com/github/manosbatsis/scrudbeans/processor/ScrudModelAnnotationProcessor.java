@@ -1,4 +1,4 @@
-package com.github.manosbatsis.scrudbeans.javapoet;
+package com.github.manosbatsis.scrudbeans.processor;
 
 import java.util.HashMap;
 import java.util.LinkedList;

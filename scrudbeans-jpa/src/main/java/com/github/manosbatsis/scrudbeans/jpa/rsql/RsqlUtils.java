@@ -81,7 +81,7 @@ public class RsqlUtils {
 	 * @param ignoreNamesForSpecification the URL parameter names to ignore if no <code>filter</code>> param is present
 	 * @return
 	 */
-	public static <M extends PersistableModel<MID>, MID extends Serializable> Specification<M> buildtSpecification(
+	public static <M extends PersistableModel<MID>, MID extends Serializable> Specification<M> buildSpecification(
 			ModelInfo<M, MID> modelInfo,
 			ConversionService conversionService,
 			Map<String, String[]> paramsMap,

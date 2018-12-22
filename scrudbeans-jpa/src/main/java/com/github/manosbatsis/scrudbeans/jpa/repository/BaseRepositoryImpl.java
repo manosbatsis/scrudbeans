@@ -389,7 +389,6 @@ public class BaseRepositoryImpl<T extends PersistableModel<PK>, PK extends Seria
 
 	protected void validate(T resource) {
 		LOGGER.debug("validate resource: {}", resource);
-		resource.preSave();
 		if (!this.skipValidation) {
 			// un-proxy for validation to work
 			resource = (T) entityManager.unwrap(SessionImplementor.class).getPersistenceContext().unproxy(resource);

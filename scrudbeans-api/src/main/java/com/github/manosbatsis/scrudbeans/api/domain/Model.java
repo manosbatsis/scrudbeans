@@ -45,9 +45,4 @@ public interface Model<PK extends Serializable> extends Serializable {
 	 */
 	void setId(PK id);
 
-	interface ItemView {
-	}
-
-	interface CollectionView {
-	}
 }

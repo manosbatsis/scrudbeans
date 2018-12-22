@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,7 @@ import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource
 import com.github.manosbatsis.scrudbeans.hypermedia.util.HypermediaUtils;
 import com.github.manosbatsis.scrudbeans.hypermedia.util.JsonApiModelBasedDocumentBuilder;
 import com.github.manosbatsis.scrudbeans.jpa.rsql.RsqlUtils;
+import com.github.manosbatsis.scrudbeans.jpa.specification.SpecificationsBuilder;
 import com.github.manosbatsis.scrudbeans.jpa.uischema.model.UiSchema;
 import com.github.manosbatsis.scrudbeans.jpa.util.ParamsAwarePageImpl;
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
@@ -137,6 +139,8 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 
 	protected Boolean isResourceSupport = false;
 
+	private SpecificationsBuilder<T, PK> specificationsBuilder;
+
 	@Autowired//@Inject
 	public void setService(S service) {
 		this.service = service;
@@ -151,6 +155,7 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 	public void afterPropertiesSet() throws Exception {
 		this.modelType = this.service.getDomainClass();
 		this.isResourceSupport = ResourceSupport.class.isAssignableFrom(this.modelType);
+		this.specificationsBuilder = new SpecificationsBuilder<T, PK>(this.modelType, this.service.getConversionService());
 	}
 
 	/**
@@ -359,67 +364,27 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 
 
 	protected ParamsAwarePageImpl<T> findPaginated(Pageable pageable, Map<String, String[]> implicitCriteria) {
-		// TODO: add support for query dialects: RequestParam MultiValueMap<String, String> httpParams
-        /*
-        SearchRequest searchRequest = new SearchRequest(
-                //...
-        );
-        LOGGER.debug("findResourcesPaginated, searchRequest: {}", searchRequest);
-         */
-
+		// Get URL query string parameters
 		Map<String, String[]> params = request.getParameterMap();
-		// optionally create a query specification
-		Specification<T> spec = RsqlUtils.buildtSpecification(this.getModelInfo(), this.service.getConversionService(), params, implicitCriteria, PARAMS_IGNORE_FOR_CRITERIA);
-		Page<T> tmp = this.service.findPaginated(spec, pageable);
 
-		return new ParamsAwarePageImpl<T>(params, tmp.getContent(), pageable, tmp.getTotalElements());
-	}
-
-        /*
-    protected Page<T> getPage(Pageable pageable, Map<String, String[]> paramsMap, Map<String, String> implicitCriteria) {
-
-        // add implicit criteria?
-        Map<String, String[]> parameters = null;
-        if (applyImplicitPredicates) {
-            LOGGER.debug("Adding implicit predicates");
-            parameters = new HashMap<String, String[]>();
-            parameters.putAll(paramsMap);
-            CurrentPrincipalField predicate = (CurrentPrincipalField) this.service.getDomainClass().getAnnotation(CurrentPrincipalField.class);
-            if (predicate != null) {
-                UserDetailsModel principal = this.service.getPrincipal();
-                // TODO
-                String[] excludeRoles = predicate.ignoreforRoles();
-                boolean skipPredicate = this.hasAnyRole(predicate.ignoreforRoles());
-                if (!skipPredicate) {
-                    String id = principal != null ? principal.getId() : "ANONYMOUS";
-                    String[] val = {id};
-                    LOGGER.debug("Adding implicit predicate, name: {}, pathFragment: {}", predicate.value(), id);
-                    parameters.put(predicate.value(), val);
-                }
-
-            }
-        } else {
-            LOGGER.debug("Skipping implicit predicates");
-            parameters = paramsMap;
-        }
-
-
-        return this.service.findPaginated(null, pageable);
-
-    }
-        */
-
-
-	protected boolean hasAnyRole(String... roles) {
-		boolean hasOne = false;
-		for (int i = 0; i < roles.length; i++) {
-			if (request.isUserInRole(roles[i])) {
-				hasOne = true;
-				break;
-			}
+		// Create a JPA query specifications
+		Specification<T> spec;
+		// Construct the specification manually if no RSQL "filter" param is present
+		if (Objects.isNull(params.get("filter"))) {
+			spec = this.specificationsBuilder.build(params);
 		}
-		return hasOne;
+		// else use the RSQL-based specification builder
+		else {
+			spec = RsqlUtils.buildSpecification(
+					this.getModelInfo(),
+					this.service.getConversionService(),
+					params, implicitCriteria, PARAMS_IGNORE_FOR_CRITERIA);
+		}
+		Page<T> page = this.service.findPaginated(spec, pageable);
+		// Return a page with the appropriate meta
+		return new ParamsAwarePageImpl<T>(params, page.getContent(), pageable, page.getTotalElements());
 	}
+
 
 	protected void applyCurrentPrincipal(T resource) {
 		// TODO

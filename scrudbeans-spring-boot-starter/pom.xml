@@ -4,7 +4,6 @@
 	<groupId>com.github.manosbatsis.scrudbeans</groupId>
 	<artifactId>scrudbeans-spring-boot-starter</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<name>scrudbeans-spring-boot-starter</name>
 
 	<parent>
 		<artifactId>scrudbeans</artifactId>

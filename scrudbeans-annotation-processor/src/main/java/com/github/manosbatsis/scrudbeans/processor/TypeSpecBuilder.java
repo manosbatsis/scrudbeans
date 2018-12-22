@@ -1,4 +1,4 @@
-package com.github.manosbatsis.scrudbeans.javapoet;
+package com.github.manosbatsis.scrudbeans.processor;
 
 import java.util.Objects;
 
@@ -12,7 +12,6 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.ScrudModelDescriptor;
 import com.github.manosbatsis.scrudbeans.api.mdd.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.PersistableModelService;
-import com.github.manosbatsis.scrudbeans.api.util.Mimes;
 import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractModelServiceBackedController;
 import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractPersistableModelController;
 import com.github.manosbatsis.scrudbeans.jpa.service.AbstractModelServiceImpl;
@@ -25,11 +24,12 @@ import com.squareup.javapoet.TypeSpec;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 class TypeSpecBuilder {
 
+	private static final Logger log = LoggerFactory.getLogger(TypeSpecBuilder.class);
 
 	/**
 	 * Create a subclass {@link TypeSpec} of {@link AbstractPersistableModelController}
@@ -51,7 +52,6 @@ class TypeSpecBuilder {
 	static TypeSpec createController(ScrudModelDescriptor descriptor) {
 		String className = descriptor.getSimpleName() + "Controller";
 		String beanName = "\"" + Character.toLowerCase(className.charAt(0)) + className.substring(1) + "\"";
-		String mimes = "{\"" + MimeTypeUtils.APPLICATION_JSON_VALUE + "\", \"" + Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE + "\"}";
 		// Get controller superclass from annotation if exists, fallback to defaults otherwise
 		Class controllerSuperClass;
 		String controllerSuperClassName = descriptor.getScrudResource().controllerSuperClass();
@@ -85,8 +85,7 @@ class TypeSpecBuilder {
 								.addMember("description", "\"" + apiDescription + "\"").build())
 				.addAnnotation(
 						AnnotationSpec.builder(RequestMapping.class)
-								.addMember("value", getRequestMappingPattern(descriptor))
-								.addMember("produces", mimes).build())
+								.addMember("value", getRequestMappingPattern(descriptor)).build())
 				.addAnnotation(
 						AnnotationSpec.builder(ExposesResourceFor.class)
 								.addMember("value", descriptor.getSimpleName() + ".class").build())
@@ -174,6 +173,7 @@ class TypeSpecBuilder {
 	 */
 	static TypeSpec createPredicateFactory(EntityModelDescriptor descriptor) {
 		String className = "AnyToOne" + descriptor.getSimpleName() + "PredicateFactory";
+		log.debug("createPredicateFactory, id: {}", descriptor.getIdType());
 		//AnyToOnePredicateFactory
 		return TypeSpec.classBuilder(className)
 				.addAnnotation(

@@ -24,7 +24,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -53,15 +52,6 @@ public abstract class AbstractSystemUuidPersistableModel extends AbstractPersist
 	 */
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@JsonIgnore
-	public boolean isNew() {
-		return null == this.getId();
 	}
 
 	/**

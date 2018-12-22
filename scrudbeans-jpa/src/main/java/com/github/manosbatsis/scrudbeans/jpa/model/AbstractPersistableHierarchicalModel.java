@@ -27,6 +27,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
@@ -106,13 +108,9 @@ public abstract class AbstractPersistableHierarchicalModel<P extends AbstractPer
 		return PATH_SEPARATOR;
 	}
 
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
+	@PrePersist
+	@PreUpdate
 	public void preSave() {
-		super.preSave();
 		// update path if needed
 		log.debug("preSave, name: {}, path: {}", this.getName(), this.getPath());
 		// if new or name does not match path

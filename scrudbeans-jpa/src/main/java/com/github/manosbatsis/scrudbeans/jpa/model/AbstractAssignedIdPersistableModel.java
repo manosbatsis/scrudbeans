@@ -25,8 +25,6 @@ import java.io.Serializable;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
-import org.hibernate.annotations.Formula;
-
 /**
  * Abstract base class for persistent model with assigned id
  * @param <PK> The id Serializable
@@ -38,9 +36,6 @@ public abstract class AbstractAssignedIdPersistableModel<PK extends Serializable
 
 	@Id
 	private PK id;
-
-	@Formula(" (id) ")
-	private PK savedPk;
 
 	public AbstractAssignedIdPersistableModel() {
 
@@ -67,22 +62,4 @@ public abstract class AbstractAssignedIdPersistableModel<PK extends Serializable
 	}
 
 
-	private PK getSavedPk() {
-		return savedPk;
-	}
-
-	/**
-	 * @inheritDoc}
-	 */
-	@Override
-	public boolean isNew() {
-		return null == getSavedPk();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void preSave() {
-
-	}
 }

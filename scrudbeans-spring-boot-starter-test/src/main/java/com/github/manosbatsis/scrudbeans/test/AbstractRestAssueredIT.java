@@ -92,8 +92,8 @@ public abstract class AbstractRestAssueredIT {
 					objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 					objectMapper.configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
 					objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
+					objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 					objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-
 					// enable features
 					objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
 

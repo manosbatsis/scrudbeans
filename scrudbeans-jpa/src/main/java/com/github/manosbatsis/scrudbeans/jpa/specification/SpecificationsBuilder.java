@@ -45,7 +45,6 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
-@Deprecated
 public class SpecificationsBuilder<T extends PersistableModel<PK>, PK extends Serializable> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpecificationsBuilder.class);

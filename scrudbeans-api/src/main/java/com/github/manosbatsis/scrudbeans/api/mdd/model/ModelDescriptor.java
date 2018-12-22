@@ -14,6 +14,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.Types;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -67,7 +68,7 @@ public abstract class ModelDescriptor {
 	}
 
 	protected void checkIfMemberIsId(Types types, Element e) throws ScrudModelProcessorException {
-		if (e.getAnnotation(Id.class) != null) {
+		if (e.getAnnotation(Id.class) != null || e.getAnnotation(EmbeddedId.class) != null) {
 			idType = getMemberType(types, e);
 		}
 	}
@@ -98,30 +99,27 @@ public abstract class ModelDescriptor {
 	 */
 	protected String getMemberType(Types types, Element scrudModelMember) throws ScrudModelProcessorException {
 		String memberType = null;
+		TypeMirror typeMirror = null;
 		// If member is a field
 		if (scrudModelMember.getKind() == ElementKind.FIELD) {
 			VariableElement ve = (VariableElement) scrudModelMember;
-			TypeMirror typeMirror = ve.asType();
+			typeMirror = ve.asType();
 			// replace generic type variables with the current concrete type
 			if (typeMirror instanceof TypeVariable) {
 				typeMirror = types.asMemberOf((DeclaredType) this.typeElement.asType(), ve);
 			}
-			memberType = typeMirror.toString();
 		}
 		// If member is a getter
 		else if (scrudModelMember.getKind() == ElementKind.METHOD && scrudModelMember.getSimpleName().toString().startsWith("get")) {
 			ExecutableElement ee = (ExecutableElement) scrudModelMember;
-			TypeMirror typeMirror = ee.getReturnType();
+			typeMirror = ee.getReturnType();
 			// replace generic type variables with the current concrete type
 			if (typeMirror instanceof TypeVariable) {
 				typeMirror = types.asMemberOf((DeclaredType) this.typeElement.asType(), ee);
 			}
-			memberType = typeMirror.toString();
-			// e.g. "()java.lang.Long"
-			if (memberType.startsWith("()")) {
-				memberType = memberType.substring(2);
-			}
+
 		}
+		memberType = asTypeElement(typeMirror).toString();
 		log.debug("getType for {}: {}", scrudModelMember.getSimpleName(), memberType);
 		return memberType;
 	}

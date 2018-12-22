@@ -28,17 +28,5 @@ import java.io.Serializable;
  */
 public interface PersistableModel<PK extends Serializable> extends Model<PK> {
 
-	/**
-	 * Equivalent of a method annotated with @{@link javax.persistence.PrePersist} and/or
-	 *
-	 * @{@link javax.persistence.PreUpdate}, only applied before validation
-	 */
-	void preSave();
-
-
-	/**
-	 * Equivalent of {@link }org.springframework.data.domain.Persistable#isNew()}
-	 */
-	boolean isNew();
 
 }

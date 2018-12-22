@@ -57,7 +57,6 @@ public class HypermediaUtils {
 	public static final String MIME_APPLICATION_VND_PLUS_JSON = "application/vnd.api+json";
 
 	public static final String MIME_APPLICATIOM_HAL_PLUS_JSON = "application/hal+json";
-
 	public static final String MIME_APPLICATIOM_JSON = "application/json";
 
 	public static List<Link> buileHateoasLinks(@NonNull ParamsAwarePage page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName) {
@@ -139,10 +138,11 @@ public class HypermediaUtils {
 	 * @param models
 	 */
 	public static <RT extends Model> ModelResources<RT> toHateoasResources(@NonNull Iterable<RT> models, Class<RT> modelType, ModelInfoRegistry modelInfoRegistry) {
+		log.debug("toHateoasResources");
 		LinkedList<ModelResource<RT>> wrapped = new LinkedList<>();
 		ModelInfo modelInfo;
+		modelInfo = modelInfoRegistry.getEntryFor(modelType);
 		for (RT model : models) {
-			modelInfo = modelInfoRegistry.getEntryFor(modelType);
 			wrapped.add(new ModelResource<RT>(modelInfo.getUriComponent(), model));
 		}
 		ModelResources<RT> resources = new ModelResources<>(wrapped);
@@ -155,6 +155,8 @@ public class HypermediaUtils {
 	 * @return
 	 */
 	public static <RT extends Model<RID>, RID extends Serializable> JsonApiModelResourceDocument<RT, RID> toDocument(RT model, ModelInfo<RT, RID> modelInfo) {
+		log.debug("toDocument");
+
 		JsonApiModelResourceDocument<RT, RID> doc = new JsonApiModelBasedDocumentBuilder<RT, RID>(modelInfo.getUriComponent())
 				.withData(model)
 				.buildModelDocument();

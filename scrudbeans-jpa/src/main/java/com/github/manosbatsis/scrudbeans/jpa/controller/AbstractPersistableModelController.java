@@ -28,9 +28,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
 import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
@@ -102,81 +100,172 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelController.class);
 
 
+	// Create
+	// =====================
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(value = "Create a new resource")
-	@JsonView(Model.ItemView.class)
-	public Resource<T> plainJsonPost(@RequestBody T model) {
+	public T plainJsonPost(@RequestBody T resource) {
+		return super.create(resource);
+	}
+
+	@RequestMapping(
+			method = RequestMethod.POST,
+			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+	@ResponseStatus(HttpStatus.CREATED)
+	@ApiOperation(value = "Create a new HAL resource")
+	public Resource<T> hateoasPost(@RequestBody T model) {
 		model = super.create(model);
 		return toHateoasResource(model);
 	}
 
-	@RequestMapping(method = RequestMethod.POST, consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+	@RequestMapping(
+			method = RequestMethod.POST,
+			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
 	@ResponseStatus(HttpStatus.CREATED)
-	@ApiOperation(value = "Create a new JSON API Resource")
-	@JsonView(Model.ItemView.class)
-	public JsonApiModelResourceDocument<T, PK> jsonApiPost(@NonNull @RequestBody JsonApiModelResourceDocument<T, PK> document) {
-
+	@ApiOperation(value = "Create a new JSON API resource")
+	public JsonApiModelResourceDocument<T, PK> jsonApiPost(
+			@NonNull @RequestBody JsonApiModelResourceDocument<T, PK> document) {
 		// unwrap the submitted model and save
 		T model = toModel(document);
 		model = super.create(model);
-
 		// repackage and return as a JSON API Document
 		return this.toDocument(model);
 	}
 
+	// Update
+	// =====================
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
 	@ApiOperation(value = "Update a resource")
-	@JsonView(Model.ItemView.class)
-	public Resource<T> plainJsonPut(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id, @RequestBody T model) {
+	public T plainJsonPut(
+			@ApiParam(name = "id", required = true, value = "string")
+			@PathVariable PK id, @RequestBody T model) {
+		return super.update(id, model);
+	}
+
+	@RequestMapping(
+			value = "{id}",
+			method = RequestMethod.PUT,
+			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+	@ApiOperation(value = "Update a HAL resource")
+	public Resource<T> hateoasPut(
+			@ApiParam(name = "id", required = true, value = "string")
+			@PathVariable PK id, @RequestBody T model) {
 		model = super.update(id, model);
 		return toHateoasResource(model);
 	}
 
-	@RequestMapping(value = "{id}", method = RequestMethod.PATCH)
-	@ApiOperation(value = "Patch (partially update) a resource"/*, notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity."*/)
-	@JsonView(Model.ItemView.class)
-	public Resource<T> plainJsonPatch(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id, @RequestBody T model) {
-		model = super.patch(id, model);
-		return toHateoasResource(model);
-	}
-
-	@RequestMapping(value = "{id}", method = RequestMethod.PATCH, consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
-	@ApiOperation(value = "Patch (partially plainJsonPut) a resource given as a JSON API Document", notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
-	@JsonView(Model.ItemView.class)
-	public JsonApiModelResourceDocument<T, PK> jsonApiPatch(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id, @RequestBody JsonApiModelResourceDocument<T, PK> document) {
-
+	@RequestMapping(
+			value = "{id}",
+			method = RequestMethod.PUT,
+			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+	@ApiOperation(value = "Update a JSON API Document")
+	public JsonApiModelResourceDocument<T, PK> jsonApiPut(
+			@ApiParam(name = "id", required = true, value = "string")
+			@PathVariable PK id, @RequestBody JsonApiModelResourceDocument<T, PK> document) {
 		// unwrap the submitted model and save changes
 		T model = toModel(document);
-		model = super.patch(id, model);
-
+		model = super.update(id, model);
 		// repackage and return as a JSON API Document
 		return this.toDocument(model);
 	}
 
+	// Patch
+	// =====================
+	@RequestMapping(value = "{id}")
+	@ApiOperation(
+			value = "Patch (partially update) a resource",
+			notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
+	public T plainJsonPatch(
+			@ApiParam(name = "id", required = true, value = "string")
+			@PathVariable PK id, @RequestBody T model) {
+		return super.patch(id, model);
+	}
+
+	@RequestMapping(
+			value = "{id}",
+			method = RequestMethod.PATCH,
+			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+	@ApiOperation(
+			value = "Patch (partially update) a HAL resource",
+			notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
+	public Resource<T> hateoasPatch(
+			@ApiParam(name = "id", required = true, value = "string")
+			@PathVariable PK id, @RequestBody T model) {
+		model = super.patch(id, model);
+		return toHateoasResource(model);
+	}
+
+	@RequestMapping(
+			value = "{id}",
+			method = RequestMethod.PATCH,
+			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+	@ApiOperation(
+			value = "Patch (partially update) a JSON API Document",
+			notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
+	public JsonApiModelResourceDocument<T, PK> jsonApiPatch(
+			@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id,
+			@RequestBody JsonApiModelResourceDocument<T, PK> document) {
+		// unwrap the submitted model and save changes
+		T model = toModel(document);
+		model = super.patch(id, model);
+		// repackage and return as a JSON API Document
+		return this.toDocument(model);
+	}
+
+	// Find all (no paging)
+	// ========================
 	@RequestMapping(method = RequestMethod.GET, params = "page=no")
-	@ApiOperation(value = "Get the full collection of resources (no paging or criteria)", notes = "Find all resources, and return the full collection (i.e. VS a page of the total results)")
-	public ModelResources<T> plainJsonGetAll() {
+	@ApiOperation(
+			value = "Get the full collection of resources (no paging or criteria)",
+			notes = "Find all resources, and return the full collection (i.e. VS a page of the total results)")
+	public Iterable<T> plainJsonGetAll() {
+		return super.findAll();
+	}
+
+	@RequestMapping(
+			method = RequestMethod.GET,
+			params = "page=no",
+			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+	@ApiOperation(
+			value = "Get the full collection of HAL resources (no paging or criteria)",
+			notes = "Find all HAL resources, and return the full collection (i.e. VS a page of the total results)")
+	public ModelResources<T> hateoasGetAll() {
 		return toHateoasResources(super.findAll());
 	}
 
-	@RequestMapping(method = RequestMethod.GET, params = "page=no", consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
-	@ApiOperation(value = "Get the full collection of resources (no paging or criteria)", notes = "Find all resources, and return the full collection (i.e. VS a page of the total results)")
+	@RequestMapping(
+			method = RequestMethod.GET,
+			params = "page=no",
+			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+	@ApiOperation(
+			value = "Get the full collection of JSON API Documents (no paging or criteria)",
+			notes = "Find all JSON API Documents, and return the full collection (i.e. VS a page of the total results)")
 	public JsonApiModelResourceCollectionDocument jsonApiGetAll() {
-
 		// obtain result models
 		Iterable<T> models = super.findAll();
-
 		// repackage and return as a JSON API Document
 		return this.toDocument(models);
 	}
+
+
+	// Search
+	// ========================
 
 	//@Override
 	@RequestMapping(method = RequestMethod.GET)
 	@ApiOperation(value = "Search for resources (paginated).", notes = "Find all resources matching the given criteria and return a paginated collection."
 			+ "Predefined paging properties are _pn (page number), _ps (page size) and sort. All serialized member names "
 			+ "of the resource are supported as search criteria in the form of HTTP URL parameters.")
-	public PagedModelResources<T> plainJsonGetPage(
+	public ParamsAwarePageImpl<T> plainJsonGetPage(
 			@ApiParam(name = PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
 			@RequestParam(value = PARAM_FILTER, required = false) String filter,
 			@ApiParam(name = PARAM_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
@@ -185,13 +274,41 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			@RequestParam(value = PARAM_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
 			@ApiParam(name = PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
 			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
-		LOGGER.debug("plainJsonGetPage");
 		Pageable pageable = PageableUtil.buildPageable(page, size, sort);
-		return this.toHateoasPagedResources(super.<T>findPaginated(pageable, null), "_pn");
+		return super.<T>findPaginated(pageable, null);
 	}
 
-	@RequestMapping(method = RequestMethod.GET, consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
-	@ApiOperation(value = "Search for resources (paginated).", notes = "Find all resources matching the given criteria and return a paginated JSON API Document.")
+	//@Override
+	@RequestMapping(
+			method = RequestMethod.GET,
+			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+	@ApiOperation(
+			value = "Search for resources (paginated).",
+			notes = "Find all resources matching the given criteria and return a paginated collection."
+					+ "Predefined paging properties are _pn (page number), _ps (page size) and sort. All serialized member names "
+					+ "of the resource are supported as search criteria in the form of HTTP URL parameters.")
+	public PagedModelResources<T> hateoasGetPage(
+			@ApiParam(name = PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
+			@RequestParam(value = PARAM_FILTER, required = false) String filter,
+			@ApiParam(name = PARAM_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
+			@RequestParam(value = PARAM_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
+			@ApiParam(name = PARAM_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]")
+			@RequestParam(value = PARAM_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
+			@ApiParam(name = PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
+			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
+		Pageable pageable = PageableUtil.buildPageable(page, size, sort);
+		return this.toHateoasPagedResources(
+				super.<T>findPaginated(pageable, null), "_pn");
+	}
+
+	@RequestMapping(
+			method = RequestMethod.GET,
+			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+	@ApiOperation(
+			value = "Search for resources (paginated).",
+			notes = "Find all resources matching the given criteria and return a paginated JSON API Document.")
 	public JsonApiModelResourceCollectionDocument<T, PK> jsonApiGetPage(
 			@ApiParam(name = PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
 			@RequestParam(value = PARAM_FILTER, required = false) String filter,
@@ -201,16 +318,28 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			@RequestParam(value = PARAM_JSONAPI_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
 			@ApiParam(name = PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
 			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
-
-		LOGGER.debug("jsonApiGetPage");
 		Pageable pageable = PageableUtil.buildPageable(page, size, sort);
 		return toPageDocument(super.<T>findPaginated(pageable, null));
 	}
 
+	// Read
+	// ==============
 	@RequestMapping(value = "{id}", method = RequestMethod.GET)
 	@ApiOperation(value = "Find by id", notes = "Find a resource by it's identifier")
-	@JsonView(Model.ItemView.class)
-	public ModelResource<T> plainJsonGetById(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id) {
+	public T plainJsonGetById(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id) {
+		T model = super.findById(id);
+		if (model == null) {
+			throw new NotFoundException();
+		}
+		return model;
+	}
+
+	@RequestMapping(value = "{id}",
+			method = RequestMethod.GET,
+			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+	@ApiOperation(value = "Find by id", notes = "Find a resource by it's identifier")
+	public ModelResource<T> hateoasGetById(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id) {
 		LOGGER.debug("plainJsonGetById, id: {}, model type: {}", id, this.service.getDomainClass());
 		T model = super.findById(id);
 		if (model == null) {
@@ -219,12 +348,19 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 		return toHateoasResource(model);
 	}
 
+	@RequestMapping(value = "{id}",
+			method = RequestMethod.GET,
+			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
+			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+	@ApiOperation(value = "Find by id", notes = "Find a resource by it's identifier")
+	public JsonApiModelResourceDocument<T, PK> jsonApiGetById(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id) {
+		return toDocument(super.findById(id));
+	}
 	/**
 	 * GET has the same effect to both member and relationship endpoints
 	 */
 	@RequestMapping(value = {"{id}/{relationName}", "{id}/relationships/{relationName}"}, method = RequestMethod.GET)
 	@ApiOperation(value = "Find related by root id", notes = "Find the related resource for the given relation name and identifier")
-	@JsonView(Model.ItemView.class)
 	public ResponseEntity plainJsonGetRelated(
 			@ApiParam(name = PARAM_PK, required = true, value = "string") @PathVariable PK id,
 			@ApiParam(name = PARAM_RELATION_NAME, required = true, value = "string") @PathVariable String relationName,
@@ -272,7 +408,6 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	 */
 	@RequestMapping(value = {"{id}/{relationName}", "{id}/relationships/{relationName}"}, method = RequestMethod.GET, consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
 	@ApiOperation(value = "Find related by root id", notes = "Find the related resource for the given relation name and identifier")
-	@JsonView(Model.ItemView.class)
 	public JsonApiDocument jsonApiGetRelated(
 			@ApiParam(name = PARAM_PK, required = true, value = "string") @PathVariable PK id,
 			@ApiParam(name = PARAM_RELATION_NAME, required = true, value = "string") @PathVariable String relationName,
@@ -316,13 +451,6 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	}
 
 
-	@RequestMapping(value = "{id}", method = RequestMethod.GET, consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
-	@ApiOperation(value = "Find by id", notes = "Find a resource by it's identifier")
-	@JsonView(Model.ItemView.class)
-	public JsonApiModelResourceDocument<T, PK> jsonApiGetById(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id) {
-
-		return toDocument(super.findById(id));
-	}
 
 	@RequestMapping(params = "ids", method = RequestMethod.GET)
 	@ApiOperation(value = "Search by ids", notes = "Find the set of resources matching the given identifiers.")
@@ -380,7 +508,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	 * @param id the root entity ID
 	 * @param fieldInfo the member/relation name
 	 * @return the single related entity, if any
-	 * @see PersistableModelService#findRelatedSingle(java.io.Serializable, com.restdude.mdd.registry.FieldInfo)
+	 * @see PersistableModelService#findRelatedSingle(Serializable, FieldInfo)
 	 */
 	protected PersistableModel findRelatedSingle(PK id, FieldInfo fieldInfo) {
 		PersistableModel resource = this.service.findRelatedSingle(id, fieldInfo);
@@ -406,7 +534,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 
 			ModelInfo relatedModelInfo = fieldInfo.getRelatedModelInfo();
 			// optionally create a query specification
-			Specification<M> spec = RsqlUtils.buildtSpecification(relatedModelInfo, this.service.getConversionService(), params, implicitCriteria, PARAMS_IGNORE_FOR_CRITERIA);
+			Specification<M> spec = RsqlUtils.buildSpecification(relatedModelInfo, this.service.getConversionService(), params, implicitCriteria, PARAMS_IGNORE_FOR_CRITERIA);
 			// get the page of related children
 			Page<M> tmp = this.service.findRelatedPaginated(relatedModelInfo.getModelType(), spec, pageable);
 			page = new ParamsAwarePageImpl<M>(params, tmp.getContent(), pageable, tmp.getTotalElements());

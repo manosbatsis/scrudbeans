@@ -91,15 +91,4 @@ public abstract class AbstractBasicAuditedModel extends AbstractSystemUuidPersis
 		super();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void preSave() {
-		super.preSave();
-
-		if (this.getCreatedBy() != null && this.getId() == null) {
-			this.setCreatedBy(null);
-		}
-	}
 }

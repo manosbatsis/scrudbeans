@@ -39,7 +39,7 @@ public class PageableUtil {
 
 
 		Sort sortObject = PageableUtil.buildSort(sort);
-		Pageable pageable = new PageRequest(page, size, sortObject);
+		Pageable pageable = PageRequest.of(page, size, sortObject);
 
 		return pageable;
 	}
