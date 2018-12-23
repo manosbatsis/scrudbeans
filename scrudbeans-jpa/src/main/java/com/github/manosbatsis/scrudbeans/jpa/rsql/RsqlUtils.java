@@ -79,9 +79,10 @@ public class RsqlUtils {
 	 * @param <M>
 	 * @param <MID>
 	 * @param ignoreNamesForSpecification the URL parameter names to ignore if no <code>filter</code>> param is present
-	 * @return
+	 * @return the resulting specification
 	 */
-	public static <M extends PersistableModel<MID>, MID extends Serializable> Specification<M> buildSpecification(
+	public static <M extends PersistableModel<MID>, MID extends Serializable> Specification<M>
+	buildSpecification(
 			ModelInfo<M, MID> modelInfo,
 			ConversionService conversionService,
 			Map<String, String[]> paramsMap,
@@ -133,10 +134,10 @@ public class RsqlUtils {
 	}
 
 	/**
-	 *
-	 * @param urlParams
+	 * Get an RSQL string
+	 * @param urlParams the URL query string parameters
 	 * @param ignoredNames the URL parameter names to ignore if no <code>filter</code>> param is present
-	 * @return
+	 * @return the RSQL string
 	 */
 	public static String toRsql(Map<String, String[]> urlParams, String... ignoredNames) {
 		Set<String> uniqueNames;
@@ -149,6 +150,12 @@ public class RsqlUtils {
 		return toRsql(urlParams, uniqueNames);
 	}
 
+	/**
+	 * Get an RSQL string
+	 * @param urlParams the URL query string parameters
+	 * @param ignoredNames the URL parameter names to ignore if no <code>filter</code>> param is present
+	 * @return the RSQL string
+	 */
 	public static String toRsql(@NonNull Map<String, String[]> urlParams, @NonNull Set<String> ignoredNames) {
 		StringBuffer rsql = new StringBuffer();
 		// iterate parameters

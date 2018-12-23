@@ -30,8 +30,6 @@ import com.github.manosbatsis.scrudbeans.jpa.validation.Unique;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Abstract entity class with basic auditing, unique constraints validation and authorization settings.
@@ -41,10 +39,7 @@ import org.slf4j.LoggerFactory;
 @MappedSuperclass
 @Unique
 public abstract class AbstractPersistableModel<PK extends Serializable> implements PersistableModel<PK> {
-
 	private static final long serialVersionUID = -6009587976502456848L;
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModel.class);
 
 	public AbstractPersistableModel() {
 		super();
@@ -90,10 +85,4 @@ public abstract class AbstractPersistableModel<PK extends Serializable> implemen
 				.toHashCode();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public void preSave() {
-
-	}
 }

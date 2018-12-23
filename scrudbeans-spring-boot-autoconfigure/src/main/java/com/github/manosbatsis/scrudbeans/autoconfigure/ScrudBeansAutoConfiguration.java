@@ -2,6 +2,7 @@ package com.github.manosbatsis.scrudbeans.autoconfigure;
 
 import javax.validation.Validator;
 
+import com.github.manosbatsis.scrudbeans.jpa.binding.CustomEnumConverterFactory;
 import com.github.manosbatsis.scrudbeans.jpa.binding.StringToEmbeddableManyToManyIdConverterFactory;
 import com.github.manosbatsis.scrudbeans.jpa.fs.FilePersistenceConfigPostProcessor;
 import com.github.manosbatsis.scrudbeans.jpa.model.AbstractEmbeddableManyToManyIdentifier;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.orm.hibernate5.HibernateExceptionTranslator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
 import org.springframework.web.context.WebApplicationContext;
@@ -31,22 +33,26 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 		this.wac = wac;
 	}
 
-	@Bean
-	@ConditionalOnMissingBean
-	static JpaModelInfoRegistry jpaModelInfoRegistry() {
-		return new JpaModelInfoRegistry();
-	}
-
-
 	/**
-	 * Register a converter factory for identifiers extending {@link AbstractEmbeddableManyToManyIdentifier}
-	 * @param registry
+	 * Register a converter factory for
+	 * a) identifiers extending {@link AbstractEmbeddableManyToManyIdentifier} and
+	 * b) Enums
 	 */
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
 		registry.addConverterFactory(new StringToEmbeddableManyToManyIdConverterFactory());
+		registry.addConverterFactory(new CustomEnumConverterFactory());
+
 	}
 
+	/** Register a bean to collect model metadata */
+	@Bean
+	@ConditionalOnMissingBean
+	public JpaModelInfoRegistry jpaModelInfoRegistry() {
+		return new JpaModelInfoRegistry();
+	}
+
+	/** Add a validator is none is already created */
 	@Bean
 	@ConditionalOnMissingBean
 	public Validator validator() {
@@ -57,17 +63,13 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 		validator.afterPropertiesSet();
 		return validator;
 	}
-	//@Bean
-	//public HibernateExceptionTranslator hibernateExceptionTranslator() {
-	//    return new HibernateExceptionTranslator();
-	// }
 
-
-	//@Bean
-	//@ConditionalOnMissingBean
-	//public javax.validation.Validator validator() {
-//		return new LocalValidatorFactoryBean();
-//	}
+	/** Improve exception handling */
+	@Bean
+	@ConditionalOnMissingBean
+	public HibernateExceptionTranslator hibernateExceptionTranslator() {
+		return new HibernateExceptionTranslator();
+	}
 
 	//TODO
 	@Bean
@@ -75,7 +77,5 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 	static FilePersistenceConfigPostProcessor filePersistenceConfigPostProcessor() {
 		return new FilePersistenceConfigPostProcessor();
 	}
-
-
 
 }

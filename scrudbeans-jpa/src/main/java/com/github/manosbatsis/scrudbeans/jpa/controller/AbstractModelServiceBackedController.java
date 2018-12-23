@@ -218,7 +218,6 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 	/**
 	 * Wrap the given model in a JSON API Document
 	 * @param model the model to wrap
-	 * @return
 	 */
 	protected JsonApiModelResourceDocument<T, PK> toDocument(T model) {
 		return HypermediaUtils.toDocument(model, this.getModelInfo());
@@ -228,7 +227,6 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 	/**
 	 * Wrap the given collection of models in a JSON API Document
 	 * @param models the models to wrap
-	 * @return
 	 */
 	protected JsonApiModelResourceCollectionDocument<T, PK> toDocument(Collection<T> models) {
 		return new JsonApiModelBasedDocumentBuilder<T, PK>(this.getModelInfo().getUriComponent())
@@ -239,7 +237,6 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 	/**
 	 * Wrap the given iterable of models of models in a JSON API Document
 	 * @param models the models to wrap
-	 * @return
 	 */
 	protected JsonApiModelResourceCollectionDocument<T, PK> toDocument(Iterable<T> models) {
 		return new JsonApiModelBasedDocumentBuilder<T, PK>(this.getModelInfo().getUriComponent())
@@ -250,7 +247,6 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 	/**
 	 * Wrap the given {@link Page} of models in a JSON API Document
 	 * @param page the page to wrap
-	 * @return
 	 */
 	protected JsonApiModelResourceCollectionDocument<T, PK> toPageDocument(ParamsAwarePage<T> page) {
 
@@ -265,7 +261,6 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 	 * @param pageNumberParamName
 	 * @param <RT>
 	 * @param <RPK>
-	 * @return
 	 */
 	protected <RT extends PersistableModel<RPK>, RPK extends Serializable> JsonApiModelResourceCollectionDocument<RT, RPK> toPageDocument(@NonNull ParamsAwarePage<RT> page, @NonNull ModelInfo<RT, RPK> modelInfo, @NonNull String pageNumberParamName) {
 		JsonApiModelResourceCollectionDocument<RT, RPK> doc = new JsonApiModelBasedDocumentBuilder<RT, RPK>(this.getModelInfo().getUriComponent())
@@ -283,8 +278,6 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 
 	/**
 	 * Unwrap the single model given as a JSON API Document
-	 * @param document
-	 * @return
 	 */
 	protected T toModel(@NonNull @RequestBody JsonApiModelResourceDocument<T, PK> document) {
 		T entity = null;

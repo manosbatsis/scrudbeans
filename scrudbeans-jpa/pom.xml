@@ -9,7 +9,6 @@
 		<artifactId>scrudbeans</artifactId>
 		<groupId>com.github.manosbatsis.scrudbeans</groupId>
 		<version>0.0.2-SNAPSHOT</version>
-
 	</parent>
 
 	<dependencies>
