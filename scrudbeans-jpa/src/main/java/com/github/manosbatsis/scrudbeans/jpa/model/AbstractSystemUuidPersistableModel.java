@@ -54,11 +54,4 @@ public abstract class AbstractSystemUuidPersistableModel extends AbstractPersist
 		this.id = id;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void preSave() {
-
-	}
 }

@@ -32,7 +32,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * Abstract entity class with basic auditing, unique constraints validation and authorization settings.
+ * Abstract entity class with basic auditing and unique constraints validation
  * @param <PK> The id Serializable
  */
 @XmlRootElement

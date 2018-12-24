@@ -1,15 +1,16 @@
 package com.github.manosbatsis.scrudbeans.autoconfigure;
 
-import javax.validation.Validator;
-
+import com.github.manosbatsis.scrudbeans.error.RestExceptionHandler;
 import com.github.manosbatsis.scrudbeans.jpa.binding.CustomEnumConverterFactory;
 import com.github.manosbatsis.scrudbeans.jpa.binding.StringToEmbeddableManyToManyIdConverterFactory;
 import com.github.manosbatsis.scrudbeans.jpa.fs.FilePersistenceConfigPostProcessor;
 import com.github.manosbatsis.scrudbeans.jpa.model.AbstractEmbeddableManyToManyIdentifier;
 import com.github.manosbatsis.scrudbeans.jpa.registry.JpaModelInfoRegistry;
+import com.github.manosbatsis.scrudbeans.jpa.validation.UniqueValidator;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,8 +18,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.orm.hibernate5.HibernateExceptionTranslator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Slf4j
@@ -42,7 +43,23 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 	public void addFormatters(FormatterRegistry registry) {
 		registry.addConverterFactory(new StringToEmbeddableManyToManyIdConverterFactory());
 		registry.addConverterFactory(new CustomEnumConverterFactory());
+	}
 
+	/**
+	 * Automatically handle errors by creating a REST exception response.
+	 * To disable, simply exclude "scrudbeans-error" as a transitive dependency of the starter.
+	 */
+	@Bean
+	@ConditionalOnClass(RestExceptionHandler.class)
+	public HandlerExceptionResolver restExceptionHandler() {
+		return new RestExceptionHandler();
+	}
+
+	/** Improve exception handling */
+	@Bean
+	@ConditionalOnMissingBean
+	public HibernateExceptionTranslator hibernateExceptionTranslator() {
+		return new HibernateExceptionTranslator();
 	}
 
 	/** Register a bean to collect model metadata */
@@ -55,20 +72,15 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 	/** Add a validator is none is already created */
 	@Bean
 	@ConditionalOnMissingBean
-	public Validator validator() {
-		SpringConstraintValidatorFactory scvf = new SpringConstraintValidatorFactory(wac.getAutowireCapableBeanFactory());
-		LocalValidatorFactoryBean validator = new LocalValidatorFactoryBean();
-		validator.setConstraintValidatorFactory(scvf);
-		validator.setApplicationContext(wac);
-		validator.afterPropertiesSet();
-		return validator;
+	public javax.validation.Validator localValidatorFactoryBean() {
+		return new LocalValidatorFactoryBean();
 	}
 
-	/** Improve exception handling */
+	/** Register custom unique constraints validator */
 	@Bean
 	@ConditionalOnMissingBean
-	public HibernateExceptionTranslator hibernateExceptionTranslator() {
-		return new HibernateExceptionTranslator();
+	public UniqueValidator uniqueValidator() {
+		return new UniqueValidator();
 	}
 
 	//TODO

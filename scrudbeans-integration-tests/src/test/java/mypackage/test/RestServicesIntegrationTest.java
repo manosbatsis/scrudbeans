@@ -213,7 +213,6 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 							.then()
 							.statusCode(200).extract().as(ProductRelationship.class);
 					assertEquals(description + "_updated_patched", relationship.getDescription());
-
 				}
 			}
 		}

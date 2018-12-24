@@ -43,6 +43,15 @@ public class HttpUtil {
 	public static final String ACESS_CONTROL_MAX_AGE_NAME = "Access-Control-Max-Age";
 	// MISC
 
+
+	public static String getRemoteAddress(HttpServletRequest request) {
+		String addresss = request.getHeader("X-FORWARDED-FOR");
+		if (addresss == null) {
+			addresss = request.getRemoteAddr();
+		}
+		return addresss;
+	}
+
 	public static String setBaseUrl(ServletRequest req) {
 		HttpServletRequest request = (HttpServletRequest) req;
 		String baseUrl = (String) request.getAttribute(Constants.BASE_URL_KEY);

@@ -88,28 +88,10 @@ public class BaseRepositoryImpl<T extends PersistableModel<PK>, PK extends Seria
 		this.domainClass = entityInformation.getJavaType();
 		//Configuration config = ConfigurationFactory.getConfiguration();
 		String[] validatorExcludeClasses = {};//TODO config.getStringArray(ConfigurationFactory.VALIDATOR_EXCLUDES_CLASSESS);
-		this.skipValidation = true;//Arrays.asList(validatorExcludeClasses).contains(domainClass.getCanonicalName());
+		// TODO this.skipValidation = Arrays.asList(validatorExcludeClasses).contains(domainClass.getCanonicalName());
 		this.validator = validator;
-		LOGGER.debug("new BaseRepositoryImpl, domainClass: {}, validator: {}", this.domainClass, this.validator);
 
 	}
-
-    /*
-	 * Creates a new {@link SimpleJpaRepository} to manage objects of the given {@link JpaEntityInformation}.
-	 *
-     * @param domainClass must not be {@literal null}.
-     * @param entityManager must not be {@literal null}.
-
-	public BaseRepositoryImpl(Class<T> domainClass, EntityManager entityManager) {
-		super(domainClass, entityManager);
-        //Configuration config = ConfigurationFactory.getConfiguration();
-        this.entityManager = entityManager;
-		this.domainClass = domainClass;
-		//this.validator = validator;
-        //tring[] validatorExcludeClasses = config.getStringArray(ConfigurationFactory.VALIDATOR_EXCLUDES_CLASSESS);
-        //this.skipValidation = Arrays.asList(validatorExcludeClasses).contains(domainClass.getCanonicalName());
-    }
-	 */
 
 	/***
 	 * {@inheritDoc}
@@ -127,42 +109,25 @@ public class BaseRepositoryImpl<T extends PersistableModel<PK>, PK extends Seria
 		return this.entityManager;
 	}
 
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public <S extends T> S save(S entity) {
+		this.validate(entity);
+		entity = super.save(entity);
+		return entity;
+	}
 
-//	/***
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public T merge(T entity) {
-//		this.validate(entity);
-//		Map<String, MetadatumModel> metadata = noteMetadata(entity);
-//		entity = this.getEntityManager().merge(entity);
-//		persistNotedMetadata(metadata, entity);
-//		return entity;
-//	}
-//
-//	/***
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public T persist(T entity) {
-//		this.validate(entity);
-//		Map<String, MetadatumModel> metadata = noteMetadata(entity);
-//		this.getEntityManager().persist(entity);
-//		persistNotedMetadata(metadata, entity);
-//		return entity;
-//	}
-//
-//	/***
-//	 * {@inheritDoc}
-//	 */
-//	@Override
-//	public <S extends T> S save(S entity) {
-//		this.validate(entity);
-//		Map<String, MetadatumModel> metadata = noteMetadata(entity);
-//		entity = super.save(entity);
-//		persistNotedMetadata(metadata, entity);
-//		return entity;
-//	}
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public <S extends T> S saveAndFlush(S entity) {
+		this.validate(entity);
+		entity = super.saveAndFlush(entity);
+		return entity;
+	}
 
 
 	/***
@@ -170,211 +135,16 @@ public class BaseRepositoryImpl<T extends PersistableModel<PK>, PK extends Seria
 	 */
 	@Override
 	public T patch(@P("resource") T delta) {
-		LOGGER.debug("patch, delta: {}", delta);
 		// load existing
 		T persisted = this.getOne(delta.getId());
-		LOGGER.debug("patch, delta: {}, persisted: {}", delta, persisted);
 		// update it by copying all non-null properties from the given transient instance
 		String[] nullPropertyNames = EntityUtil.getNullPropertyNames(delta);
-		LOGGER.debug("patch, nullPropertyNames: {}", nullPropertyNames);
 		BeanUtils.copyProperties(delta, persisted, nullPropertyNames);
-		LOGGER.debug("patch, patched persisted: {}", persisted);
 		// validate
 		this.validate(persisted);
 		// persist changes
 		return this.entityManager.merge(persisted);
 	}
-
-//	@Override
-//	public MetadatumModel addMetadatum(PK subjectId, String predicate, String object) {
-//		Map<String, String> metadata = new HashMap<String, String>();
-//		metadata.put(predicate, object);
-//		List<MetadatumModel> saved = addMetadata(subjectId, metadata);
-//		if (!CollectionUtils.isEmpty(metadata)) {
-//			return saved.get(0);
-//		}
-//		else {
-//			return null;
-//		}
-//	}
-//
-//	@Override
-//	public List<MetadatumModel> addMetadata(PK subjectId,
-//			Map<String, String> metadata) {
-//		ensureMetadataIsSupported();
-//		List<MetadatumModel> saved;
-//		if (!CollectionUtils.isEmpty(metadata)) {
-//			saved = new ArrayList<MetadatumModel>(metadata.size());
-//			for (String predicate : metadata.keySet()) {
-//				LOGGER.info("addMetadatum subjectId: " + subjectId
-//						+ ", predicate: " + predicate);
-//				MetadatumModel metadatum = this.findMetadatum(subjectId, predicate);
-//				LOGGER.info("addMetadatum metadatum: " + metadatum);
-//				if (metadatum == null) {
-//					T entity = this.getOne(subjectId);
-//					// Class<?> metadatumClass = ((MetadataSubjectModel) entity)
-//					// .getMetadataDomainClass();
-//					MetadataSubjectModel subject = (MetadataSubjectModel) entity;
-//					metadatum = this.buildMetadatum(subject, predicate,
-//							metadata.get(predicate));
-//					this.getEntityManager().persist(metadatum);
-//				}
-//				else {
-//					// if exists, only update the value
-//					metadatum.setObject(metadata.get(predicate));
-//					metadatum = this.getEntityManager().merge(metadatum);
-//				}
-//
-//				// subject.addMetadatum(model.buildPredicate(), model.getObject());
-//				// this.entityManager.merge(entity);
-//				LOGGER.info("addMetadatum saved metadatum: " + metadatum);
-//				saved.add(metadatum);
-//			}
-//		}
-//		else {
-//			saved = new ArrayList<MetadatumModel>(0);
-//		}
-//		LOGGER.info("addMetadatum returns: " + saved);
-//		return saved;
-//	}
-//
-//	@SuppressWarnings("unchecked")
-//	private MetadatumModel buildMetadatum(MetadataSubjectModel subject, String predicate,
-//			String object) {
-//		Class<?> metadatumClass = subject.getMetadataDomainClass();
-//		MetadatumModel metadatum = null;
-//		try {
-//			metadatum = (MetadatumModel) metadatumClass.getConstructor(
-//					this.getDomainClass(), String.class, String.class)
-//					.newInstance(subject, predicate, object);
-//		}
-//		catch (Exception e) {
-//			throw new RuntimeException("Failed adding metadatum", e);
-//		}
-//		return metadatum;
-//	}
-//
-//	@SuppressWarnings("unchecked")
-//	@Override
-//	public void removeMetadatum(PK subjectId, String predicate) {
-//		Assert.notNull(subjectId);
-//		Assert.notNull(predicate);
-//		ensureMetadataIsSupported();
-//		T subjectEntity = this.getOne(subjectId);
-//		Class<?> metadatumClass = ((MetadataSubjectModel) subjectEntity)
-//				.getMetadataDomainClass();
-//		// TODO: refactor to criteria
-//		MetadatumModel metadatum = findMetadatum(subjectId, predicate,
-//				metadatumClass);
-//		if (metadatum != null) {
-//			this.getEntityManager().remove(metadatum);
-//		}
-//		// CriteriaBuilder builder = this.entityManager.getCriteriaBuilder();
-//		// CriteriaQuery criteria = builder.createQuery(metadatumClass);
-//		// Root root = criteria.from(metadatumClass);
-//		// criteria.where( builder.equal(root.get("predicate"), predicate));
-//
-//		// T entity = this.findOne(subjectId);
-//		// MetadataSubjectModel subject = (MetadataSubjectModel) entity;
-//		// if (subject.getMetadata() != null) {
-//		// subject.getMetadata().remove(predicate);
-//		// this.merge(entity);
-//		// }
-//	}
-//
-//	@Override
-//	public MetadatumModel findMetadatum(PK subjectId, String predicate) {
-//		T subjectEntity = this.getOne(subjectId);
-//		Class<?> metadatumClass = ((MetadataSubjectModel) subjectEntity)
-//				.getMetadataDomainClass();
-//		return this.findMetadatum(subjectId, predicate, metadatumClass);
-//
-//	}
-//
-//	protected MetadatumModel findMetadatum(PK subjectId, String predicate,
-//			Class<?> metadatumClass) {
-//		List<MetadatumModel> results = this
-//				.getEntityManager()
-//				.createQuery(
-//						"from "
-//								+ metadatumClass.getSimpleName()
-//								+ " m where m.predicate = ?1 and m.subject.id = ?2")
-//				.setParameter(1, predicate).setParameter(2, subjectId)
-//				.getResultList();
-//		MetadatumModel metadatum = results.isEmpty() ? null : results.get(0);
-//		return metadatum;
-//	}
-//
-//	protected void ensureMetadataIsSupported() {
-//		if (!MetadataSubjectModel.class.isAssignableFrom(getDomainClass())) {
-//			throw new UnsupportedOperationException();
-//		}
-//	}
-//
-//	@Override
-//	public void refresh(T entity) {
-//		this.getEntityManager().refresh(entity);
-//	}
-//
-//
-//	/**
-//	 * Get the entity's file uploads for this property
-//	 * @param subjectId the entity id
-//	 * @param propertyName the property holding the upload(s)
-//	 * @return the uploads
-//	 */
-//	public List<UploadedFileModel> getUploadsForProperty(PK subjectId, String propertyName) {
-//		CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-//
-//		CriteriaQuery<BinaryFile> query = cb.createQuery(BinaryFile.class);
-//		Root<T> root = query.from(this.domainClass);
-//		query.where(cb.equal(root.get("id"), subjectId));
-//		Selection<? extends BinaryFile> join = root.join(propertyName, JoinType.INNER);
-//		query.select(join);
-//		List<BinaryFile> results = this.entityManager.createQuery(query).getResultList();
-//		List<UploadedFileModel> casted = new ArrayList<>(results.size());
-//		for (BinaryFile f : results) {
-//			casted.addAll(results);
-//		}
-//		return casted;
-//	}
-//
-//	@SuppressWarnings({"rawtypes", "unchecked"})
-//	private void persistNotedMetadata(Map<String, MetadatumModel> metadata, T saved) {
-//
-//		if (LOGGER.isDebugEnabled()) {
-//			LOGGER.debug("persistNotedMetadata, noted: " + metadata);
-//		}
-//		if (!CollectionUtils.isEmpty(metadata)) {
-//			MetadataSubjectModel subject = (MetadataSubjectModel) saved;
-//			MetadatumModel[] metaArray = metadata.values().toArray(
-//					new MetadatumModel[metadata.values().size()]);
-//			for (int i = 0; i < metaArray.length; i++) {
-//				MetadatumModel metadatum = metaArray[i];
-//				subject.addMetadatum(this.addMetadatum(
-//						saved.getId(), metadatum.getPredicate(),
-//						metadatum.getObject()));
-//			}
-//		}
-//	}
-//
-//	private Map<String, MetadatumModel> noteMetadata(T resource) {
-//		Map<String, MetadatumModel> metadata = null;
-//		if (MetadataSubjectModel.class.isAssignableFrom(this.getDomainClass())) {
-//			metadata = ((MetadataSubjectModel) resource).getMetadata();
-//			((MetadataSubjectModel) resource)
-//					.setMetadata(new HashMap<String, MetadatumModel>());
-//			if (LOGGER.isDebugEnabled()) {
-//				LOGGER.debug("noteMetadata, noted: " + metadata);
-//			}
-//		}
-//		else {
-//			if (LOGGER.isDebugEnabled()) {
-//				LOGGER.debug("noteMetadata, not a metadata subject");
-//			}
-//		}
-//		return metadata;
-//	}
 
 	/***
 	 * {@inheritDoc}
@@ -387,6 +157,10 @@ public class BaseRepositoryImpl<T extends PersistableModel<PK>, PK extends Seria
 		return constraintViolations;
 	}
 
+	/**
+	 * Validate the resource
+	 * @param resource
+	 */
 	protected void validate(T resource) {
 		LOGGER.debug("validate resource: {}", resource);
 		if (!this.skipValidation) {
@@ -407,6 +181,13 @@ public class BaseRepositoryImpl<T extends PersistableModel<PK>, PK extends Seria
 
 	}
 
+	/**
+	 *  Used to validate relations
+	 * @param id the id of the root model
+	 * @param fieldInfo the attribute name of the relationship
+	 * @param <RT>
+	 * @return
+	 */
 	@Override
 	public <RT extends PersistableModel> RT findRelatedEntityByOwnId(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
 		if (!fieldInfo.getFieldMappingType().isToOne()) {

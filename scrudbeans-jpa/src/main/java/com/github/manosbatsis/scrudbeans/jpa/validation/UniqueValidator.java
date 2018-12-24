@@ -43,16 +43,21 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.hibernate.proxy.HibernateProxyHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Provides meaningful constraint validation messages
+ * @see Unique
+ */
 @Slf4j
-@Component
 public class UniqueValidator implements ConstraintValidator<Unique, PersistableModel> {
 
+	private EntityManager entityManager;
 
 	@Autowired
-	private EntityManager entityManager;
+	public void setEntityManager(EntityManager entityManager) {
+		this.entityManager = entityManager;
+	}
 
 	public void initialize(Unique annotation) {
 	}
