@@ -9,10 +9,10 @@ In short, ScrudBeans reads a package structure like the one bellow:
 └── mypackage
     ├── controller
     │   └── OrderLineController.java
-    ├── model
-    │   ├── OrderLine.java
-    │   ├── Order.java
-    │   └── Product.java
+    └── model
+        ├── OrderLine.java
+        ├── Order.java
+        └── Product.java
 ```
 
 To use your custom components, all you have to do is create them yourself - like the `OrderLineController` 
