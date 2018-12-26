@@ -1,4 +1,4 @@
-# scrudbeans [![Build Status](https://travis-ci.org/manosbatsis/scrudbeans.svg?branch=master)](https://travis-ci.org/manosbatsis/scrudbeans)
+# ScrudBeans [![Build Status](https://travis-ci.org/manosbatsis/scrudbeans.svg?branch=master)](https://travis-ci.org/manosbatsis/scrudbeans)
 
 Documentation at https://manosbatsis.github.io/scrudbeans/
 

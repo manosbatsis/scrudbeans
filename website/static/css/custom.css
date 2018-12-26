@@ -1,5 +1,5 @@
 /* your custom css */
-img.logo {
+img.logo, div.projectLogo img {
     display: none
 }
 
