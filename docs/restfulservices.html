@@ -1,0 +1,107 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>RESTful Services · ScrudBeans</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;p&gt;For each &lt;code&gt;ScrudBean&lt;/code&gt; like the &lt;code&gt;Order&lt;/code&gt; entity in the previous chapter, ScrudBeans will generate a number of&lt;/p&gt;
+"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="RESTful Services · ScrudBeans"/><meta property="og:type" content="website"/><meta property="og:url" content="https://manosbatsis.github.io/scrudbeans/index.html"/><meta property="og:description" content="&lt;p&gt;For each &lt;code&gt;ScrudBean&lt;/code&gt; like the &lt;code&gt;Order&lt;/code&gt; entity in the previous chapter, ScrudBeans will generate a number of&lt;/p&gt;
+"/><meta property="og:image" content="https://manosbatsis.github.io/scrudbeans/img/docusaurus.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://manosbatsis.github.io/scrudbeans/img/docusaurus.png"/><link rel="shortcut icon" href="/scrudbeans/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-131279953-1"></script><script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments); }
+              gtag('js', new Date());
+              gtag('config', 'UA-131279953-1');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="https://unpkg.com/vanilla-back-to-top@7.1.14/dist/vanilla-back-to-top.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+          addBackToTop(
+            {"zIndex":100}
+          )
+        });
+        </script><link rel="stylesheet" href="/scrudbeans/css/main.css"/></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/scrudbeans/"><img class="logo" src="/scrudbeans/img/docusaurus.svg" alt="ScrudBeans"/><h2 class="headerTitleWithLogo">ScrudBeans</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/scrudbeans/docs/installation" target="_self">Documentation</a></li><li class=""><a href="https://github.com/manosbatsis/scrudbeans" target="_self">Repository</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><i></i></div><h2><i>›</i><span>Guides</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Guides</h3><ul><li class="navListItem"><a class="navItem" href="/scrudbeans/docs/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/scrudbeans/docs/modelmapping">Model Mapping</a></li><li class="navListItem navListItemActive"><a class="navItem" href="/scrudbeans/docs/restfulservices">RESTful Services</a></li><li class="navListItem"><a class="navItem" href="/scrudbeans/docs/applicationcomponents">Application Components</a></li></ul></div></div></section></div><script>
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              const headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                if (event.target.tagName === 'A') {
+                  document.body.classList.remove('tocActive');
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle">RESTful Services</h1></header><article><div><span><p>For each <code>ScrudBean</code> like the <code>Order</code> entity in the previous chapter, ScrudBeans will generate a number of
+components and expose a RESTful services for SCRUD: Search, Create, Update and Delete.</p>
+<h2><a class="anchor" aria-hidden="true" id="default-endpoints"></a><a href="#default-endpoints" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Default Endpoints</h2>
+<table>
+<thead>
+<tr><th>Method</th><th>Path</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td>GET</td><td>/api/rest/orders/{id}</td><td>Fetch the order matching the id</td></tr>
+<tr><td>GET</td><td>/api/rest/orders/{id}/relationships/{relation}</td><td>Fetch the related object for the order matching the id</td></tr>
+<tr><td>GET</td><td>/api/rest/orders?email=%25startsWith</td><td>Search based on model properties using simple name-value pairs as URL query string parameters (paged)</td></tr>
+<tr><td>GET</td><td>/api/rest/orders?filter=createdDate=ge=2018-12-10T00:00;createdDate=le=2018-12-10T23:59:59</td><td>Search based on model properties using an <a href="https://manosbatsis.github.io/restdude/rsql.html">RSQL or FIQL</a> filter (paged)</td></tr>
+<tr><td>GET</td><td>/api/rest/orders?page=no</td><td>Get all orders</td></tr>
+<tr><td>POST</td><td>/api/rest/orders</td><td>Create a new order</td></tr>
+<tr><td>PUT</td><td>/api/rest/orders/{id}</td><td>Update the order matching the id</td></tr>
+<tr><td>PATCH</td><td>/api/rest/orders/{id}</td><td>Partially update the order matching the id</td></tr>
+<tr><td>DELETE</td><td>/api/rest/orders/{id}</td><td>Delete the order matching the id</td></tr>
+<tr><td>&lt;!--- GET</td><td>/api/rest/orders/jsonschema</td><td>Get the JSONSchema for orders --&gt;</td></tr>
+</tbody>
+</table>
+<p>Most endpoints support <code>application/json</code>, <code>application/hal+json</code> and <code>application/vnd.api+json</code>.
+If you are using the scrudbeans-template, you can inspect the endpoints by starting Spring Boot
+with <code>./mvnw spring-boot:run</code> and pointing your browser to <a href="http://localhost:8080/swagger-ui.html">http://localhost:8080/swagger-ui.html</a></p>
+<p><img src="/scrudbeans/docs/assets/img/swagger-ui-fragment.png" alt="swagger-ui"></p>
+<h2><a class="anchor" aria-hidden="true" id="error-responses"></a><a href="#error-responses" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Error Responses</h2>
+<p>ScrudBeans will automatically handle any exception by creating an appropriate RESTful HTTP response.
+It will also automatically perform validation based on Java Bean Validation (<code>javax.validation</code>) before persisting
+or updating an entity and provide meaningful messages in such a response as necessary. For example, consider the
+following entity field:</p>
+<pre><code class="hljs css language-java"><span class="hljs-meta">@NotNull</span>
+<span class="hljs-meta">@Column</span>(nullable = <span class="hljs-keyword">false</span>, unique = <span class="hljs-keyword">true</span>)
+<span class="hljs-keyword">private</span> String code;
+</code></pre>
+<p>A <code>null</code> value will result in the following response:</p>
+<pre><code class="hljs css language-json">{
+    <span class="hljs-attr">"title"</span>: <span class="hljs-string">"Validation failed"</span>,
+    <span class="hljs-attr">"httpStatusCode"</span>: <span class="hljs-number">400</span>,
+    <span class="hljs-attr">"requestMethod"</span>: <span class="hljs-string">"POST"</span>,
+    <span class="hljs-attr">"requestUrl"</span>: <span class="hljs-string">"/api/rest/discountCodes"</span>,
+    <span class="hljs-attr">"validationErrors"</span>: [
+        {
+            <span class="hljs-attr">"message"</span>: <span class="hljs-string">"must not be null"</span>,
+            <span class="hljs-attr">"propertyPath"</span>: <span class="hljs-string">"percentage"</span>
+        }
+    ],
+    <span class="hljs-attr">"remoteAddress"</span>: <span class="hljs-string">"127.0.0.1"</span>,
+    <span class="hljs-attr">"userAgent"</span>: <span class="hljs-string">"Apache-HttpClient/4.5.6 (Java/1.8.0_181)"</span>
+}
+
+</code></pre>
+<p>Similarly, a non-unique value will result in the following response:</p>
+<pre><code class="hljs css language-json">{
+    <span class="hljs-attr">"title"</span>: <span class="hljs-string">"Validation failed"</span>,
+    <span class="hljs-attr">"httpStatusCode"</span>: <span class="hljs-number">400</span>,
+    <span class="hljs-attr">"requestMethod"</span>: <span class="hljs-string">"POST"</span>,
+    <span class="hljs-attr">"requestUrl"</span>: <span class="hljs-string">"/api/rest/discountCodes"</span>,
+    <span class="hljs-attr">"validationErrors"</span>: [
+        {
+            <span class="hljs-attr">"message"</span>: <span class="hljs-string">"Unique value not available for property: code"</span>,
+            <span class="hljs-attr">"propertyPath"</span>: <span class="hljs-string">"code"</span>
+        }
+    ],
+    <span class="hljs-attr">"remoteAddress"</span>: <span class="hljs-string">"127.0.0.1"</span>,
+    <span class="hljs-attr">"userAgent"</span>: <span class="hljs-string">"Apache-HttpClient/4.5.6 (Java/1.8.0_181)"</span>
+}
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/scrudbeans/docs/modelmapping"><span class="arrow-prev">← </span><span>Model Mapping</span></a><a class="docs-next button" href="/scrudbeans/docs/applicationcomponents"><span>Application Components</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#default-endpoints">Default Endpoints</a></li><li><a href="#error-responses">Error Responses</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="copyright">Copyright © 2018 Manos Batsis</section></footer></div></body></html>
