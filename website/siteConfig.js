@@ -88,8 +88,8 @@ const siteConfig = {
     cleanUrl: true,
 
     // Open Graph and Twitter card images.
-    ogImage: 'img/docusaurus.png',
-    twitterImage: 'img/docusaurus.png',
+    ogImage: 'img/poster.png',
+    twitterImage: 'img/poster.png',
 
     // Show documentation's last contributor's name.
     // enableUpdateBy: true,

@@ -25,7 +25,8 @@ class Footer extends React.Component {
         return (
             <footer className="nav-footer" id="footer">
 
-                <section className="copyright">{this.props.config.copyright}</section>
+                <section className="copyright"><a href="http://manosbatsis.github.io/">{this.props.config.copyright}</a>
+                </section>
             </footer>
 
 
