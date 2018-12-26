@@ -6,7 +6,9 @@
       "restfulservices",
       "applicationcomponents"
     ],
-    "Reference": []
+    "Reference": [
+      "rsqlsupport"
+    ]
   },
   "docs-other": {
     "First Category": [

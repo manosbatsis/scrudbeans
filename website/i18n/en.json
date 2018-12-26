@@ -16,6 +16,9 @@
       },
       "restfulservices": {
         "title": "RESTful Services"
+      },
+      "rsqlsupport": {
+        "title": "RSQL Support"
       }
     },
     "links": {
