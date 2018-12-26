@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Application Components · ScrudBeans</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;p&gt;TBA&lt;/p&gt;
-"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Application Components · ScrudBeans"/><meta property="og:type" content="website"/><meta property="og:url" content="https://manosbatsis.github.io/scrudbeans/index.html"/><meta property="og:description" content="&lt;p&gt;TBA&lt;/p&gt;
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>Application Components · ScrudBeans</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;p&gt;In short, ScrudBeans reads a package structure like the one bellow:&lt;/p&gt;
+"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="Application Components · ScrudBeans"/><meta property="og:type" content="website"/><meta property="og:url" content="https://manosbatsis.github.io/scrudbeans/index.html"/><meta property="og:description" content="&lt;p&gt;In short, ScrudBeans reads a package structure like the one bellow:&lt;/p&gt;
 "/><meta property="og:image" content="https://manosbatsis.github.io/scrudbeans/img/docusaurus.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://manosbatsis.github.io/scrudbeans/img/docusaurus.png"/><link rel="shortcut icon" href="/scrudbeans/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-131279953-1"></script><script>
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments); }
@@ -38,9 +38,41 @@
                 };
               }
             });
-        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle">Application Components</h1></header><article><div><span><p>TBA</p>
-<h2><a class="anchor" aria-hidden="true" id="component-architecture"></a><a href="#component-architecture" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Component Architecture</h2>
-<p>TBA</p>
-<h2><a class="anchor" aria-hidden="true" id="custom-components"></a><a href="#custom-components" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Custom Components</h2>
-<p>TBA</p>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/scrudbeans/docs/restfulservices"><span class="arrow-prev">← </span><span>RESTful Services</span></a><a class="docs-next button" href="/scrudbeans/docs/rsqlsupport"><span>RSQL Support</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#component-architecture">Component Architecture</a></li><li><a href="#custom-components">Custom Components</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="copyright">Copyright © 2018 Manos Batsis</section></footer></div></body></html>
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle">Application Components</h1></header><article><div><span><p>In short, ScrudBeans reads a package structure like the one bellow:</p>
+<pre><code class="hljs">└── mypackage
+    ├── controller
+    │   └── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderLineController</span>.</span></span>java
+    ├── model
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderLine</span>.</span></span>java
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">Order</span>.</span></span>java
+    │   └── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">Product</span>.</span></span>java
+</code></pre>
+<p>To use your custom components, all you have to do is create them yourself - like the <code>OrderLineController</code>
+above. ScrudBeans preserving any existing components and completes the structure as follows;</p>
+<pre><code class="hljs">└── mypackage
+    ├── controller
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderLineController</span>.</span></span>java
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderController</span>.</span></span>java
+    │   └── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">ProductController</span>.</span></span>java
+    ├── model
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderLine</span>.</span></span>java
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">Order</span>.</span></span>java
+    │   └── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">Product</span>.</span></span>java
+    ├── repository
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderLineRepository</span>.</span></span>java
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderRepository</span>.</span></span>java
+    │   └── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">ProductRepository</span>.</span></span>java
+    ├── service
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderLineServiceImpl</span>.</span></span>java
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderLineService</span>.</span></span>java
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderServiceImpl</span>.</span></span>java
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">OrderService</span>.</span></span>java
+    │   ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">ProductServiceImpl</span>.</span></span>java
+    │   └── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">ProductService</span>.</span></span>java
+    └── specification
+        ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">AnyToOneOrderLinePredicateFactory</span>.</span></span>java
+        ├── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">AnyToOneOrderPredicateFactory</span>.</span></span>java
+        └── <span class="hljs-module-access"><span class="hljs-module"><span class="hljs-identifier">AnyToOneProductPredicateFactory</span>.</span></span>java
+</code></pre>
+<p>When using Maven, you can browse the generated component sources in <code>target/generated-sources/annotations</code>.</p>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/scrudbeans/docs/restfulservices"><span class="arrow-prev">← </span><span>RESTful Services</span></a><a class="docs-next button" href="/scrudbeans/docs/rsqlsupport"><span>RSQL Support</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"></nav></div><footer class="nav-footer" id="footer"><section class="copyright">Copyright © 2018 Manos Batsis</section></footer></div></body></html>
