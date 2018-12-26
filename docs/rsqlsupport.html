@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><title>RSQL Support · ScrudBeans</title><meta name="viewport" content="width=device-width"/><meta name="generator" content="Docusaurus"/><meta name="description" content="&lt;p&gt;ScrudBeans supports search by either URL params or RSQL and a &lt;code&gt;filter&lt;/code&gt; param. RSQL is a query&lt;/p&gt;
+"/><meta name="docsearch:language" content="en"/><meta property="og:title" content="RSQL Support · ScrudBeans"/><meta property="og:type" content="website"/><meta property="og:url" content="https://manosbatsis.github.io/scrudbeans/index.html"/><meta property="og:description" content="&lt;p&gt;ScrudBeans supports search by either URL params or RSQL and a &lt;code&gt;filter&lt;/code&gt; param. RSQL is a query&lt;/p&gt;
+"/><meta property="og:image" content="https://manosbatsis.github.io/scrudbeans/img/docusaurus.png"/><meta name="twitter:card" content="summary"/><meta name="twitter:image" content="https://manosbatsis.github.io/scrudbeans/img/docusaurus.png"/><link rel="shortcut icon" href="/scrudbeans/img/favicon.png"/><link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"/><script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-131279953-1"></script><script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments); }
+              gtag('js', new Date());
+              gtag('config', 'UA-131279953-1');
+            </script><script type="text/javascript" src="https://buttons.github.io/buttons.js"></script><script src="https://unpkg.com/vanilla-back-to-top@7.1.14/dist/vanilla-back-to-top.min.js"></script><script>
+        document.addEventListener('DOMContentLoaded', function() {
+          addBackToTop(
+            {"zIndex":100}
+          )
+        });
+        </script><link rel="stylesheet" href="/scrudbeans/css/main.css"/></head><body class="sideNavVisible separateOnPageNav"><div class="fixedHeaderContainer"><div class="headerWrapper wrapper"><header><a href="/scrudbeans/"><img class="logo" src="/scrudbeans/img/docusaurus.svg" alt="ScrudBeans"/><h2 class="headerTitleWithLogo">ScrudBeans</h2></a><div class="navigationWrapper navigationSlider"><nav class="slidingNav"><ul class="nav-site nav-site-internal"><li class="siteNavGroupActive"><a href="/scrudbeans/docs/installation" target="_self">Documentation</a></li><li class=""><a href="https://github.com/manosbatsis/scrudbeans" target="_self">Repository</a></li></ul></nav></div></header></div></div><div class="navPusher"><div class="docMainWrapper wrapper"><div class="container docsNavContainer" id="docsNav"><nav class="toc"><div class="toggleNav"><section class="navWrapper wrapper"><div class="navBreadcrumb wrapper"><div class="navToggle" id="navToggler"><i></i></div><h2><i>›</i><span>Reference</span></h2><div class="tocToggler" id="tocToggler"><i class="icon-toc"></i></div></div><div class="navGroups"><div class="navGroup"><h3 class="navGroupCategoryTitle">Guides</h3><ul><li class="navListItem"><a class="navItem" href="/scrudbeans/docs/installation">Installation</a></li><li class="navListItem"><a class="navItem" href="/scrudbeans/docs/modelmapping">Model Mapping</a></li><li class="navListItem"><a class="navItem" href="/scrudbeans/docs/restfulservices">RESTful Services</a></li><li class="navListItem"><a class="navItem" href="/scrudbeans/docs/applicationcomponents">Application Components</a></li></ul></div><div class="navGroup"><h3 class="navGroupCategoryTitle">Reference</h3><ul><li class="navListItem navListItemActive"><a class="navItem" href="/scrudbeans/docs/rsqlsupport">RSQL Support</a></li></ul></div></div></section></div><script>
+            document.addEventListener('DOMContentLoaded', function() {
+              createToggler('#navToggler', '#docsNav', 'docsSliderActive');
+              createToggler('#tocToggler', 'body', 'tocActive');
+
+              const headings = document.querySelector('.toc-headings');
+              headings && headings.addEventListener('click', function(event) {
+                if (event.target.tagName === 'A') {
+                  document.body.classList.remove('tocActive');
+                }
+              }, false);
+
+              function createToggler(togglerSelector, targetSelector, className) {
+                var toggler = document.querySelector(togglerSelector);
+                var target = document.querySelector(targetSelector);
+
+                if (!toggler) {
+                  return;
+                }
+
+                toggler.onclick = function(event) {
+                  event.preventDefault();
+
+                  target.classList.toggle(className);
+                };
+              }
+            });
+        </script></nav></div><div class="container mainContainer"><div class="wrapper"><div class="post"><header class="postHeader"><h1 class="postHeaderTitle">RSQL Support</h1></header><article><div><span><p>ScrudBeans supports search by either URL params or RSQL and a <code>filter</code> param. RSQL is a query
+language for parametrized filtering of entries in RESTful APIs.</p>
+<p>It’s based on <a href="http://tools.ietf.org/html/draft-nottingham-atompub-fiql-00">FIQL</a> (Feed Item Query Language), a URI-friendly syntax for expressing filters across the entries in an Atom Feed.
+FIQL is great for use in a URI; there are no unsafe characters, so URL encoding is not required.
+On the other side, FIQL’s syntax is not very intuitive and URL encoding isn’t always that big deal, so RSQL also provides a friendlier syntax for logical operators and some of the comparison operators.</p>
+<p>For example, you can query your resource like this: <code>/movies?query=name==&quot;Kill Bill&quot;;year=gt=2003</code> or <code>/movies?query=director.lastName==Nolan and year&gt;=2000</code>.
+See below for examples.</p>
+<p>ScrudBeans' RSQL support is based on <a href="https://github.com/jirutka/rsql-parser">rsql-parser</a>, a complete and thoroughly tested parser for RSQL written in <a href="http://javacc.java.net">JavaCC</a> and Java.
+Since RSQL is a superset of the FIQL, it can be used for parsing FIQL as well.</p>
+<h2><a class="anchor" aria-hidden="true" id="grammar"></a><a href="#grammar" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Grammar</h2>
+<p><em>The following grammar specification is written in EBNF notation (<a href="http://www.cl.cam.ac.uk/~mgk25/iso-14977.pdf">ISO 14977</a>)</em>.</p>
+<p>RSQL expression is composed of one or more comparisons, related to each other with logical operators:</p>
+<ul>
+<li>Logical AND: <code>;</code> or <code>and</code></li>
+<li>Logical OR: <code>,</code> or <code>or</code></li>
+</ul>
+<p>By default, the AND operator takes precedence (i.e. it’s evaluated before any OR operators are).
+However, a parenthesized expression can be used to change the precedence, yielding whatever the contained expression yields.</p>
+<pre><code class="hljs">input          = <span class="hljs-keyword">or</span>, EOF;
+<span class="hljs-keyword">or</span>             = <span class="hljs-keyword">and</span>, { <span class="hljs-string">","</span> , <span class="hljs-keyword">and</span> };
+<span class="hljs-keyword">and</span>            = constraint, { <span class="hljs-string">";"</span> , constraint };
+constraint     = (<span class="hljs-built_in"> group </span>| comparison );<span class="hljs-built_in">
+group </span>         = <span class="hljs-string">"("</span>, <span class="hljs-keyword">or</span>, <span class="hljs-string">")"</span>;
+</code></pre>
+<p>Comparison is composed of a selector, an operator and an argument.</p>
+<pre><code class="hljs"><span class="hljs-attribute">comparison</span>     = selector, comparison-op, arguments;
+</code></pre>
+<p>Selector identifies a field (or attribute, element, …) of the resource representation to filter by.
+It can be any non empty Unicode string that doesn’t contain reserved characters (see below) or a white space.
+The specific syntax of the selector is not enforced by this parser.</p>
+<p><code>selector = unreserved-str;</code></p>
+<p>Comparison operators are in FIQL notation and some of them has an alternative syntax as well:</p>
+<ul>
+<li>Equal to : <code>==</code></li>
+<li>Not equal to : <code>!=</code></li>
+<li>Less than : <code>=lt=</code> or <code>&amp;lt;</code></li>
+<li>Less than or equal to : <code>=le=</code> or <code>⇐</code></li>
+<li>Greater than operator : <code>=gt=</code> or <code>&amp;gt;</code></li>
+<li>Greater than or equal to : <code>=ge=</code> or <code>&amp;gt;=</code></li>
+<li>In : <code>=in=</code></li>
+<li>Not in : <code>=out=</code></li>
+</ul>
+<p>You can also add your own operators.</p>
+<pre><code class="hljs"><span class="hljs-attribute">comparison-op</span>  = comp-fiql | comp-alt;
+<span class="hljs-attribute">comp-fiql</span>      = ( ( <span class="hljs-string">"="</span>, { ALPHA } ) | <span class="hljs-string">"!"</span> ), <span class="hljs-string">"="</span>;
+<span class="hljs-attribute">comp-alt</span>       = ( <span class="hljs-string">"&amp;gt;"</span> | <span class="hljs-string">"&amp;lt;"</span> ), [ <span class="hljs-string">"="</span> ];
+</code></pre>
+<p>Argument can be a single value, or multiple values in parenthesis separated by comma.
+Value that doesn’t contain any reserved character or a white space can be unquoted, other arguments must be enclosed in single or double quotes.</p>
+<pre><code class="hljs">arguments      = ( "(", <span class="hljs-keyword">value</span>, { "," , <span class="hljs-keyword">value</span> }, ")" ) | <span class="hljs-keyword">value</span>;
+<span class="hljs-keyword">value</span>          = unreserved-str | <span class="hljs-type">double</span>-quoted | single-quoted;
+
+unreserved-str = unreserved, { unreserved }
+single-quoted  = "'", { ( escaped | <span class="hljs-keyword">all</span>-chars - ( "'" | "\" ) ) }, "'";
+<span class="hljs-type">double</span>-quoted  = <span class="hljs-string">'"'</span>, { ( escaped | <span class="hljs-keyword">all</span>-chars - ( <span class="hljs-string">'"'</span> | "\" ) ) }, <span class="hljs-string">'"'</span>;
+
+reserved       = <span class="hljs-string">'"'</span> | "'" | "(" | ")" | ";" | "," | "=" | "!" | "~" | "&amp;lt;" | "&amp;gt;";
+unreserved     = <span class="hljs-keyword">all</span>-chars - reserved - " ";
+escaped        = "\", <span class="hljs-keyword">all</span>-chars;
+<span class="hljs-keyword">all</span>-chars      = ? <span class="hljs-keyword">all</span> unicode characters ?;
+</code></pre>
+<p>If you need to use both single and double quotes inside a quoted argument, then you must escape one of them using <code>\</code> (backslash).
+If you want to use <code>\</code> literally, then double it as <code>\\</code>.
+Backslash has a special meaning only inside a quoted argument, not in unquoted argument.</p>
+<h2><a class="anchor" aria-hidden="true" id="examples"></a><a href="#examples" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Examples</h2>
+<p>Examples of RSQL expressions in both FIQL-like and alternative notation:</p>
+<pre><code class="hljs">?<span class="hljs-keyword">filter</span>=<span class="hljs-type">name</span>=="Kill Bill";year=gt=<span class="hljs-number">2003</span>
+?<span class="hljs-keyword">filter</span>=<span class="hljs-type">name</span>=="Kill Bill" <span class="hljs-keyword">and</span> year&amp;gt;<span class="hljs-number">2003</span>
+?<span class="hljs-keyword">filter</span>=genres=<span class="hljs-keyword">in</span>=(sci-fi,action);(director==<span class="hljs-string">'Christopher Nolan'</span>,actor==*Bale);year=ge=<span class="hljs-number">2000</span>
+?<span class="hljs-keyword">filter</span>=genres=<span class="hljs-keyword">in</span>=(sci-fi,action) <span class="hljs-keyword">and</span> (director==<span class="hljs-string">'Christopher Nolan'</span> <span class="hljs-keyword">or</span> actor==*Bale) <span class="hljs-keyword">and</span> year&amp;gt;=<span class="hljs-number">2000</span>
+?<span class="hljs-keyword">filter</span>=director.lastName==Nolan;year=ge=<span class="hljs-number">2000</span>;year=lt=<span class="hljs-number">2010</span>
+?<span class="hljs-keyword">filter</span>=director.lastName==Nolan <span class="hljs-keyword">and</span> year&amp;gt;=<span class="hljs-number">2000</span> <span class="hljs-keyword">and</span> year&amp;lt;<span class="hljs-number">2010</span>
+?<span class="hljs-keyword">filter</span>=genres=<span class="hljs-keyword">in</span>=(sci-fi,action);genres=<span class="hljs-keyword">out</span>=(romance,animated,horror),director==Que*Tarantino
+?<span class="hljs-keyword">filter</span>=genres=<span class="hljs-keyword">in</span>=(sci-fi,action) <span class="hljs-keyword">and</span> genres=<span class="hljs-keyword">out</span>=(romance,animated,horror) <span class="hljs-keyword">or</span> director==Que*Tarantino
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/scrudbeans/docs/applicationcomponents"><span class="arrow-prev">← </span><span>Application Components</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#grammar">Grammar</a></li><li><a href="#examples">Examples</a></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="copyright">Copyright © 2018 Manos Batsis</section></footer></div></body></html>
