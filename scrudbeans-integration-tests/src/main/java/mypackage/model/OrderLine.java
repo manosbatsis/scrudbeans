@@ -26,17 +26,9 @@ import org.hibernate.annotations.Formula;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ScrudBean(
-		//pathFragment = OrderLine.API_PATH_FRAGMENT,
-		//apiName = "Order lines",
-		//apiDescription = OrderLine.API_MODEL_DESCRIPTION
-)
+@ScrudBean
 @ApiModel(value = "Order Line", description = "A model representing an order line")
 public class OrderLine extends AbstractSystemUuidPersistableModel {
-
-	public static final String API_PATH_FRAGMENT = "orderLines";
-
-	public static final String API_MODEL_DESCRIPTION = "Search, create or modify order lines";
 
 	@NotNull
 	@Column(nullable = false)

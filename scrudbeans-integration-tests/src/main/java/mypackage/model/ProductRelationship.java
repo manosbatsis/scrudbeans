@@ -24,16 +24,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ScrudBean(
-		pathFragment = ProductRelationship.API_PATH_FRAGMENT,
-		apiName = "Product Relationships",
-		apiDescription = ProductRelationship.API_MODEL_DESCRIPTION)
+@ScrudBean
 @ApiModel(value = "Product Relationships", description = "A model representing a relationship between products")
 public class ProductRelationship implements PersistableModel<ProductRelationshipIdentifier> {
-
-	public static final String API_PATH_FRAGMENT = "productRelationships";
-
-	public static final String API_MODEL_DESCRIPTION = "Search, create or modify product relationships";
 
 	@NotNull
 	@ApiModelProperty(required = true)

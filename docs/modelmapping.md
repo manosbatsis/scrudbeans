@@ -26,8 +26,7 @@ Model driven services are enabled per entity provided two conditions are met:
  ```java
 @Entity
 @Table(name = "product_orders")
-@ScrudBean(pathFragment = "orders", apiName = "Orders", 
-	apiDescription = "Search, create or modify orders")
+@ScrudBean
 public class Order extends AbstractSystemUuidPersistableModel {
 
 	// ScrudBeans will automatically pick-up Bean Validation and Column annotations 
@@ -46,7 +45,33 @@ further in the next chapter.
 
 ## Relevant Annotations
 
-Besides `@ScrudBean`, the following annotations are also taken into account by ScrudBeans.
+### ScrudBean
+
+The `@ScrudBean` annotation marks the entity model for annotation processing and, optionally, provides relevant metadata.
+The annotation processors have a reasonable strategy for creating those metadata themselves when missing. The following shorthand 
+for example:
+
+```java
+@ScrudBean
+public class DiscountCode {//...
+```
+Is equivalent to:
+
+```java
+@ScrudBean(
+	pathFragment = "discountCodes", 
+	apiName = "Discount Codes", 
+	apiDescription = "Search or manage Discount Code entries")
+public class DiscountCode { //...
+```
+
+About the annotation members:
+
+- `pathFragment` is the path fragment appended to the API base path (by default `api/rest/`), thus forming the base 
+`RequestMapping` path for this entity's REST controller.
+- `apiName` is equivalent to `io.swagger.annotations.Api#tags` and serves as a name and logical grouping of 
+operations/endpoints for this entity's REST controller .
+- `apiDescription` is equivalent to `io.swagger.annotations.Api#description`.
 
 ### Validation
 

@@ -22,16 +22,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ScrudBean(
-		pathFragment = Product.API_PATH_FRAGMENT,
-		apiName = "Products",
-		apiDescription = Product.API_MODEL_DESCRIPTION)
+@ScrudBean
 @ApiModel(value = "Product", description = "A model representing a single product")
 public class Product extends AbstractSystemUuidPersistableModel {
-
-	public static final String API_PATH_FRAGMENT = "products";
-
-	public static final String API_MODEL_DESCRIPTION = "Search, create or modify products";
 
 	@NotNull
 	@Column(nullable = false)

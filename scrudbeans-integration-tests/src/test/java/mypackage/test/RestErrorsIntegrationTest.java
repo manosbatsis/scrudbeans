@@ -42,7 +42,7 @@ public class RestErrorsIntegrationTest extends AbstractRestAssueredIT {
 		SimpleErrorResponse error = given()
 				.spec(defaultSpec())
 				.body(discountCode)
-				.post("/" + DiscountCode.API_PATH_FRAGMENT)
+				.post("/discountCodes")
 				.then()
 				.statusCode(400).extract().as(SimpleErrorResponse.class);
 
@@ -68,7 +68,7 @@ public class RestErrorsIntegrationTest extends AbstractRestAssueredIT {
 		discountCode1 = given()
 				.spec(defaultSpec())
 				.body(discountCode1)
-				.post("/" + DiscountCode.API_PATH_FRAGMENT)
+				.post("/discountCodes")
 				.then()
 				.statusCode(201).extract().as(DiscountCode.class);
 
@@ -78,7 +78,7 @@ public class RestErrorsIntegrationTest extends AbstractRestAssueredIT {
 		SimpleErrorResponse error = given()
 				.spec(defaultSpec())
 				.body(discountCode2)
-				.post("/" + DiscountCode.API_PATH_FRAGMENT)
+				.post("/discountCodes")
 				.then()
 				.statusCode(400).extract().as(SimpleErrorResponse.class);
 

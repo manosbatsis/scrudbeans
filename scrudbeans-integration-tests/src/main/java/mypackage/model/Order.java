@@ -33,16 +33,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@ScrudBean(
-		pathFragment = Order.API_PATH_FRAGMENT,
-		apiName = "Orders",
-		apiDescription = Order.API_MODEL_DESCRIPTION)
+@ScrudBean
 @ApiModel(value = "Order", description = "A model representing an order of product items")
 public class Order extends AbstractSystemUuidPersistableModel {
-
-	public static final String API_PATH_FRAGMENT = "orders";
-
-	public static final String API_MODEL_DESCRIPTION = "Search, create or modify orders";
 
 	@NotNull
 	@Column(nullable = false)

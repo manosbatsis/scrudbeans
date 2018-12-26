@@ -120,7 +120,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 			given()
 					.spec(defaultSpec())
 					.body(orderLine)
-					.post("/" + OrderLine.API_PATH_FRAGMENT)
+					.post("/orderLines")
 					.then()
 					.statusCode(201).extract().as(OrderLine.class);
 		}
@@ -186,7 +186,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 					relationship = given()
 							.spec(defaultSpec())
 							.body(relationship)
-							.post("/" + ProductRelationship.API_PATH_FRAGMENT)
+							.post("/productRelationships")
 							.then()
 							.statusCode(201).extract().as(ProductRelationship.class);
 					// Test Update
@@ -194,7 +194,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 					relationship = given()
 							.spec(defaultSpec())
 							.body(relationship)
-							.put("/" + ProductRelationship.API_PATH_FRAGMENT + '/' + relationship.getId())
+							.put("/productRelationships" + '/' + relationship.getId())
 							.then()
 							.statusCode(200).extract().as(ProductRelationship.class);
 					// Test Patch
@@ -203,13 +203,13 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 					relationship = given()
 							.spec(defaultSpec())
 							.body(patch)
-							.put("/" + ProductRelationship.API_PATH_FRAGMENT + '/' + relationship.getId())
+							.put("/productRelationships" + '/' + relationship.getId())
 							.then()
 							.statusCode(200).extract().as(ProductRelationship.class);
 					// Test Read
 					relationship = given()
 							.spec(defaultSpec())
-							.get("/" + ProductRelationship.API_PATH_FRAGMENT + '/' + relationship.getId())
+							.get("/productRelationships" + '/' + relationship.getId())
 							.then()
 							.statusCode(200).extract().as(ProductRelationship.class);
 					assertEquals(description + "_updated_patched", relationship.getDescription());

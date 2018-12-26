@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  * A controller for order lines that allows search, create and delete but removes support for update and patch.
  */
 @RestController
-@RequestMapping(value = {"/api/rest/" + OrderLine.API_PATH_FRAGMENT},
+@RequestMapping(value = {"/api/rest/orderLines"},
 		consumes = {MimeTypeUtils.APPLICATION_JSON_VALUE, Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE},
 		produces = {MimeTypeUtils.APPLICATION_JSON_VALUE, Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE})
 @ExposesResourceFor(OrderLine.class)
