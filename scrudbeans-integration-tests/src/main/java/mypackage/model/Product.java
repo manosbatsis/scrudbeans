@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.jpa.model.AbstractSystemUuidPersistableModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ScrudResource(
+@ScrudBean(
 		pathFragment = Product.API_PATH_FRAGMENT,
 		apiName = "Products",
 		apiDescription = Product.API_MODEL_DESCRIPTION)

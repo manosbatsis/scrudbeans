@@ -27,7 +27,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.jpa.model.AbstractAssignedIdPersistableModel;
 import io.swagger.annotations.ApiModel;
 import lombok.Getter;
@@ -52,7 +52,7 @@ import org.springframework.hateoas.core.Relation;
 		@AttributeOverride(name = "id", column = @Column(unique = true, nullable = false, length = 2)),
 		@AttributeOverride(name = "name", column = @Column(unique = true, nullable = false, length = 50)),
 })
-@ScrudResource(pathFragment = "countries", apiName = "Countries", apiDescription = "Operations about countries"
+@ScrudBean(pathFragment = "countries", apiName = "Countries", apiDescription = "Operations about countries"
 		/*TODO , controllerSuperClass = CountryController.class*/)
 @ApiModel(value = "Country", description = "A model representing a country, meaning a region that is identified as a distinct entity in political geography.")
 @Relation(value = "country", collectionRelation = "countries")

@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 /**
  * Configure thumbs or other preview generation
  */
-@RestdudeModelAnnotation
+@ScrudBeansModelAnnotation
 @Target(value = ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FilePersistencePreviews {

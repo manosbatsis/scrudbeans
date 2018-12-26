@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
  *  <p>For example:</p>
  *
  *  <pre class="code">
- * &#064;ScrudResource(
+ * &#064;ScrudBean(
  * 		pathFragment = "countries",
  * 		apiName = "Countries",
  * 		apiDescription = "Operations about countries",
@@ -55,11 +55,11 @@ import java.lang.annotation.Target;
  * </pre>
  *
  */
-@RestdudeModelAnnotation
+@ScrudBeansModelAnnotation
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented
-public @interface ScrudResource {
+public @interface ScrudBean {
 
 	/**
 	 * The superclass for the generated controller
@@ -79,7 +79,7 @@ public @interface ScrudResource {
 	/**
 	 * The default URI component for the annotated type
 	 */
-	String pathFragment();
+	String pathFragment() default "";
 
 	/**
 	 *

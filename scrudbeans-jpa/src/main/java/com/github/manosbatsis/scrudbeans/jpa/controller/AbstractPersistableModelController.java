@@ -20,6 +20,9 @@
  */
 package com.github.manosbatsis.scrudbeans.jpa.controller;
 
+import static com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATION_VND_API_PLUS_JSON_VALUE;
+import static com.github.manosbatsis.scrudbeans.api.util.Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -111,8 +114,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 
 	@RequestMapping(
 			method = RequestMethod.POST,
-			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+			consumes = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE,
+			produces = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(value = "Create a new HAL resource")
 	public Resource<T> hateoasPost(@RequestBody T model) {
@@ -122,8 +125,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 
 	@RequestMapping(
 			method = RequestMethod.POST,
-			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+			consumes = APPLICATION_VND_API_PLUS_JSON_VALUE,
+			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
 	@ApiOperation(value = "Create a new JSON API resource")
 	public JsonApiModelResourceDocument<T, PK> jsonApiPost(
@@ -148,8 +151,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	@RequestMapping(
 			value = "{id}",
 			method = RequestMethod.PUT,
-			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+			consumes = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE,
+			produces = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE)
 	@ApiOperation(value = "Update a HAL resource")
 	public Resource<T> hateoasPut(
 			@ApiParam(name = "id", required = true, value = "string")
@@ -161,8 +164,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	@RequestMapping(
 			value = "{id}",
 			method = RequestMethod.PUT,
-			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+			consumes = APPLICATION_VND_API_PLUS_JSON_VALUE,
+			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ApiOperation(value = "Update a JSON API Document")
 	public JsonApiModelResourceDocument<T, PK> jsonApiPut(
 			@ApiParam(name = "id", required = true, value = "string")
@@ -189,8 +192,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	@RequestMapping(
 			value = "{id}",
 			method = RequestMethod.PATCH,
-			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+			consumes = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE,
+			produces = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE)
 	@ApiOperation(
 			value = "Patch (partially update) a HAL resource",
 			notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
@@ -204,8 +207,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	@RequestMapping(
 			value = "{id}",
 			method = RequestMethod.PATCH,
-			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+			consumes = APPLICATION_VND_API_PLUS_JSON_VALUE,
+			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ApiOperation(
 			value = "Patch (partially update) a JSON API Document",
 			notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
@@ -232,8 +235,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	@RequestMapping(
 			method = RequestMethod.GET,
 			params = "page=no",
-			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+			consumes = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE,
+			produces = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE)
 	@ApiOperation(
 			value = "Get the full collection of HAL resources (no paging or criteria)",
 			notes = "Find all HAL resources, and return the full collection (i.e. VS a page of the total results)")
@@ -244,8 +247,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	@RequestMapping(
 			method = RequestMethod.GET,
 			params = "page=no",
-			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+			consumes = APPLICATION_VND_API_PLUS_JSON_VALUE,
+			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ApiOperation(
 			value = "Get the full collection of JSON API Documents (no paging or criteria)",
 			notes = "Find all JSON API Documents, and return the full collection (i.e. VS a page of the total results)")
@@ -281,8 +284,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	//@Override
 	@RequestMapping(
 			method = RequestMethod.GET,
-			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+			consumes = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE,
+			produces = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE)
 	@ApiOperation(
 			value = "Search for resources (paginated).",
 			notes = "Find all resources matching the given criteria and return a paginated collection."
@@ -304,8 +307,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 
 	@RequestMapping(
 			method = RequestMethod.GET,
-			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+			consumes = APPLICATION_VND_API_PLUS_JSON_VALUE,
+			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ApiOperation(
 			value = "Search for resources (paginated).",
 			notes = "Find all resources matching the given criteria and return a paginated JSON API Document.")
@@ -336,8 +339,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 
 	@RequestMapping(value = "{id}",
 			method = RequestMethod.GET,
-			consumes = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATIOM_HAL_PLUS_JSON)
+			consumes = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE,
+			produces = MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE)
 	@ApiOperation(value = "Find by id", notes = "Find a resource by it's identifier")
 	public ModelResource<T> hateoasGetById(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id) {
 		LOGGER.debug("plainJsonGetById, id: {}, model type: {}", id, this.service.getDomainClass());
@@ -350,8 +353,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 
 	@RequestMapping(value = "{id}",
 			method = RequestMethod.GET,
-			consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON,
-			produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+			consumes = APPLICATION_VND_API_PLUS_JSON_VALUE,
+			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ApiOperation(value = "Find by id", notes = "Find a resource by it's identifier")
 	public JsonApiModelResourceDocument<T, PK> jsonApiGetById(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id) {
 		return toDocument(super.findById(id));
@@ -406,7 +409,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	/**
 	 * GET has the same effect to both member and relationship endpoints
 	 */
-	@RequestMapping(value = {"{id}/{relationName}", "{id}/relationships/{relationName}"}, method = RequestMethod.GET, consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+	@RequestMapping(value = {"{id}/{relationName}", "{id}/relationships/{relationName}"}, method = RequestMethod.GET, consumes = APPLICATION_VND_API_PLUS_JSON_VALUE, produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ApiOperation(value = "Find related by root id", notes = "Find the related resource for the given relation name and identifier")
 	public JsonApiDocument jsonApiGetRelated(
 			@ApiParam(name = PARAM_PK, required = true, value = "string") @PathVariable PK id,
@@ -458,7 +461,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 		return this.toHateoasResources(super.findByIds(ids));
 	}
 
-	@RequestMapping(params = "ids", method = RequestMethod.GET, consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+	@RequestMapping(params = "ids", method = RequestMethod.GET, consumes = APPLICATION_VND_API_PLUS_JSON_VALUE, produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ApiOperation(value = "Search by ids", notes = "Find the set of resources matching the given identifiers.")
 	public JsonApiModelResourceCollectionDocument<T, PK> jsonApiGetByIds(@RequestParam(value = "ids[]") Set<PK> ids) {
 		return toDocument(super.findByIds(ids));
@@ -471,7 +474,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 		super.delete(id);
 	}
 
-	@RequestMapping(value = "{id}", method = RequestMethod.DELETE, consumes = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, produces = HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON)
+	@RequestMapping(value = "{id}", method = RequestMethod.DELETE, consumes = APPLICATION_VND_API_PLUS_JSON_VALUE, produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@ApiOperation(value = "Delete a resource", notes = "Delete a resource by its identifier. ", httpMethod = "DELETE")
 	public void jsonApiDelete(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id) {
@@ -491,7 +494,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 		return super.getUiSchema();
 	}
 
-	@RequestMapping(method = RequestMethod.OPTIONS, consumes = {HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, MimeTypeUtils.APPLICATION_JSON_VALUE}, produces = {HypermediaUtils.MIME_APPLICATION_VND_PLUS_JSON, MimeTypeUtils.APPLICATION_JSON_VALUE})
+	@RequestMapping(method = RequestMethod.OPTIONS, consumes = {APPLICATION_VND_API_PLUS_JSON_VALUE, MimeTypeUtils.APPLICATION_JSON_VALUE}, produces = {APPLICATION_VND_API_PLUS_JSON_VALUE, MimeTypeUtils.APPLICATION_JSON_VALUE})
 	@ApiOperation(value = "Get CORS headers", notes = "Get the CORS headers for the given path")
 	public void options(HttpServletResponse response) {
 		response.setHeader(HttpUtil.ACESS_CONTROL_CREDENTIALS_NAME, "true");

@@ -32,7 +32,7 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.jpa.uischema.annotation.FormSchemaEntry;
 import com.github.manosbatsis.scrudbeans.jpa.uischema.annotation.FormSchemas;
 import com.github.manosbatsis.scrudbeans.jpa.uischema.model.UiSchema;
@@ -130,16 +130,16 @@ public class UiSchemaSerializer extends JsonSerializer<UiSchema> {
 				jgen.writeStartObject();
 
 				// write superclass hint
-				ScrudResource superResource = (ScrudResource) domainClass.getSuperclass().getAnnotation(ScrudResource.class);
+				ScrudBean superResource = (ScrudBean) domainClass.getSuperclass().getAnnotation(ScrudBean.class);
 				if (superResource != null) {
 					jgen.writeFieldName("superPathFragment");
 					jgen.writeString(superResource.pathFragment());
 				}
 
 				// write pathFragment
-				ScrudResource scrudResource = (ScrudResource) domainClass.getAnnotation(ScrudResource.class);
+				ScrudBean scrudBean = (ScrudBean) domainClass.getAnnotation(ScrudBean.class);
 				jgen.writeFieldName("pathFragment");
-				jgen.writeString(scrudResource.pathFragment());
+				jgen.writeString(scrudBean.pathFragment());
 
 				// write simple class name
 				jgen.writeFieldName("simpleClassName");

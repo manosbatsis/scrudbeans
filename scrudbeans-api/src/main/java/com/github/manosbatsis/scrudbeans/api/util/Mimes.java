@@ -25,6 +25,16 @@ import org.springframework.util.MimeType;
 public class Mimes {
 
 	/**
+	 * Public constant mime type for {@code application/json}.
+	 */
+	public final static MimeType APPLICATIOM_JSON;
+
+	/**
+	 * A String equivalent of {@link Mimes#APPLICATIOM_JSON}.
+	 */
+	public final static String APPLICATIOM_JSON_VALUE = "application/json";
+
+	/**
 	 * Public constant mime type for {@code application/vnd.api+json}.
 	 */
 	public final static MimeType APPLICATION_VND_API_PLUS_JSON;
@@ -45,9 +55,9 @@ public class Mimes {
 	public static final String MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE = "application/hal+json";
 
 	static {
-		APPLICATION_VND_API_PLUS_JSON = MimeType.valueOf(APPLICATION_VND_API_PLUS_JSON_VALUE);
+		APPLICATIOM_JSON = MimeType.valueOf(APPLICATIOM_JSON_VALUE);
 		MIME_APPLICATIOM_HAL_PLUS_JSON = MimeType.valueOf(MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE);
-
+		APPLICATION_VND_API_PLUS_JSON = MimeType.valueOf(APPLICATION_VND_API_PLUS_JSON_VALUE);
 	}
 
 }

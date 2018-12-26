@@ -17,11 +17,15 @@
 			<artifactId>scrudbeans-jpa</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>com.squareup</groupId>
 			<artifactId>javapoet</artifactId>
 			<version>${javapoet.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.atteo</groupId>
+			<artifactId>evo-inflector</artifactId>
+			<version>${evo-inflector.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.annotation</groupId>

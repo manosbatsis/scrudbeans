@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
  *
  * @see CurrentPrincipal
  */
-@RestdudeModelAnnotation
+@ScrudBeansModelAnnotation
 @Target(value = ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CurrentPrincipalField {

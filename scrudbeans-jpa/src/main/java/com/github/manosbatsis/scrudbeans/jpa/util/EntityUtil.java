@@ -34,8 +34,8 @@ import javax.persistence.Entity;
 
 import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedResource;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedBean;
 import com.github.manosbatsis.scrudbeans.common.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.jpa.validation.CaseSensitive;
 import org.apache.commons.lang3.StringUtils;
@@ -59,7 +59,7 @@ public class EntityUtil {
 
 	@SuppressWarnings("unchecked")
 	public static <T> T getParentEntity(Object child) {
-		ScrudRelatedResource anr = child.getClass().getAnnotation(ScrudRelatedResource.class);
+		ScrudRelatedBean anr = child.getClass().getAnnotation(ScrudRelatedBean.class);
 		Assert.notNull(anr, "Given child object has no @RelatedEntity annotation");
 		Field field = ReflectionUtils.findField(child.getClass(), anr.parentProperty());
 		field.setAccessible(true);
@@ -73,7 +73,7 @@ public class EntityUtil {
 	}
 
 	public static Set<BeanDefinition> findModelResources(String scanPackage) {
-		ClassPathScanningCandidateComponentProvider provider = createComponentScanner(ScrudResource.class, ScrudRelatedResource.class);
+		ClassPathScanningCandidateComponentProvider provider = createComponentScanner(ScrudBean.class, ScrudRelatedBean.class);
 		return provider.findCandidateComponents(scanPackage);
 	}
 
@@ -95,7 +95,7 @@ public class EntityUtil {
 		return predicateFactories;
 	}
 	public static Set<BeanDefinition> findAllModels(String... basePackages) {
-		ClassPathScanningCandidateComponentProvider provider = createComponentScanner(Entity.class, ScrudResource.class, ScrudRelatedResource.class);
+		ClassPathScanningCandidateComponentProvider provider = createComponentScanner(Entity.class, ScrudBean.class, ScrudRelatedBean.class);
 		Set<BeanDefinition> entities = new HashSet<>();
 		for (String basePackage : basePackages) {
 			entities.addAll(provider.findCandidateComponents(basePackage));

@@ -18,27 +18,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.api.mdd.annotation.model;
+package com.github.manosbatsis.scrudbeans.api.mdd.annotation;
 
-import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks Model relationships
+ * Meta-annotation (annotations used on other annotations)
+ * used for marking all annotations that are
+ * part of Restdude. Can be used for recognizing all
+ * Restdude annotations generically, and in future also for
+ * passing other generic annotation configuration.
  */
-@RestdudeModelAnnotation
+@Target({ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Documented
-public @interface ScrudRelatedResource {
-
-	Class<?> beanClass() default Object.class;
-
-	String parentProperty();
-
-	String path() default "";
-
+public @interface ScrudBeansAnnotation {
+	// for now, a pure tag annotation, no parameters
 }
+

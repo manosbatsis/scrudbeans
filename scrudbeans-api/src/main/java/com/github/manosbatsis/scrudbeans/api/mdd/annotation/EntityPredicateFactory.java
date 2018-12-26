@@ -26,13 +26,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.RestdudeModelAnnotation;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBeansModelAnnotation;
 
 
 /**
  * <p>Marks a t6ype as predicate factory of a JPA entity type.
  */
-@RestdudeModelAnnotation
+@ScrudBeansModelAnnotation
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented

@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.jpa.model.AbstractSystemUuidPersistableModel;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -26,10 +26,11 @@ import org.hibernate.annotations.Formula;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ScrudResource(
-		pathFragment = OrderLine.API_PATH_FRAGMENT,
-		apiName = "Order lines",
-		apiDescription = OrderLine.API_MODEL_DESCRIPTION)
+@ScrudBean(
+		//pathFragment = OrderLine.API_PATH_FRAGMENT,
+		//apiName = "Order lines",
+		//apiDescription = OrderLine.API_MODEL_DESCRIPTION
+)
 @ApiModel(value = "Order Line", description = "A model representing an order line")
 public class OrderLine extends AbstractSystemUuidPersistableModel {
 

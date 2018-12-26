@@ -1,0 +1,17 @@
+{
+  "docs": {
+    "Guides": [
+      "installation",
+      "modelmapping",
+      "restfulservices",
+      "applicationcomponents"
+    ],
+    "Reference": []
+  },
+  "docs-other": {
+    "First Category": [
+      "doc4",
+      "doc5"
+    ]
+  }
+}

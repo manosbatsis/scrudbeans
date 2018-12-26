@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 import com.github.manosbatsis.scrudbeans.api.domain.Model;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
 
 /**
@@ -45,7 +45,7 @@ public interface ModelInfo<T extends Model<PK>, PK extends Serializable> {
 
 	Class<T> getModelType();
 
-	ScrudResource getScrudResource();
+	ScrudBean getScrudBean();
 
 	String getPackageName();
 

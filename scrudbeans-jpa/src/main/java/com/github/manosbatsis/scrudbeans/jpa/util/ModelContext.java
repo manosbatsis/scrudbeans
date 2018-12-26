@@ -31,8 +31,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedResource;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
@@ -52,8 +52,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * Adapter-ish context class for classes with {@link ScrudResource}
- * and {@link ScrudRelatedResource}
+ * Adapter-ish context class for classes with {@link ScrudBean}
+ * and {@link ScrudRelatedBean}
  * annotations.
  */
 public final class ModelContext {
@@ -84,7 +84,7 @@ public final class ModelContext {
 
 	private Map<String, Object> apiAnnotationMembers;
 
-	private ScrudResource scrudResource;
+	private ScrudBean scrudBean;
 
 	@Getter
 	private boolean auditable;
@@ -99,9 +99,9 @@ public final class ModelContext {
 		Class<?> modelClass = modelInfo.getModelType();
 
 		this.generatedClassNamePrefix = modelClass.getSimpleName().replace("Model", "").replace("Entity", "");
-		this.scrudResource = modelClass.getAnnotation(ScrudResource.class);
+		this.scrudBean = modelClass.getAnnotation(ScrudBean.class);
 		this.generatedClassNamePrefix = modelClass.getSimpleName().replace("Model", "").replace("Entity", "");
-		if (this.scrudResource != null) {
+		if (this.scrudBean != null) {
 			this.parentClass = null;
 			this.parentProperty = null;
 		}
@@ -118,7 +118,7 @@ public final class ModelContext {
 
 
 	public Class getControllerSuperClass() {
-		Class sClass = ClassUtils.getClass(this.scrudResource.controllerSuperClass());
+		Class sClass = ClassUtils.getClass(this.scrudBean.controllerSuperClass());
 		if (sClass == null || Object.class.equals(sClass)) {
 			sClass = this.modelInfo.isJpaEntity() ? AbstractPersistableModelController.class : AbstractModelServiceBackedController.class;
 		}
@@ -146,7 +146,7 @@ public final class ModelContext {
 			return false;
 		}
 		Class<?> modelType = this.modelInfo.getModelType();
-		ScrudRelatedResource anr = modelType.getAnnotation(ScrudRelatedResource.class);
+		ScrudRelatedBean anr = modelType.getAnnotation(ScrudRelatedBean.class);
 		Assert.notNull(anr, "Not a nested resource");
 
 		String parentProperty = anr.parentProperty();
@@ -180,7 +180,7 @@ public final class ModelContext {
 			apiAnnotationMembers = new HashMap<>();
 
 			Class<?> modelType = this.getModelType();
-			ScrudResource resource = modelType.getAnnotation(ScrudResource.class);
+			ScrudBean resource = modelType.getAnnotation(ScrudBean.class);
 			if (resource != null) {
 				// auditable?
 				apiAnnotationMembers.put(AUDITABLE2, resource.auditable());

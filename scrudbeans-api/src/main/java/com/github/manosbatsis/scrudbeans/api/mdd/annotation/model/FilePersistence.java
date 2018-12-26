@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 /**
  * Mark field as a manageable file
  */
-@RestdudeModelAnnotation
+@ScrudBeansModelAnnotation
 @Target(value = ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface FilePersistence {

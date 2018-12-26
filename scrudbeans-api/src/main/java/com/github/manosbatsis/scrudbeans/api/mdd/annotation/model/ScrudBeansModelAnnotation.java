@@ -18,23 +18,26 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.api.mdd.annotation;
+package com.github.manosbatsis.scrudbeans.api.mdd.annotation.model;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.ScrudBeansAnnotation;
+
 /**
  * Meta-annotation (annotations used on other annotations)
  * used for marking all annotations that are
- * part of Restdude. Can be used for recognizing all
- * Restdude annotations generically, and in future also for
+ * part of Restdude applicable to models. Can be used for recognizing
+ * model annotations generically, and in future also for
  * passing other generic annotation configuration.
  */
+@ScrudBeansAnnotation
 @Target({ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RestdudeAnnotation {
+public @interface ScrudBeansModelAnnotation {
 	// for now, a pure tag annotation, no parameters
 }
 

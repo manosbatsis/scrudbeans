@@ -33,14 +33,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.jpa.model.AbstractSystemUuidPersistableModel;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
 /**
  */
 @DiffIgnore
-@ScrudResource(pathFragment = "hosts",
+@ScrudBean(pathFragment = "hosts",
 		controllerSuperClass = "com.github.manosbatsis.scrudbeans.jpa.controller.AbstractPersistableModelController",
 		apiName = "Hosts", apiDescription = "Operations about hosts")
 @Entity

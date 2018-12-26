@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
  * at controller level see CurrentPrincipalField.
  * @see CurrentPrincipalField
  */
-@RestdudeModelAnnotation
+@ScrudBeansModelAnnotation
 @Target(value = ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CurrentPrincipal {

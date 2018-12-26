@@ -19,7 +19,7 @@ import javax.lang.model.element.TypeElement;
 import javax.persistence.Entity;
 
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.EntityModelDescriptor;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.ModelDescriptor;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.ScrudModelDescriptor;
@@ -30,12 +30,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Annotation processor that generates SCRUD components
- * for model annotated with @{@link ScrudResource}
+ * for model annotated with @{@link ScrudBean}
  * and JPA specification predicate factories for models
  * annotated with @{@link Entity}
  */
 @SupportedAnnotationTypes({
-		"com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource",
+		"com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean",
 		"javax.persistence.Entity"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -61,7 +61,7 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 
 		// Create JPA query predicate factories for each entity in the source path
 		generateEntityPredicateFactories(roundEnv);
-		// Create other SCRUD components for each model annotated with ScrudResource
+		// Create other SCRUD components for each model annotated with ScrudBean
 		generateScrudComponents(roundEnv);
 		// Claiming that annotations have been processed by this processor
 
@@ -74,7 +74,7 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 	 * @param roundEnv The current compilation round environment
 	 */
 	private void generateScrudComponents(RoundEnvironment roundEnv) {
-		Set<? extends Element> annotatedModels = roundEnv.getElementsAnnotatedWith(ScrudResource.class);
+		Set<? extends Element> annotatedModels = roundEnv.getElementsAnnotatedWith(ScrudBean.class);
 		Map<Name, ScrudModelDescriptor> modelDescriptors = new HashMap<>();
 		log.info("ScrudModelAnnotationProcessor found {} annotated classes", (annotatedModels != null ? annotatedModels.size() : 0));
 		if (annotatedModels != null) {
@@ -90,7 +90,7 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 						createController(descriptor);
 					}
 					else {
-						log.warn("Not an instance of TypeElement but annotated with ScrudResource: {}", element.getSimpleName());
+						log.warn("Not an instance of TypeElement but annotated with ScrudBean: {}", element.getSimpleName());
 					}
 				}
 				catch (ScrudModelProcessorException e) {
@@ -114,7 +114,7 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 					createPredicateFactory(descriptor);
 				}
 				else {
-					log.warn("Not an instance of TypeElement but annotated with ScrudResource: {}", element.getSimpleName());
+					log.warn("Not an instance of TypeElement but annotated with ScrudBean: {}", element.getSimpleName());
 				}
 			}
 			catch (ScrudModelProcessorException e) {

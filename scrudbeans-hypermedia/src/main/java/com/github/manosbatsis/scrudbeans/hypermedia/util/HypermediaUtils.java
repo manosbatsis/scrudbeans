@@ -54,10 +54,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class HypermediaUtils {
 
-	public static final String MIME_APPLICATION_VND_PLUS_JSON = "application/vnd.api+json";
-
-	public static final String MIME_APPLICATIOM_HAL_PLUS_JSON = "application/hal+json";
-	public static final String MIME_APPLICATIOM_JSON = "application/json";
 
 	public static List<Link> buileHateoasLinks(@NonNull ParamsAwarePage page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName) {
 		List<Link> links = new LinkedList<>();

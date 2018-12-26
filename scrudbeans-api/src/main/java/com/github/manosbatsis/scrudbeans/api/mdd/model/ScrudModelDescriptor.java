@@ -9,19 +9,19 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Types;
 
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * A metadata and utility context helper focusing on a single model annotated with
- * {@link ScrudResource}. Used during javapoet-driven sourcecode generation.
+ * {@link ScrudBean}. Used during javapoet-driven sourcecode generation.
  */
 @Slf4j
 @Data
 public class ScrudModelDescriptor extends ModelDescriptor {
 
-	private final ScrudResource scrudResource;
+	private final ScrudBean scrudBean;
 
 	private Map<String, String> oneToMany = new HashMap<>();
 
@@ -33,7 +33,7 @@ public class ScrudModelDescriptor extends ModelDescriptor {
 
 	public ScrudModelDescriptor(ProcessingEnvironment processingEnv, TypeElement typeElement) throws ScrudModelProcessorException {
 		super(processingEnv, typeElement);
-		this.scrudResource = typeElement.getAnnotation(ScrudResource.class);
+		this.scrudBean = typeElement.getAnnotation(ScrudBean.class);
 	}
 
 	@Override

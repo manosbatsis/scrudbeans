@@ -1,17 +1,22 @@
 package com.github.manosbatsis.scrudbeans.processor;
 
+import static com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATIOM_JSON_VALUE;
+import static com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATION_VND_API_PLUS_JSON_VALUE;
+import static com.github.manosbatsis.scrudbeans.api.util.Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE;
+
 import java.util.Objects;
 
 import javax.lang.model.element.Modifier;
 import javax.persistence.Entity;
 
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.EntityModelDescriptor;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.ScrudModelDescriptor;
 import com.github.manosbatsis.scrudbeans.api.mdd.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.PersistableModelService;
+import com.github.manosbatsis.scrudbeans.common.util.ScrudStringUtils;
 import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractModelServiceBackedController;
 import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractPersistableModelController;
 import com.github.manosbatsis.scrudbeans.jpa.service.AbstractModelServiceImpl;
@@ -24,6 +29,7 @@ import com.squareup.javapoet.TypeSpec;
 import io.swagger.annotations.Api;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.atteo.evo.inflector.English;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +46,10 @@ class TypeSpecBuilder {
 
 	private static final Logger log = LoggerFactory.getLogger(TypeSpecBuilder.class);
 
+	private static final String MIMES_PRODUCED =
+			APPLICATIOM_JSON_VALUE + ", " +
+					MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE + ", " +
+					APPLICATION_VND_API_PLUS_JSON_VALUE;
 	/**
 	 * Create a subclass {@link TypeSpec} of {@link AbstractPersistableModelController}
 	 * or {@link AbstractModelServiceBackedController} depending on whether 
@@ -51,17 +61,19 @@ class TypeSpecBuilder {
 	 */
 	static TypeSpec createController(ScrudModelDescriptor descriptor) {
 		String className = descriptor.getSimpleName() + "Controller";
-		String beanName = "\"" + Character.toLowerCase(className.charAt(0)) + className.substring(1) + "\"";
+		String beanName = ScrudStringUtils.withFirstCharToLowercase(className);
 		// Get controller superclass from annotation if exists, fallback to defaults otherwise
 		Class controllerSuperClass;
-		String controllerSuperClassName = descriptor.getScrudResource().controllerSuperClass();
-		String apiName = descriptor.getScrudResource().apiName();
+		String controllerSuperClassName = descriptor.getScrudBean().controllerSuperClass();
+		String apiName = descriptor.getScrudBean().apiName();
 		if (StringUtils.isBlank(apiName)) {
-			apiName = descriptor.getSimpleName() + " API";
+			// To plural, de-camelcase
+			apiName = ScrudStringUtils.decamelize(English.plural(descriptor.getSimpleName()));
 		}
-		String apiDescription = descriptor.getScrudResource().apiDescription();
+		String apiDescription = descriptor.getScrudBean().apiDescription();
 		if (StringUtils.isBlank(apiDescription)) {
-			apiDescription = "Search, create, update or delete " + descriptor.getSimpleName() + " entries";
+			apiDescription = "Search or manage " +
+					ScrudStringUtils.decamelize(descriptor.getSimpleName()) + " entries";
 		}
 		if (StringUtils.isBlank(controllerSuperClassName)) {
 			controllerSuperClass = descriptor.getJpaEntity() ? AbstractPersistableModelController.class : AbstractModelServiceBackedController.class;
@@ -72,17 +84,18 @@ class TypeSpecBuilder {
 			}
 			catch (ClassNotFoundException e) {
 				throw new RuntimeException(
-						"Could not obtain controllerSuperClass for ScrudResource " + descriptor.getQualifiedName(), e);
+						"Could not obtain controllerSuperClass for ScrudBean " + descriptor.getQualifiedName(), e);
 			}
 		}
 		return TypeSpec.classBuilder(className)
 				.addAnnotation(
 						AnnotationSpec.builder(RestController.class)
-								.addMember("value", beanName).build())
+								.addMember("value", "\"" + beanName + "\"").build())
 				.addAnnotation(
 						AnnotationSpec.builder(Api.class)
 								.addMember("tags", "\"" + apiName + "\"")
-								.addMember("description", "\"" + apiDescription + "\"").build())
+								.addMember("description", "\"" + apiDescription + "\"")
+								.addMember("produces", "\"" + MIMES_PRODUCED + "\"").build())
 				.addAnnotation(
 						AnnotationSpec.builder(RequestMapping.class)
 								.addMember("value", getRequestMappingPattern(descriptor)).build())
@@ -195,17 +208,18 @@ class TypeSpecBuilder {
 	 */
 	private static String getRequestMappingPattern(ScrudModelDescriptor descriptor) {
 		// Get a reference to the annotation
-		ScrudResource scrudResource = descriptor.getScrudResource();
+		ScrudBean scrudBean = descriptor.getScrudBean();
 		// Construct the endpoint end URL fragment
-		String modelUriComponent = Objects.nonNull(scrudResource) ? scrudResource.pathFragment() : null;
+		String modelUriComponent = Objects.nonNull(scrudBean) ? scrudBean.pathFragment() : null;
 		if (StringUtils.isBlank(modelUriComponent)) {
-			modelUriComponent = descriptor.getSimpleName();
-			modelUriComponent = modelUriComponent.toLowerCase().charAt(0) + modelUriComponent.substring(1) + "s";
+			// To plural and with 1st char to low case
+			modelUriComponent = English.plural(
+					ScrudStringUtils.withFirstCharToLowercase(descriptor.getSimpleName()));
 		}
 		// Construct the base API path
-		String modelBasePath = StringUtils.isNotBlank(scrudResource.basePath()) ? scrudResource.basePath() : "api/rest";
+		String modelBasePath = StringUtils.isNotBlank(scrudBean.basePath()) ? scrudBean.basePath() : "api/rest";
 		// Construct the complete endpoint URL
-		String pattern = "\"/" + modelBasePath + "/" + scrudResource.parentPath() + "/" + modelUriComponent + "\"";
+		String pattern = "\"/" + modelBasePath + "/" + scrudBean.parentPath() + "/" + modelUriComponent + "\"";
 		return pattern.replaceAll("/{2,}", "/");
 	}
 }

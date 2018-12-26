@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.persistence.Entity;
 
 import com.github.manosbatsis.scrudbeans.api.domain.Model;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudResource;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
@@ -50,7 +50,7 @@ public class ModelInfoImpl<T extends Model<PK>, PK extends Serializable> impleme
 
 	@Getter private final Class<T> modelType;
 
-	@Getter private final ScrudResource scrudResource;
+	@Getter private final ScrudBean scrudBean;
 
 	@Getter private final String packageName;
 
@@ -99,15 +99,15 @@ public class ModelInfoImpl<T extends Model<PK>, PK extends Serializable> impleme
 		this.jpaEntity = modelType.isAnnotationPresent(Entity.class);
 
 
-		scrudResource = modelType.getAnnotation(ScrudResource.class);
+		scrudBean = modelType.getAnnotation(ScrudBean.class);
 
 		// add controller info
 		this.uriComponent = buildUriComponent();
-		if (scrudResource != null) {
+		if (scrudBean != null) {
 
-			this.linkableResource = scrudResource.linkable();
-			this.basePath = scrudResource.basePath();
-			this.parentApplicationPath = scrudResource.parentPath();
+			this.linkableResource = scrudBean.linkable();
+			this.basePath = scrudBean.basePath();
+			this.parentApplicationPath = scrudBean.parentPath();
 		}
 		else {
 			this.basePath = "";
@@ -155,7 +155,7 @@ public class ModelInfoImpl<T extends Model<PK>, PK extends Serializable> impleme
 	}
 
 	protected String buildUriComponent() {
-		ScrudResource meta = this.getModelType().getAnnotation(ScrudResource.class);
+		ScrudBean meta = this.getModelType().getAnnotation(ScrudBean.class);
 		String endpointPathName = meta != null ? meta.pathFragment() : null;
 		if (StringUtils.isBlank(endpointPathName)) {
 			endpointPathName = this.getModelType().getSimpleName();

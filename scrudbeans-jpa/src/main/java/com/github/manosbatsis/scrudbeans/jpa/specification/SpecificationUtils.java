@@ -115,7 +115,7 @@ public class SpecificationUtils<T extends PersistableModel<PK>, PK extends Seria
 		factoryForClassMap.put(BigDecimal.class, bigDecimalPredicateFactory);
 
 		// init ignore list
-		// TODO: pick model-specific exclides from anotation
+		// TODO: pick model-specific excludes from annotation
 		String[] ignoredFieldNames = {"page", "direction", "properties", "size", "totalPages", "_searchmode", "_all", "totalElements", "format"};
 		IGNORED_FIELD_NAMES = new ArrayList<String>(ignoredFieldNames.length);
 		for (int i = 0; i < ignoredFieldNames.length; i++) {

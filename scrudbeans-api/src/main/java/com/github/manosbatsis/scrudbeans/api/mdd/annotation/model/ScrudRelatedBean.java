@@ -20,24 +20,25 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.annotation.model;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.RestdudeAnnotation;
-
 /**
- * Meta-annotation (annotations used on other annotations)
- * used for marking all annotations that are
- * part of Restdude applicable to models. Can be used for recognizing
- * model annotations generically, and in future also for
- * passing other generic annotation configuration.
+ * Marks Model relationships
  */
-@RestdudeAnnotation
-@Target({ElementType.ANNOTATION_TYPE})
+@ScrudBeansModelAnnotation
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RestdudeModelAnnotation {
-	// for now, a pure tag annotation, no parameters
-}
+@Target(ElementType.TYPE)
+@Documented
+public @interface ScrudRelatedBean {
 
+	Class<?> beanClass() default Object.class;
+
+	String parentProperty();
+
+	String path() default "";
+
+}
