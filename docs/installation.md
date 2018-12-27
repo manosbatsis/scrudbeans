@@ -56,15 +56,15 @@ scrudbeans.packages=mypackage
 
 # Properties used by our Swagger UI: version, contact info, license etc.
 # Update with your own info
-scrudbeans.appVersion=0.1-SNAPSHOT
-scrudbeans.contact.name=Manos Batsis
-scrudbeans.contact.url=https://github.com/manosbatsis/scrudbeans
-scrudbeans.contact.email=manosbatsis at gmail dot com
-scrudbeans.license.name=LGPLv3
-scrudbeans.license.url=https://www.gnu.org/licenses/lgpl-3.0.en.html
+scrudbeans.appVersion=0.1-SNAPSHOT # Your project version
+scrudbeans.contact.name=Your contact name
+scrudbeans.contact.url=https://your.contact.website
+scrudbeans.contact.email=contact_email@there
+scrudbeans.license.name=Your Licence Name
+scrudbeans.license.url=https://your.license.url
 
 # Set the project name - also used by our swagger UI
-spring.application.name=Product Orders
+spring.application.name=Project Name
 
 # Work around useless errors
 spring.jackson.serialization.FAIL_ON_EMPTY_BEANS=false
