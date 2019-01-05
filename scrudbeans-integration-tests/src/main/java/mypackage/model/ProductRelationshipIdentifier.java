@@ -13,7 +13,7 @@ import io.swagger.annotations.ApiModel;
  */
 @Embeddable
 @ApiModel(value = "ProductRelationshipIdentifier", description = "A composite identifier used an ID in ProductRelationship entities")
-public class ProductRelationshipIdentifier extends AbstractEmbeddableManyToManyIdentifier<Product, String, Product, String> implements Serializable {
+public class ProductRelationshipIdentifier extends AbstractEmbeddableManyToManyIdentifier<Product, String, Product, String> {
 
 	@Override
 	public Product buildLeft(Serializable left) {

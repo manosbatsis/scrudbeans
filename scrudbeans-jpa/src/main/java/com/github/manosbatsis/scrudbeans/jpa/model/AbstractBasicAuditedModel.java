@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.jpa.domain;
+package com.github.manosbatsis.scrudbeans.jpa.model;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -30,7 +30,6 @@ import javax.persistence.MappedSuperclass;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.manosbatsis.scrudbeans.api.domain.BasicAuditedModel;
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractSystemUuidPersistableModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;

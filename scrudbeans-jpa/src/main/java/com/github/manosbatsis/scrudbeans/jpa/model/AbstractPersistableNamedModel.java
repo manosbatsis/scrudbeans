@@ -23,7 +23,6 @@ package com.github.manosbatsis.scrudbeans.jpa.model;
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
-import com.github.manosbatsis.scrudbeans.jpa.domain.AbstractBasicAuditedModel;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 

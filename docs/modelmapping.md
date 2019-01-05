@@ -17,6 +17,8 @@ Model driven services are enabled per entity provided two conditions are met:
 
 > The last requirement will be removed in upcpming versions.
 
+To make this easier, ScrudBeans provides a set of mapped superclasses you can extend to create your
+entities, see [Application Components: Entity Models](applicationcomponents#entity-models) for more details.
 
 ## Mapping Example
  

@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.github.manosbatsis.scrudbeans.api.domain.MetadataSubjectModel;
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
-import com.github.manosbatsis.scrudbeans.jpa.domain.AbstractBasicAuditedModel;
+import com.github.manosbatsis.scrudbeans.jpa.model.AbstractBasicAuditedModel;
 import net.jodah.typetools.TypeResolver;
 
 import org.springframework.util.CollectionUtils;

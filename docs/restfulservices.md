@@ -29,6 +29,8 @@ with `./mvnw spring-boot:run` and pointing your browser to http://localhost:8080
 
 ## Error Responses
 
+	> The `scrudbeans-error` module is a lightweight dependency that can be used for enabling RESTful errors in any Spring Boot project.
+
 ScrudBeans will automatically handle any exception by creating an appropriate RESTful HTTP response.
 It will also automatically perform validation based on Java Bean Validation (`javax.validation`) before persisting 
 or updating an entity and provide meaningful messages in such a response as necessary. For example, consider the 
