@@ -5,8 +5,8 @@
     "previous": "Previous",
     "tagline": "Model driven development for Spring Boot",
     "docs": {
-      "applicationcomponents": {
-        "title": "Application Components"
+      "customcomponents": {
+        "title": "Custom Components"
       },
       "installation": {
         "title": "Installation"

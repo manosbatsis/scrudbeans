@@ -1,5 +1,5 @@
 ---
-title: Application Components
+title: Custom Components
 ---
 
 ## Code Structure
@@ -157,3 +157,101 @@ Then, use the new identifier as the entity ID type of a `PersistableModel`:
 public class Friendship implements PersistableModel<FriendshipIdentifier> {/* ...*/ }
 ```
 
+### Repositories
+
+To use your custom repository, all you have to do is create them e.g. like the `OrderLineRepository` bellow.
+
+```
+└── mypackage
+    ├── repository
+    │   └── OrderLineRepository.java
+    └── model
+        ├── OrderLine.java
+        ├── Order.java
+        └── Product.java
+```
+
+The implementation is actually a common Spring Data repository interface that extends 
+`ModelRepository<ENTITY_TYPE, ID_TYPE>`:
+
+```java
+
+@Repository
+public interface OrderLineRepository extends ModelRepository<OrderLine, String> {
+	// Custom method!
+    OrderLine findByFoo(String foo);
+}
+
+```
+
+### Services
+
+To use your custom services, all you have to do is create them e.g. like the `OrderLineService` 
+
+bellow.
+
+```
+└── mypackage
+    ├── service
+    │   └── OrderLineService.java
+    └── model
+        ├── OrderLine.java
+        ├── Order.java
+        └── Product.java
+```
+
+The service can either be a concrete class like: 
+
+```java
+public class OrderLineService  
+	// either ModelRepository<OrderLine, String> or simply OrderLineRepository
+	extends AbstractPersistableModelServiceImpl<OrderLine, String, ModelRepository<OrderLine, String>>
+	implements PersistableModelService<OrderLine, String> {
+	//custom methods...	
+}
+```
+
+or, if preferred, an interface and separate implementation:
+
+```java
+// For the interface, extend PersistableModelService<<ENTITY_TYPE, ID_TYPE>>
+public interface OrderLineService 
+	extends PersistableModelService<OrderLine, String> {
+	//custom methods...	
+}
+	
+// For the implementation, extend AbstractPersistableModelServiceImpl<<ENTITY_TYPE, ID_TYPE, REPO_TYPE>>
+@Service("orderLineService")
+public class OrderLineServiceImpl 
+	extends AbstractPersistableModelServiceImpl<OrderLine, String, OrderLineRepository> 
+	implements OrderLineService {
+	//custom methods...
+}
+```
+
+### Controllers
+
+To use your custom controllers, create them yourself e.g. like the `OrderLineController` 
+bellow.
+
+```
+└── mypackage
+    ├── controller
+    │   └── OrderLineController.java
+    └── model
+        ├── OrderLine.java
+        ├── Order.java
+        └── Product.java
+```
+
+The implementation can extend  
+`AbstractPersistableModelController<ENTITY_TYPE, ID_TYPE, SERVICE_TYPE>`:
+
+```java
+@RestController("orderLineController")
+@RequestMapping("/api/rest/orderLines")
+@ExposesResourceFor(OrderLine.class)
+public class OrderLineController extends AbstractPersistableModelController<OrderLine, String, OrderLineService> {
+	//custom methods...
+}
+```
