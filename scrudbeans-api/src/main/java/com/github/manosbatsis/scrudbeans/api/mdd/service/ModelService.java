@@ -26,10 +26,6 @@ import java.util.Set;
 
 import com.github.manosbatsis.scrudbeans.api.domain.Model;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-
 /**
  * CRUD Service interface.
  *
@@ -116,15 +112,6 @@ public interface ModelService<T extends Model<PK>, PK extends Serializable> exte
 	 * @return a list of all resources.
 	 */
 	List<T> findAll();
-
-	/**
-	 * Find resources page-by-page
-	 *
-	 * @param spec the query specification
-	 * @param pageRequest page request
-	 * @return resources
-	 */
-	Page<T> findPaginated(Specification<T> spec, Pageable pageRequest);
 
 	/**
 	 * Count all resources.

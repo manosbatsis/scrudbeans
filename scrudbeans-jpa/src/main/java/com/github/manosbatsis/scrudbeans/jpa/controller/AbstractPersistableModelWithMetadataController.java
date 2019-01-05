@@ -24,7 +24,7 @@ package com.github.manosbatsis.scrudbeans.jpa.controller;
 import java.io.Serializable;
 
 import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
-import com.github.manosbatsis.scrudbeans.api.mdd.service.PersistableModelService;
+import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import com.github.manosbatsis.scrudbeans.jpa.metadata.MetadatumDTO;
 import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;

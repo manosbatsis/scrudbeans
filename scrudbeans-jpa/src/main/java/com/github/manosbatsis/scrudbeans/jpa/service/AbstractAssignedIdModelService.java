@@ -23,7 +23,7 @@ package com.github.manosbatsis.scrudbeans.jpa.service;
 
 import java.io.Serializable;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.service.PersistableModelService;
+import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import com.github.manosbatsis.scrudbeans.jpa.model.AbstractAssignedIdPersistableModel;
 
 import org.springframework.security.access.method.P;

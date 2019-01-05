@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.api.mdd.service;
+package com.github.manosbatsis.scrudbeans.common.service;
 
 
 import java.io.Serializable;
@@ -33,7 +33,8 @@ import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
 import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
-import com.github.manosbatsis.scrudbeans.api.mdd.repository.ModelRepository;
+import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
+import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
 import lombok.NonNull;
 
 import org.springframework.data.domain.Page;
@@ -85,6 +86,15 @@ public interface PersistableModelService<T extends PersistableModel<PK>, PK exte
 	 * @return the page of results, may be <code>null</code>
 	 */
 	<M extends PersistableModel<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable);
+
+	/**
+	 * Find resources page-by-page
+	 *
+	 * @param spec the query specification
+	 * @param pageRequest page request
+	 * @return resources
+	 */
+	Page<T> findPaginated(Specification<T> spec, Pageable pageRequest);
 
 	/**
 	 * Find the other end of a ToOne relationship

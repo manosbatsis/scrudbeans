@@ -22,7 +22,7 @@ package com.github.manosbatsis.scrudbeans.jpa.misc.repository;
 
 import java.util.Optional;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.repository.ModelRepository;
+import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.jpa.misc.model.Host;
 
 import org.springframework.data.jpa.repository.Query;

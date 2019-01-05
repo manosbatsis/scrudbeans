@@ -36,12 +36,14 @@ import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistence;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
-import com.github.manosbatsis.scrudbeans.api.mdd.repository.ModelRepository;
-import com.github.manosbatsis.scrudbeans.api.mdd.service.PersistableModelService;
+import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
+import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import com.github.manosbatsis.scrudbeans.jpa.specification.SpecificationUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -73,6 +75,8 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public class AbstractPersistableModelServiceImpl<T extends PersistableModel<PK>, PK extends Serializable, R extends ModelRepository<T, PK>>
 		extends AbstractBaseServiceImpl
 		implements PersistableModelService<T, PK> {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelServiceImpl.class);
 
 	protected R repository;
 
@@ -305,6 +309,7 @@ public class AbstractPersistableModelServiceImpl<T extends PersistableModel<PK>,
 			return this.repository.findAll(pageable);
 		}
 	}
+
 
 	/**
 	 * {@inheritDoc}

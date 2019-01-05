@@ -26,12 +26,13 @@ import com.github.manosbatsis.scrudbeans.api.mdd.service.FilePersistenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
  * A dummy implementation of {@link FilePersistenceService} that does not save files
  */
-public class DummyFilePersistenceServiceImpl implements FilePersistenceService, InitializingBean {
+public class DummyFilePersistenceServiceImpl extends AbstractFilePersistenceServiceImpl implements FilePersistenceService, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DummyFilePersistenceServiceImpl.class);
 

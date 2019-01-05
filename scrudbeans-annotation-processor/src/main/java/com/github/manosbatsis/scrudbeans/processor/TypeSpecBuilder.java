@@ -13,9 +13,9 @@ import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFacto
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.EntityModelDescriptor;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.ScrudModelDescriptor;
-import com.github.manosbatsis.scrudbeans.api.mdd.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
-import com.github.manosbatsis.scrudbeans.api.mdd.service.PersistableModelService;
+import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
+import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import com.github.manosbatsis.scrudbeans.common.util.ScrudStringUtils;
 import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractModelServiceBackedController;
 import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractPersistableModelController;

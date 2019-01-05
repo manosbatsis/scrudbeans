@@ -33,6 +33,7 @@ import com.github.manosbatsis.scrudbeans.api.mdd.service.FilePersistenceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -47,7 +48,7 @@ import org.springframework.beans.factory.annotation.Value;
  * from bean config: awsAccessKey, awsSecretAccessKey, nameCardBucket
  *
  */
-public class S3FilePersistenceServiceImpl implements FilePersistenceService, InitializingBean {
+public class S3FilePersistenceServiceImpl extends AbstractFilePersistenceServiceImpl implements FilePersistenceService, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(S3FilePersistenceServiceImpl.class);
 

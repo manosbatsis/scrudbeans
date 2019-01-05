@@ -1,8 +1,8 @@
 package mypackage.service;
 
 
-import com.github.manosbatsis.scrudbeans.api.mdd.repository.ModelRepository;
-import com.github.manosbatsis.scrudbeans.api.mdd.service.PersistableModelService;
+import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
+import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import com.github.manosbatsis.scrudbeans.jpa.service.AbstractPersistableModelServiceImpl;
 import mypackage.model.OrderLine;
 import mypackage.model.Product;

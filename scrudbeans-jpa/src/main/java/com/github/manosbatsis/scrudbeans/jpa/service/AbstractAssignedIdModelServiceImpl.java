@@ -25,7 +25,7 @@ import java.io.Serializable;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.repository.ModelRepository;
+import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.jpa.model.AbstractAssignedIdPersistableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

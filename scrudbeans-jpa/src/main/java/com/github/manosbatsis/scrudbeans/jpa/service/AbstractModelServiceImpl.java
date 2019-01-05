@@ -29,9 +29,6 @@ import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 
 /**
  * TODO:
@@ -147,18 +144,6 @@ public abstract class AbstractModelServiceImpl<T extends Model<PK>, PK extends S
 	 */
 	@Override
 	public List<T> findAll() {
-		return null;
-	}
-
-	/**
-	 * Find resources page-by-page
-	 *
-	 * @param spec        the query specification
-	 * @param pageRequest page request
-	 * @return resources
-	 */
-	@Override
-	public Page<T> findPaginated(Specification<T> spec, Pageable pageRequest) {
 		return null;
 	}
 

@@ -26,6 +26,7 @@ import static com.github.manosbatsis.scrudbeans.api.util.Mimes.MIME_APPLICATIOM_
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,9 +36,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
-import com.github.manosbatsis.scrudbeans.api.mdd.service.PersistableModelService;
 import com.github.manosbatsis.scrudbeans.common.domain.RawJson;
 import com.github.manosbatsis.scrudbeans.common.exception.NotFoundException;
+import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import com.github.manosbatsis.scrudbeans.hypermedia.hateoas.ModelResource;
 import com.github.manosbatsis.scrudbeans.hypermedia.hateoas.ModelResources;
 import com.github.manosbatsis.scrudbeans.hypermedia.hateoas.PagedModelResources;
@@ -46,6 +47,7 @@ import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceDocument;
 import com.github.manosbatsis.scrudbeans.hypermedia.util.HypermediaUtils;
 import com.github.manosbatsis.scrudbeans.jpa.rsql.RsqlUtils;
+import com.github.manosbatsis.scrudbeans.jpa.specification.SpecificationsBuilder;
 import com.github.manosbatsis.scrudbeans.jpa.uischema.model.UiSchema;
 import com.github.manosbatsis.scrudbeans.jpa.util.HttpUtil;
 import com.github.manosbatsis.scrudbeans.jpa.util.ParamsAwarePageImpl;
@@ -102,6 +104,13 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelController.class);
 
+	private SpecificationsBuilder<T, PK> specificationsBuilder;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		super.afterPropertiesSet();
+		this.specificationsBuilder = new SpecificationsBuilder<T, PK>(this.modelType, this.service.getConversionService());
+	}
 
 	// Create
 	// =====================
@@ -278,7 +287,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			@ApiParam(name = PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
 			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
 		Pageable pageable = PageableUtil.buildPageable(page, size, sort);
-		return super.<T>findPaginated(pageable, null);
+		return this.<T>findPaginated(pageable, null);
 	}
 
 	//@Override
@@ -302,7 +311,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
 		Pageable pageable = PageableUtil.buildPageable(page, size, sort);
 		return this.toHateoasPagedResources(
-				super.<T>findPaginated(pageable, null), "_pn");
+				this.<T>findPaginated(pageable, null), "_pn");
 	}
 
 	@RequestMapping(
@@ -322,7 +331,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			@ApiParam(name = PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
 			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
 		Pageable pageable = PageableUtil.buildPageable(page, size, sort);
-		return toPageDocument(super.<T>findPaginated(pageable, null));
+		return toPageDocument(this.<T>findPaginated(pageable, null));
 	}
 
 	// Read
@@ -546,5 +555,27 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			throw new IllegalArgumentException("Related field info has no reverse field name");
 		}
 		return page;
+	}
+
+	protected ParamsAwarePageImpl<T> findPaginated(Pageable pageable, Map<String, String[]> implicitCriteria) {
+		// Get URL query string parameters
+		Map<String, String[]> params = request.getParameterMap();
+
+		// Create a JPA query specifications
+		Specification<T> spec;
+		// Construct the specification manually if no RSQL "filter" param is present
+		if (Objects.isNull(params.get("filter"))) {
+			spec = this.specificationsBuilder.build(params);
+		}
+		// else use the RSQL-based specification builder
+		else {
+			spec = RsqlUtils.buildSpecification(
+					this.getModelInfo(),
+					this.service.getConversionService(),
+					params, implicitCriteria, PARAMS_IGNORE_FOR_CRITERIA);
+		}
+		Page<T> page = this.service.findPaginated(spec, pageable);
+		// Return a page with the appropriate meta
+		return new ParamsAwarePageImpl<T>(params, page.getContent(), pageable, page.getTotalElements());
 	}
 }
