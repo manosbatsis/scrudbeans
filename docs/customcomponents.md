@@ -50,11 +50,11 @@ above. ScrudBeans will preserve any existing components and complete the structu
 
 When using Maven, you can browse the generated component sources in `target/generated-sources/annotations`.
 
-## Base Components
+## Writing Components
 
 ScrudBeans uses a 3-tier architecture with controllers, services and repositories to provide SCRUD services 
 around each entity model. The following sections introduce the base components used by ScrudBeans and 
-explain how those can be extended to make your own explicit custom components as needed.
+explain how those can be extended to make your own custom components if needed.
 
 ### Entity Models
 
@@ -166,20 +166,17 @@ To use your custom repository, all you have to do is create them e.g. like the `
     ├── repository
     │   └── OrderLineRepository.java
     └── model
-        ├── OrderLine.java
-        ├── Order.java
-        └── Product.java
+        └── OrderLine.java
 ```
 
 The implementation is actually a common Spring Data repository interface that extends 
 `ModelRepository<ENTITY_TYPE, ID_TYPE>`:
 
 ```java
-
 @Repository
 public interface OrderLineRepository extends ModelRepository<OrderLine, String> {
 	// Custom method!
-    OrderLine findByFoo(String foo);
+    Optional<OrderLine> findOneByFoo(String foo);
 }
 
 ```
@@ -195,19 +192,20 @@ bellow.
     ├── service
     │   └── OrderLineService.java
     └── model
-        ├── OrderLine.java
-        ├── Order.java
-        └── Product.java
+        └── OrderLine.java
 ```
 
 The service can either be a concrete class like: 
 
 ```java
 public class OrderLineService  
-	// either ModelRepository<OrderLine, String> or simply OrderLineRepository
-	extends AbstractPersistableModelServiceImpl<OrderLine, String, ModelRepository<OrderLine, String>>
+	extends AbstractPersistableModelServiceImpl<OrderLine, String, OrderLineRepository>
 	implements PersistableModelService<OrderLine, String> {
-	//custom methods...	
+	// Custom methods...	
+	Optional<OrderLine> findOneByFoo(String foo) {
+		return this.repository.findOneByFoo(foo);
+	}
+	
 }
 ```
 
@@ -218,6 +216,7 @@ or, if preferred, an interface and separate implementation:
 public interface OrderLineService 
 	extends PersistableModelService<OrderLine, String> {
 	//custom methods...	
+	Optional<OrderLine> findOneByFoo(String foo);
 }
 	
 // For the implementation, extend AbstractPersistableModelServiceImpl<<ENTITY_TYPE, ID_TYPE, REPO_TYPE>>
@@ -225,7 +224,10 @@ public interface OrderLineService
 public class OrderLineServiceImpl 
 	extends AbstractPersistableModelServiceImpl<OrderLine, String, OrderLineRepository> 
 	implements OrderLineService {
-	//custom methods...
+	// Custom methods...
+	Optional<OrderLine> findOneByFoo(String foo) {
+		return this.repository.findOneByFoo(foo);
+	}
 }
 ```
 
@@ -239,9 +241,7 @@ bellow.
     ├── controller
     │   └── OrderLineController.java
     └── model
-        ├── OrderLine.java
-        ├── Order.java
-        └── Product.java
+        └── OrderLine.java
 ```
 
 The implementation can extend  
@@ -251,7 +251,14 @@ The implementation can extend
 @RestController("orderLineController")
 @RequestMapping("/api/rest/orderLines")
 @ExposesResourceFor(OrderLine.class)
-public class OrderLineController extends AbstractPersistableModelController<OrderLine, String, OrderLineService> {
-	//custom methods...
+public class OrderLineController 
+extends AbstractPersistableModelController<OrderLine, String, OrderLineService> {
+	// Custom methods...
+	@GetMapping("foo/{foo}")
+	public OrderLine findByFoo(@PathVariable String foo) {
+		return this.service.findOneByFoo(foo).orElseThrow(() ->
+			// Let scrudbeans-error create a 404 JSON response
+			new NotFoundException("No match for foo: " + foo));
+	}
 }
 ```
