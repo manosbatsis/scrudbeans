@@ -31,8 +31,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.manosbatsis.scrudbeans.api.error.ConstraintViolationEntry;
 import com.github.manosbatsis.scrudbeans.api.error.Error;
-import com.github.manosbatsis.scrudbeans.common.exception.ConstraintViolationException;
-import com.github.manosbatsis.scrudbeans.jpa.util.HttpUtil;
+import com.github.manosbatsis.scrudbeans.api.exception.ConstraintViolationException;
+import com.github.manosbatsis.scrudbeans.api.util.HttpUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -96,9 +96,10 @@ public class ErrorResponse implements Error {
 
 		// add validation errors, if any
 		if (ConstraintViolationException.class.isAssignableFrom(throwable.getClass())) {
-			Set<ConstraintViolation> violations = ((ConstraintViolationException) throwable).getConstraintViolations();
+			Set<ConstraintViolation> violations = ((ConstraintViolationException) throwable)
+					.getConstraintViolations();
 			if (CollectionUtils.isNotEmpty(violations)) {
-				this.validationErrors = new HashSet<ConstraintViolationEntry>();
+				this.validationErrors = new HashSet<>();
 				for (ConstraintViolation violation : violations) {
 					this.validationErrors.add(new ConstraintViolationEntry(violation));
 				}

@@ -22,6 +22,8 @@ package com.github.manosbatsis.scrudbeans.common.exception;
 
 import java.util.List;
 
+import com.github.manosbatsis.scrudbeans.api.exception.SystemException;
+
 import org.springframework.http.HttpStatus;
 
 /**

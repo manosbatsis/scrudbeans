@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.jpa.util;
+package com.github.manosbatsis.scrudbeans.api.util;
 
 public class Constants {
 

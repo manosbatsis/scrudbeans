@@ -29,8 +29,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.ValidationException;
 
-import com.github.manosbatsis.scrudbeans.common.exception.SystemException;
-import org.hibernate.ObjectNotFoundException;
+import com.github.manosbatsis.scrudbeans.api.exception.SystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,6 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.MessageSource;
 import org.springframework.context.MessageSourceAware;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
@@ -59,40 +57,42 @@ import org.springframework.web.context.request.async.AsyncRequestTimeoutExceptio
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+//import org.springframework.dao.DataIntegrityViolationException;
+
 /**
  * Default {@code RestErrorResolver} implementation that converts discovered Exceptions to
  * {@link ErrorResponse} instances.
  */
 public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourceAware, InitializingBean {
 
-	private static Map<Class, Integer> exceptionStatuses = new HashMap<Class, Integer>();
+	private static Map<String, Integer> exceptionStatuses = new HashMap<>();
 
 	static {
-		exceptionStatuses.put(AuthenticationException.class, HttpServletResponse.SC_UNAUTHORIZED);
-		exceptionStatuses.put(UsernameNotFoundException.class, HttpServletResponse.SC_UNAUTHORIZED);
-		exceptionStatuses.put(AccessDeniedException.class, HttpServletResponse.SC_UNAUTHORIZED);
-		exceptionStatuses.put(ObjectNotFoundException.class, HttpServletResponse.SC_NOT_FOUND);
-		exceptionStatuses.put(EntityNotFoundException.class, HttpServletResponse.SC_NOT_FOUND);
-		exceptionStatuses.put(EntityExistsException.class, HttpServletResponse.SC_CONFLICT);
-		exceptionStatuses.put(HttpRequestMethodNotSupportedException.class, HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-		exceptionStatuses.put(HttpMediaTypeNotSupportedException.class, HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
-		exceptionStatuses.put(HttpMediaTypeNotAcceptableException.class, HttpServletResponse.SC_NOT_ACCEPTABLE);
-		exceptionStatuses.put(MissingPathVariableException.class, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		exceptionStatuses.put(DataIntegrityViolationException.class, HttpServletResponse.SC_BAD_REQUEST);
-		exceptionStatuses.put(MissingServletRequestParameterException.class, HttpServletResponse.SC_BAD_REQUEST);
-		exceptionStatuses.put(ServletRequestBindingException.class, HttpServletResponse.SC_BAD_REQUEST);
-		exceptionStatuses.put(ValidationException.class, HttpServletResponse.SC_BAD_REQUEST);
-		exceptionStatuses.put(ConversionNotSupportedException.class, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		exceptionStatuses.put(TypeMismatchException.class, HttpServletResponse.SC_BAD_REQUEST);
-		exceptionStatuses.put(HttpMessageNotReadableException.class, HttpServletResponse.SC_BAD_REQUEST);
-		exceptionStatuses.put(HttpMessageNotWritableException.class, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		exceptionStatuses.put(MethodArgumentNotValidException.class, HttpServletResponse.SC_BAD_REQUEST);
-		exceptionStatuses.put(MissingServletRequestPartException.class, HttpServletResponse.SC_BAD_REQUEST);
-		exceptionStatuses.put(BindException.class, HttpServletResponse.SC_BAD_REQUEST);
-		exceptionStatuses.put(NoHandlerFoundException.class, HttpServletResponse.SC_NOT_FOUND);
-		exceptionStatuses.put(AsyncRequestTimeoutException.class, HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-		exceptionStatuses.put(RuntimeException.class, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		exceptionStatuses.put(Exception.class, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		exceptionStatuses.put(AuthenticationException.class.getCanonicalName(), HttpServletResponse.SC_UNAUTHORIZED);
+		exceptionStatuses.put(UsernameNotFoundException.class.getCanonicalName(), HttpServletResponse.SC_UNAUTHORIZED);
+		exceptionStatuses.put(AccessDeniedException.class.getCanonicalName(), HttpServletResponse.SC_UNAUTHORIZED);
+		exceptionStatuses.put("org.hibernate.ObjectNotFoundException", HttpServletResponse.SC_NOT_FOUND);
+		exceptionStatuses.put(EntityNotFoundException.class.getCanonicalName(), HttpServletResponse.SC_NOT_FOUND);
+		exceptionStatuses.put(EntityExistsException.class.getCanonicalName(), HttpServletResponse.SC_CONFLICT);
+		exceptionStatuses.put(HttpRequestMethodNotSupportedException.class.getCanonicalName(), HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+		exceptionStatuses.put(HttpMediaTypeNotSupportedException.class.getCanonicalName(), HttpServletResponse.SC_UNSUPPORTED_MEDIA_TYPE);
+		exceptionStatuses.put(HttpMediaTypeNotAcceptableException.class.getCanonicalName(), HttpServletResponse.SC_NOT_ACCEPTABLE);
+		exceptionStatuses.put(MissingPathVariableException.class.getCanonicalName(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		exceptionStatuses.put("org.springframework.dao.DataIntegrityViolationException", HttpServletResponse.SC_BAD_REQUEST);
+		exceptionStatuses.put(MissingServletRequestParameterException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
+		exceptionStatuses.put(ServletRequestBindingException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
+		exceptionStatuses.put(ValidationException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
+		exceptionStatuses.put(ConversionNotSupportedException.class.getCanonicalName(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		exceptionStatuses.put(TypeMismatchException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
+		exceptionStatuses.put(HttpMessageNotReadableException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
+		exceptionStatuses.put(HttpMessageNotWritableException.class.getCanonicalName(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		exceptionStatuses.put(MethodArgumentNotValidException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
+		exceptionStatuses.put(MissingServletRequestPartException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
+		exceptionStatuses.put(BindException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
+		exceptionStatuses.put(NoHandlerFoundException.class.getCanonicalName(), HttpServletResponse.SC_NOT_FOUND);
+		exceptionStatuses.put(AsyncRequestTimeoutException.class.getCanonicalName(), HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+		exceptionStatuses.put(RuntimeException.class.getCanonicalName(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		exceptionStatuses.put(Exception.class.getCanonicalName(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
 	}
 
@@ -127,7 +127,7 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		Class exceptionClass = ex.getClass();
 		Integer statusCode = null;
 		while (statusCode == null) {
-			statusCode = exceptionStatuses.get(exceptionClass);
+			statusCode = exceptionStatuses.get(exceptionClass.getCanonicalName());
 			if (statusCode == null) {
 				exceptionClass = exceptionClass.getSuperclass();
 			}
