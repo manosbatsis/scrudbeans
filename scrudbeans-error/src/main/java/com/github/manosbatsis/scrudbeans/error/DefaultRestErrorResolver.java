@@ -21,6 +21,7 @@
 package com.github.manosbatsis.scrudbeans.error;
 
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.ValidationException;
 
+import com.github.manosbatsis.scrudbeans.api.exception.NotFoundException;
 import com.github.manosbatsis.scrudbeans.api.exception.SystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +74,8 @@ public class DefaultRestErrorResolver implements RestErrorResolver, MessageSourc
 		exceptionStatuses.put(UsernameNotFoundException.class.getCanonicalName(), HttpServletResponse.SC_UNAUTHORIZED);
 		exceptionStatuses.put(AccessDeniedException.class.getCanonicalName(), HttpServletResponse.SC_UNAUTHORIZED);
 		exceptionStatuses.put("org.hibernate.ObjectNotFoundException", HttpServletResponse.SC_NOT_FOUND);
+		exceptionStatuses.put(NotFoundException.class.getCanonicalName(), HttpServletResponse.SC_NOT_FOUND);
+		exceptionStatuses.put(FileNotFoundException.class.getCanonicalName(), HttpServletResponse.SC_NOT_FOUND);
 		exceptionStatuses.put(EntityNotFoundException.class.getCanonicalName(), HttpServletResponse.SC_NOT_FOUND);
 		exceptionStatuses.put(EntityExistsException.class.getCanonicalName(), HttpServletResponse.SC_CONFLICT);
 		exceptionStatuses.put(HttpRequestMethodNotSupportedException.class.getCanonicalName(), HttpServletResponse.SC_METHOD_NOT_ALLOWED);
