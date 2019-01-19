@@ -18,55 +18,51 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.common.exception;
-
-
-import com.github.manosbatsis.scrudbeans.api.exception.SystemException;
-
-import org.springframework.http.HttpStatus;
+package com.github.manosbatsis.scrudbeans.api.exception;
 
 /**
- * Signals the appropriate handler for the request is not implemented
+ * Signals that authentication credentials required to respond to a authentication
+ * challenge are invalid
  */
-public class NotImplementedException extends SystemException {
+public class InvalidCredentialsException extends AuthenticationException {
 
-	protected static final HttpStatus STATUS = HttpStatus.NOT_IMPLEMENTED;
+
+	public static final String MESSAGE = "Invalid credentials";
 
 	/**
-	 * Creates a new NotImplementedException with HTTP 501 status code and message.
+	 * Creates a new InvalidCredentialsException with default message and HTTP status 401.
 	 */
-	public NotImplementedException() {
-		super(STATUS);
+	public InvalidCredentialsException() {
+		super(MESSAGE);
 	}
 
 	/**
-	 * Creates a new NotImplementedException with the specified message and HTTP status 501.
+	 * Creates a new InvalidCredentialsException with the specified message and HTTP status 401
 	 *
 	 * @param message the exception detail message
 	 */
-	public NotImplementedException(final String message) {
-		super(message, STATUS);
+	public InvalidCredentialsException(final String message) {
+		super(message);
 	}
 
 	/**
-	 * Creates a new NotImplementedException with the specified cause and HTTP status 501.
+	 * Creates a new InvalidCredentialsException with the specified cause and HTTP status 401.
 	 *
 	 * @param cause the {@code Throwable} that caused this exception, or {@code null}
 	 *              if the cause is unavailable, unknown, or not a {@code Throwable}
 	 */
-	public NotImplementedException(final Throwable cause) {
-		super(STATUS.getReasonPhrase(), STATUS, cause);
+	public InvalidCredentialsException(Throwable cause) {
+		super(MESSAGE, cause);
 	}
 
 	/**
-	 * Creates a new NotImplementedException with the specified message, cause and HTTP status 501.
+	 * Creates a new InvalidCredentialsException with the specified detail message, cause and HTTP status 401
 	 *
 	 * @param message the exception detail message
 	 * @param cause   the {@code Throwable} that caused this exception, or {@code null}
 	 *                if the cause is unavailable, unknown, or not a {@code Throwable}
 	 */
-	public NotImplementedException(final String message, final Throwable cause) {
-		super(message, STATUS, cause);
+	public InvalidCredentialsException(final String message, final Throwable cause) {
+		super(message, cause);
 	}
-
 }

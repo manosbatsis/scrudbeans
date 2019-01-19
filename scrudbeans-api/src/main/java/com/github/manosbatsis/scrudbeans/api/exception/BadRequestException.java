@@ -18,64 +18,57 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.common.exception;
+package com.github.manosbatsis.scrudbeans.api.exception;
 
-
-import java.util.HashMap;
-import java.util.Map;
-
-import com.github.manosbatsis.scrudbeans.api.exception.SystemException;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 
 /**
  * Signals a failure in authentication process
  */
-public class AuthenticationException extends SystemException {
+public class BadRequestException extends SystemException {
 
-	protected static final HttpStatus STATUS = HttpStatus.UNAUTHORIZED;
+	protected static final HttpStatus STATUS = HttpStatus.BAD_REQUEST;
+
+	private List<String> errors;
 
 	/**
-	 * Creates a new instance with HTTP 401 status code and message.
+	 * Creates a new instance with HTTP 400 status code and message.
 	 */
-	protected AuthenticationException() {
+	protected BadRequestException() {
 		super(STATUS);
 	}
 
+
 	/**
-	 * Creates a new instance with the specified message and HTTP status 401.
+	 * Creates a new instance with the specified message and HTTP status 400.
 	 *
 	 * @param message the exception detail message
 	 */
-	protected AuthenticationException(final String message) {
+	public BadRequestException(final String message) {
 		super(message, STATUS);
 	}
 
 	/**
-	 * Creates a new instance with the specified cause and HTTP status 401.
+	 * Creates a new instance with the specified cause and HTTP status 400.
 	 *
 	 * @param cause the {@code Throwable} that caused this exception, or {@code null}
 	 *              if the cause is unavailable, unknown, or not a {@code Throwable}
 	 */
-	protected AuthenticationException(final Throwable cause) {
+	public BadRequestException(final Throwable cause) {
 		super(STATUS.getReasonPhrase(), STATUS, cause);
 	}
 
 	/**
-	 * Creates a new instance with the specified message, cause and HTTP status 401.
+	 * Creates a new instance with the specified message, cause and HTTP status 400.
 	 *
 	 * @param message the exception detail message
 	 * @param cause   the {@code Throwable} that caused this exception, or {@code null}
 	 *                if the cause is unavailable, unknown, or not a {@code Throwable}
 	 */
-	protected AuthenticationException(final String message, final Throwable cause) {
+	public BadRequestException(final String message, final Throwable cause) {
 		super(message, STATUS, cause);
 	}
 
-	@Override
-	public Map<String, String> getResponseHeaders() {
-		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("WWW-Authenticate", "X-Calipso-Token header or calipso-sso token cookie");
-		return headers;
-	}
 }

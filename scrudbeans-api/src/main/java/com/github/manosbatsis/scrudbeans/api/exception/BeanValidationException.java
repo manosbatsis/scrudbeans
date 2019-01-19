@@ -18,14 +18,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.common.exception;
+package com.github.manosbatsis.scrudbeans.api.exception;
 
 
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 
-import com.github.manosbatsis.scrudbeans.api.exception.ConstraintViolationException;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**

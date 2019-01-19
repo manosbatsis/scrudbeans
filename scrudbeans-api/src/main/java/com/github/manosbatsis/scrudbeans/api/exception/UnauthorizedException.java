@@ -18,59 +18,50 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.common.exception;
-
-import java.util.List;
-
-import com.github.manosbatsis.scrudbeans.api.exception.SystemException;
-
-import org.springframework.http.HttpStatus;
+package com.github.manosbatsis.scrudbeans.api.exception;
 
 /**
- * Signals a failure in authentication process
+ * Signals an unauthorized attempt
  */
-public class BadRequestException extends SystemException {
+public class UnauthorizedException extends AuthenticationException {
 
-	protected static final HttpStatus STATUS = HttpStatus.BAD_REQUEST;
 
-	private List<String> errors;
+	public static final String MESSAGE = "Invalid credentials";
 
 	/**
-	 * Creates a new instance with HTTP 400 status code and message.
+	 * Creates a new instance with default message and HTTP status 401.
 	 */
-	protected BadRequestException() {
-		super(STATUS);
+	public UnauthorizedException() {
+		super(MESSAGE);
 	}
 
-
 	/**
-	 * Creates a new instance with the specified message and HTTP status 400.
+	 * Creates a new instance with the specified message and HTTP status 401
 	 *
 	 * @param message the exception detail message
 	 */
-	public BadRequestException(final String message) {
-		super(message, STATUS);
+	public UnauthorizedException(final String message) {
+		super(message);
 	}
 
 	/**
-	 * Creates a new instance with the specified cause and HTTP status 400.
+	 * Creates a new instance with the specified cause and HTTP status 401.
 	 *
 	 * @param cause the {@code Throwable} that caused this exception, or {@code null}
 	 *              if the cause is unavailable, unknown, or not a {@code Throwable}
 	 */
-	public BadRequestException(final Throwable cause) {
-		super(STATUS.getReasonPhrase(), STATUS, cause);
+	public UnauthorizedException(Throwable cause) {
+		super(MESSAGE, cause);
 	}
 
 	/**
-	 * Creates a new instance with the specified message, cause and HTTP status 400.
+	 * Creates a new instance with the specified detail message, cause and HTTP status 401
 	 *
 	 * @param message the exception detail message
 	 * @param cause   the {@code Throwable} that caused this exception, or {@code null}
 	 *                if the cause is unavailable, unknown, or not a {@code Throwable}
 	 */
-	public BadRequestException(final String message, final Throwable cause) {
-		super(message, STATUS, cause);
+	public UnauthorizedException(final String message, final Throwable cause) {
+		super(message, cause);
 	}
-
 }

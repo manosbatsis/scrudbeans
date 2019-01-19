@@ -18,54 +18,52 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.common.exception;
+package com.github.manosbatsis.scrudbeans.api.exception;
 
-
-import com.github.manosbatsis.scrudbeans.api.exception.SystemException;
 
 import org.springframework.http.HttpStatus;
 
 /**
- * Signals users attempted an operation for which they were not authorized
+ * Signals the appropriate handler for the request is not implemented
  */
-public class ForbiddenException extends SystemException {
+public class NotImplementedException extends SystemException {
 
-	protected static final HttpStatus STATUS = HttpStatus.FORBIDDEN;
+	protected static final HttpStatus STATUS = HttpStatus.NOT_IMPLEMENTED;
 
 	/**
-	 * Creates a new instance with HTTP 403 status code and message.
+	 * Creates a new NotImplementedException with HTTP 501 status code and message.
 	 */
-	public ForbiddenException() {
+	public NotImplementedException() {
 		super(STATUS);
 	}
 
 	/**
-	 * Creates a new instance with the specified message and HTTP status 403.
+	 * Creates a new NotImplementedException with the specified message and HTTP status 501.
 	 *
 	 * @param message the exception detail message
 	 */
-	public ForbiddenException(final String message) {
+	public NotImplementedException(final String message) {
 		super(message, STATUS);
 	}
 
 	/**
-	 * Creates a new instance with the specified cause and HTTP status 403.
+	 * Creates a new NotImplementedException with the specified cause and HTTP status 501.
 	 *
 	 * @param cause the {@code Throwable} that caused this exception, or {@code null}
 	 *              if the cause is unavailable, unknown, or not a {@code Throwable}
 	 */
-	public ForbiddenException(final Throwable cause) {
+	public NotImplementedException(final Throwable cause) {
 		super(STATUS.getReasonPhrase(), STATUS, cause);
 	}
 
 	/**
-	 * Creates a new instance with the specified message, cause and HTTP status 403.
+	 * Creates a new NotImplementedException with the specified message, cause and HTTP status 501.
 	 *
 	 * @param message the exception detail message
 	 * @param cause   the {@code Throwable} that caused this exception, or {@code null}
 	 *                if the cause is unavailable, unknown, or not a {@code Throwable}
 	 */
-	public ForbiddenException(final String message, final Throwable cause) {
+	public NotImplementedException(final String message, final Throwable cause) {
 		super(message, STATUS, cause);
 	}
 

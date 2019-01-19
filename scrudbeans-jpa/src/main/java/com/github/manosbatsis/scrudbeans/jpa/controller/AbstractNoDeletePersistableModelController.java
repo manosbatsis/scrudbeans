@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
-import com.github.manosbatsis.scrudbeans.common.exception.NotImplementedException;
+import com.github.manosbatsis.scrudbeans.api.exception.NotImplementedException;
 import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

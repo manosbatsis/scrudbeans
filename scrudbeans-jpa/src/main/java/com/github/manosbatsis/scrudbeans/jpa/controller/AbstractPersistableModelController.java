@@ -34,11 +34,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.exception.NotFoundException;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.util.HttpUtil;
 import com.github.manosbatsis.scrudbeans.common.domain.RawJson;
-import com.github.manosbatsis.scrudbeans.common.exception.NotFoundException;
 import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import com.github.manosbatsis.scrudbeans.hypermedia.hateoas.ModelResource;
 import com.github.manosbatsis.scrudbeans.hypermedia.hateoas.ModelResources;

@@ -1,8 +1,8 @@
 package mypackage.controller;
 
 
+import com.github.manosbatsis.scrudbeans.api.exception.NotImplementedException;
 import com.github.manosbatsis.scrudbeans.api.util.Mimes;
-import com.github.manosbatsis.scrudbeans.common.exception.NotImplementedException;
 import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractPersistableModelController;
 import io.swagger.annotations.Api;
 import mypackage.model.OrderLine;

@@ -18,50 +18,53 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.common.exception;
+package com.github.manosbatsis.scrudbeans.api.exception;
+
+
+import org.springframework.http.HttpStatus;
 
 /**
- * Signals an unauthorized attempt
+ * Signals users attempted an operation for which they were not authorized
  */
-public class UnauthorizedException extends AuthenticationException {
+public class ForbiddenException extends SystemException {
 
-
-	public static final String MESSAGE = "Invalid credentials";
+	protected static final HttpStatus STATUS = HttpStatus.FORBIDDEN;
 
 	/**
-	 * Creates a new instance with default message and HTTP status 401.
+	 * Creates a new instance with HTTP 403 status code and message.
 	 */
-	public UnauthorizedException() {
-		super(MESSAGE);
+	public ForbiddenException() {
+		super(STATUS);
 	}
 
 	/**
-	 * Creates a new instance with the specified message and HTTP status 401
+	 * Creates a new instance with the specified message and HTTP status 403.
 	 *
 	 * @param message the exception detail message
 	 */
-	public UnauthorizedException(final String message) {
-		super(message);
+	public ForbiddenException(final String message) {
+		super(message, STATUS);
 	}
 
 	/**
-	 * Creates a new instance with the specified cause and HTTP status 401.
+	 * Creates a new instance with the specified cause and HTTP status 403.
 	 *
 	 * @param cause the {@code Throwable} that caused this exception, or {@code null}
 	 *              if the cause is unavailable, unknown, or not a {@code Throwable}
 	 */
-	public UnauthorizedException(Throwable cause) {
-		super(MESSAGE, cause);
+	public ForbiddenException(final Throwable cause) {
+		super(STATUS.getReasonPhrase(), STATUS, cause);
 	}
 
 	/**
-	 * Creates a new instance with the specified detail message, cause and HTTP status 401
+	 * Creates a new instance with the specified message, cause and HTTP status 403.
 	 *
 	 * @param message the exception detail message
 	 * @param cause   the {@code Throwable} that caused this exception, or {@code null}
 	 *                if the cause is unavailable, unknown, or not a {@code Throwable}
 	 */
-	public UnauthorizedException(final String message, final Throwable cause) {
-		super(message, cause);
+	public ForbiddenException(final String message, final Throwable cause) {
+		super(message, STATUS, cause);
 	}
+
 }

@@ -40,8 +40,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
 import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.exception.BeanValidationException;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
-import com.github.manosbatsis.scrudbeans.common.exception.BeanValidationException;
 import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.jpa.util.EntityUtil;
 import lombok.NonNull;

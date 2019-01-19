@@ -25,7 +25,12 @@ class Footer extends React.Component {
         return (
             <footer className="nav-footer" id="footer">
 
-                <section className="copyright"><a href="http://manosbatsis.github.io/">{this.props.config.copyright}</a>
+                <section className="copyright">
+                    <a href="http://manosbatsis.github.io/">{this.props.config.copyright}</a>.
+                    <span> Got a remote contract? Contact me by
+                    <a href="mailto:manosbatsis@gmail.com?subject=Remote Contract"> email</a> or
+                    <a href="https://www.linkedin.com/in/manosbatsis"> linkedin</a>
+                    </span>
                 </section>
             </footer>
 
