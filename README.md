@@ -2,4 +2,4 @@
 
 Documentation at https://manosbatsis.github.io/scrudbeans/
 
-A sample project template can be fopund at [scrudbeans-template](https://github.com/manosbatsis/scrudbeans-template).
+A sample project template can be found at [scrudbeans-template](https://github.com/manosbatsis/scrudbeans-template).
