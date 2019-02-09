@@ -117,3 +117,4 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+/website/node_modules/
