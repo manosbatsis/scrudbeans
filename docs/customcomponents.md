@@ -268,3 +268,48 @@ extends AbstractPersistableModelController<OrderLine, String, OrderLineService> 
 	}
 }
 ```
+
+### DTO Mappers
+
+Most of the time, you can automatically generate [MapStruct](http://mapstruct.org/)-based mappers for your DTOs by 
+adding those to your `@ScrudBean` `dtoTypes` or `dtoTypeNames` attributes like so:
+
+```java
+@ScrudBean(dtoTypes = {OrderUpdateEmailDTO.class}, dtoTypeNames = {"mypackage.dto.OrderUpdateCommentDTO"})
+public class Order {
+	//...
+}
+```
+
+Sometimes however, you might want to edit the mappings your self by creating a custom mapper, 
+like `OrderToOrderUpdateCommentDTOMapper` bellow:
+
+```
+└── mypackage
+    ├── dto
+    │   └── OrderUpdateCommentDTO.java
+    ├── model
+    │   └── Order.java
+    └── mapper
+        └── OrderToOrderUpdateCommentDTOMapper.java
+```
+
+The `OrderToOrderUpdateCommentDTOMapper` implementation can be a MapStruct-based interface that simply extends 
+`DtoMapper<ENTITY_TYPE, DTO_TYPE>`:
+
+```java
+import com.github.manosbatsis.scrudbeans.api.DtoMapper;
+import mypackage.dto.OrderUpdateCommentDTO;
+import mypackage.model.Order;
+import org.mapstruct.Mapper;
+
+@Mapper(
+    unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE,
+    componentModel = "spring"
+)
+public interface OrderToOrderUpdateCommentDTOMapper extends DtoMapper<Order, OrderUpdateCommentDTO> {
+	// your custom mappings here...
+}
+```
+
+MapStruct will pick up the interface and generate the actual implementation as usual.
