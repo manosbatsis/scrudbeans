@@ -9,6 +9,7 @@ import java.util.Objects;
 import javax.lang.model.element.Modifier;
 import javax.persistence.Entity;
 
+import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.EntityModelDescriptor;
@@ -30,6 +31,7 @@ import io.swagger.annotations.Api;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.atteo.evo.inflector.English;
+import org.mapstruct.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -221,5 +223,28 @@ class TypeSpecBuilder {
 		// Construct the complete endpoint URL
 		String pattern = "\"/" + modelBasePath + "/" + scrudBean.parentPath() + "/" + modelUriComponent + "\"";
 		return pattern.replaceAll("/{2,}", "/");
+	}
+
+	public static TypeSpec createDtoMapper(ScrudModelDescriptor descriptor, String dtoClass) {
+		String dtoSimpleName = dtoClass.substring(dtoClass.lastIndexOf('.') + 1);
+		String dtoPackage = dtoClass.substring(0, dtoClass.lastIndexOf('.'));
+		log.debug("createDtoMapper, dtoPackage: {}, dtoSimpleName: {}", dtoPackage, dtoSimpleName);
+		String className = descriptor.getSimpleName() + "To" + dtoSimpleName + "Mapper";
+		log.debug("createDtoMapper, className: {}", className);
+
+		return TypeSpec.interfaceBuilder(className)
+				//@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
+				.addAnnotation(
+						AnnotationSpec.builder(Mapper.class)
+								.addMember("unmappedTargetPolicy", "org.mapstruct.ReportingPolicy.IGNORE")
+								.addMember("componentModel", "\"spring\"").build())
+				// extends DtoMapper<EntityClass, DTOClass>
+				.addSuperinterface(
+						ParameterizedTypeName.get(
+								ClassName.get(DtoMapper.class),
+								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
+								ClassName.get(dtoPackage, dtoSimpleName)))
+				.addModifiers(Modifier.PUBLIC)
+				.build();
 	}
 }

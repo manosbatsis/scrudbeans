@@ -12,6 +12,8 @@ take a note of any optional, pre-existing custom components:
 └── mypackage
     ├── controller
     │   └── OrderLineController.java
+    └── dto
+    │   └── OrderEmailUpdateDTO.java
     └── model
         ├── OrderLine.java
         ├── Order.java
@@ -27,6 +29,10 @@ above. ScrudBeans will preserve any existing components and complete the structu
     │   ├── OrderLineController.java
     │   ├── OrderController.java
     │   └── ProductController.java
+    └── dto
+    │   └── OrderEmailUpdateDTO.java
+    └── mapper
+    │   └── OrderToOrderEmailUpdateDTOMapper.java
     ├── model
     │   ├── OrderLine.java
     │   ├── Order.java

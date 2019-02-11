@@ -18,6 +18,7 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.persistence.Entity;
 
+import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.EntityModelDescriptor;
@@ -85,6 +86,7 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 						// Parse model to something more convenient
 						ScrudModelDescriptor descriptor = new ScrudModelDescriptor(processingEnv, typeElement);
 						// Generate components for model
+						generateDtoMappers(descriptor);
 						createRepository(descriptor);
 						createService(descriptor);
 						createController(descriptor);
@@ -134,6 +136,22 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 		return writeJavaFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".controller");
 	}
 
+	/**
+	 * Create {@link DtoMapper}s for the ScudBeans' target DTOs
+	 * @param descriptor The target model descriptor
+	 * @return the mapper files
+	 */
+	private List<JavaFile> generateDtoMappers(ScrudModelDescriptor descriptor) {
+		List<JavaFile> files = new LinkedList<>();
+		descriptor.getDtoTypes().forEach((dtoClass) -> {
+			TypeSpec typeSpec = TypeSpecBuilder.createDtoMapper(descriptor, dtoClass);
+			files.add(writeJavaFile(
+					descriptor,
+					typeSpec,
+					descriptor.getParentPackageName() + ".mapper"));
+		});
+		return files;
+	}
 	/**
 	 * Create SCRUD service source files
 	 * @param descriptor The target model descriptor

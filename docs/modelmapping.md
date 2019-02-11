@@ -74,6 +74,7 @@ About the annotation members:
 - `apiName` is equivalent to `io.swagger.annotations.Api#tags` and serves as a name and logical grouping of 
 operations/endpoints for this entity's REST controller .
 - `apiDescription` is equivalent to `io.swagger.annotations.Api#description`.
+- 
 
 ### Validation
 

@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import mypackage.dto.OrderUpdateEmailDTO;
 import org.hibernate.annotations.Formula;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 
@@ -33,7 +34,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@ScrudBean
+@ScrudBean(dtoTypes = OrderUpdateEmailDTO.class, dtoTypeNames = "mypackage.dto.OrderUpdateCommentDTO")
 @ApiModel(value = "Order", description = "A model representing an order of product items")
 public class Order extends AbstractSystemUuidPersistableModel {
 
@@ -41,6 +42,10 @@ public class Order extends AbstractSystemUuidPersistableModel {
 	@Column(nullable = false)
 	@ApiModelProperty(value = "The client's email", required = true)
 	private String email;
+
+	@Column(length = 512)
+	@ApiModelProperty(value = "Oder comment", required = false)
+	private String comment;
 
 	@CreatedDate
 	@DiffIgnore

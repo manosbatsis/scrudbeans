@@ -26,6 +26,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.github.manosbatsis.scrudbeans.api.DtoMapper;
+
 
 /**
  * <p>Marks a Model as candidate for mdd code generation (Controller, Service, Repository)</p>
@@ -61,6 +63,12 @@ import java.lang.annotation.Target;
 @Documented
 public @interface ScrudBean {
 
+	/** DTO classes to generate {@link DtoMapper}s for */
+	Class[] dtoTypes() default Object.class;
+
+	/** DTO class canonical names to generate {@link DtoMapper}s for */
+	String[] dtoTypeNames() default "";
+
 	/**
 	 * The superclass for the generated controller
 	 */
@@ -94,8 +102,7 @@ public @interface ScrudBean {
 	String apiDescription() default "";
 
 	/**
-	 *
-	 * Hint to enable (javers auditing b
+	 * Hint to enable javers auditing
 	 */
 	boolean auditable() default false;
 
