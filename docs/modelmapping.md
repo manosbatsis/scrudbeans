@@ -74,7 +74,9 @@ About the annotation members:
 - `apiName` is equivalent to `io.swagger.annotations.Api#tags` and serves as a name and logical grouping of 
 operations/endpoints for this entity's REST controller .
 - `apiDescription` is equivalent to `io.swagger.annotations.Api#description`.
-- 
+- `dtoTypes` an array of DTO classes to generate mappers for.
+- `dtoTypeNames` an array of DTO (canonical) class names to generate mappers for.
+
 
 ### Validation
 
