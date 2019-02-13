@@ -54,7 +54,7 @@ create SCRUD components and services everytime your build runs.</p>
 <p>The last requirement will be removed in upcpming versions.</p>
 </blockquote>
 <p>To make this easier, ScrudBeans provides a set of mapped superclasses you can extend to create your
-entities, see <a href="customcomponents#entity-models">Application Components: Entity Models</a> for more details.</p>
+entities, see <a href="#base-models">Base Models</a> for more details.</p>
 <h2><a class="anchor" aria-hidden="true" id="mapping-example"></a><a href="#mapping-example" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Mapping Example</h2>
 <p>As an example, consider an <code>Order</code> entity. The scrudbeans-template repo has the
 <a href="https://github.com/manosbatsis/scrudbeans-template/blob/master/src/main/java/mypackage/model/Order.java">full source</a>.</p>
@@ -97,6 +97,8 @@ for example:</p>
 <li><code>apiName</code> is equivalent to <code>io.swagger.annotations.Api#tags</code> and serves as a name and logical grouping of
 operations/endpoints for this entity's REST controller .</li>
 <li><code>apiDescription</code> is equivalent to <code>io.swagger.annotations.Api#description</code>.</li>
+<li><code>dtoTypes</code> an array of DTO classes to generate mappers for.</li>
+<li><code>dtoTypeNames</code> an array of DTO (canonical) class names to generate mappers for.</li>
 </ul>
 <h3><a class="anchor" aria-hidden="true" id="validation"></a><a href="#validation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Validation</h3>
 <ul>
@@ -109,4 +111,79 @@ example, or create your own.</li>
 <p>Annotating your models and their fields properly with <code>io.swagger.annotations.ApiModel</code> and
 <code>io.swagger.annotations.ApiModelProperty</code> respectively will increase the quality of the generated Springfox/Swagger
 documentation.</p>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/scrudbeans/docs/installation"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/scrudbeans/docs/restfulservices"><span>RESTful Services</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#mapping-prerequisites">Mapping Prerequisites</a></li><li><a href="#mapping-example">Mapping Example</a></li><li><a href="#relevant-annotations">Relevant Annotations</a><ul class="toc-headings"><li><a href="#scrudbean">ScrudBean</a></li><li><a href="#validation">Validation</a></li><li><a href="#documentation">Documentation</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="copyright"><a href="http://manosbatsis.github.io/">Copyright © 2019 Manos Batsis</a>.<span> Got a remote contract? Contact me by<a href="mailto:manosbatsis@gmail.com?subject=Remote Contract"> email</a> or<a href="https://www.linkedin.com/in/manosbatsis"> linkedin</a></span></section></footer></div></body></html>
+<h3><a class="anchor" aria-hidden="true" id="base-models"></a><a href="#base-models" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Base Models</h3>
+<p>Model driven services are enabled per entity provided two conditions are met:</p>
+<ul>
+<li>It must be annotated with <code>@ScrudBean</code>.</li>
+<li>It must implement <code>PersistableModel</code> or simply extend one of the abstract entities from the
+<code>com.github.manosbatsis.scrudbeans.jpa.model</code> package.</li>
+</ul>
+<p>To make this easier, ScrudBeans provides the <code>com.github.manosbatsis.scrudbeans.jpa.model</code> package,
+a set of mapped superclasses you can extend to create your entities.</p>
+<h4><a class="anchor" aria-hidden="true" id="uuid"></a><a href="#uuid" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>UUID</h4>
+<p>To use automatically generated UUIDs as a primary key you can extend <code>AbstractSystemUuidPersistableModel</code>:</p>
+<pre><code class="hljs css language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-meta">@Table</span>(name = <span class="hljs-string">"products"</span>)
+<span class="hljs-meta">@ScrudBean</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Product</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractSystemUuidPersistableModel</span> </span>{<span class="hljs-comment">/* ...*/</span> }
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="auto-increment"></a><a href="#auto-increment" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Auto Increment</h4>
+<p>You can auto-increment long IDs (i.e. <code>javax.persistence.GenerationType.AUTO</code>) you can extend
+<code>AbstractAutoGeneratedLongIdPersistableModel</code>:</p>
+<pre><code class="hljs css language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-meta">@Table</span>(name = <span class="hljs-string">"discount_code"</span>)
+<span class="hljs-meta">@ScrudBean</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DiscountCode</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractAutoGeneratedLongIdPersistableModel</span> </span>{<span class="hljs-comment">/* ...*/</span> }
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="assigned-ids"></a><a href="#assigned-ids" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Assigned IDs</h4>
+<p>To use assigned (i.e. manual) IDs, you can extend <code>AbstractAssignedIdPersistableModel</code>. It's generic,
+so you can specify the ID type required. e.g. for <code>Long</code>:</p>
+<pre><code class="hljs css language-java"><span class="hljs-meta">@Entity</span> 
+<span class="hljs-meta">@ScrudBean</span>
+<span class="hljs-meta">@Table</span>(name = <span class="hljs-string">"slot"</span>)
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Slot</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractAssignedIdPersistableModel</span>&lt;<span class="hljs-title">Long</span>&gt; </span>{<span class="hljs-comment">/* ...*/</span> }
+</code></pre>
+<p>You can use <code>@AttributeOverrides</code> to apply more specific restrictions, for example a string with a
+maximum length of two characters:</p>
+<pre><code class="hljs css language-java"><span class="hljs-meta">@Entity</span> 
+<span class="hljs-meta">@ScrudBean</span>
+<span class="hljs-meta">@Table</span>(name = <span class="hljs-string">"country"</span>)
+<span class="hljs-meta">@AttributeOverrides</span>({
+        <span class="hljs-meta">@AttributeOverride</span>(name = <span class="hljs-string">"id"</span>, column = <span class="hljs-meta">@Column</span>(unique = <span class="hljs-keyword">true</span>, nullable = <span class="hljs-keyword">false</span>, length = <span class="hljs-number">2</span>)),
+})
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Country</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractAssignedIdPersistableModel</span>&lt;<span class="hljs-title">String</span>&gt; </span>{<span class="hljs-comment">/* ...*/</span> }
+</code></pre>
+<h4><a class="anchor" aria-hidden="true" id="manytomany-id"></a><a href="#manytomany-id" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>ManyToMany ID</h4>
+<p>Some times you need to assign additional attributes to a many-to-many relationship between models,
+for example the <code>Friendship</code> between two <code>User</code>s, along with the requirement of using the two foreign
+keys as the composite ID. This introduces some complexity in a number areas where the ID is handled,
+like JSON (de)serialization and request mapping bindings of path or query parameters.</p>
+<p>For cases like these, you can easily create a mapping that &quot;just works&quot; in two steps. First, begin by<br>
+extending <code>AbstractEmbeddableManyToManyIdentifier</code> to create a new <code>@Embeddable</code> ID type:</p>
+<pre><code class="hljs css language-java"><span class="hljs-meta">@Embeddable</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FriendshipIdentifier</span> 
+    <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractEmbeddableManyToManyIdentifier</span>&lt;<span class="hljs-title">User</span>, <span class="hljs-title">String</span>, <span class="hljs-title">User</span>, <span class="hljs-title">String</span>&gt; <span class="hljs-keyword">implements</span> <span class="hljs-title">Serializable</span> </span>{
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> User <span class="hljs-title">buildLeft</span><span class="hljs-params">(Serializable left)</span> </span>{
+        User u = <span class="hljs-keyword">new</span> User();
+        u.setId(left.toString());
+        <span class="hljs-keyword">return</span> u;
+    }
+
+    <span class="hljs-meta">@Override</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> User <span class="hljs-title">buildRight</span><span class="hljs-params">(Serializable right)</span> </span>{
+        User u = <span class="hljs-keyword">new</span> User();
+        u.setId(right.toString());
+        <span class="hljs-keyword">return</span> u;
+    }
+
+}
+</code></pre>
+<p>Then, use the new identifier as the entity ID type of a <code>PersistableModel</code>:</p>
+<pre><code class="hljs css language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-meta">@Table</span>(name = <span class="hljs-string">"friendship"</span>)
+<span class="hljs-meta">@ScrudBean</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Friendship</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">PersistableModel</span>&lt;<span class="hljs-title">FriendshipIdentifier</span>&gt; </span>{<span class="hljs-comment">/* ...*/</span> }
+</code></pre>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/scrudbeans/docs/installation"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/scrudbeans/docs/restfulservices"><span>RESTful Services</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#mapping-prerequisites">Mapping Prerequisites</a></li><li><a href="#mapping-example">Mapping Example</a></li><li><a href="#relevant-annotations">Relevant Annotations</a><ul class="toc-headings"><li><a href="#scrudbean">ScrudBean</a></li><li><a href="#validation">Validation</a></li><li><a href="#documentation">Documentation</a></li><li><a href="#base-models">Base Models</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="copyright"><a href="http://manosbatsis.github.io/">Copyright © 2019 Manos Batsis</a>.<span> Got a remote contract? Contact me by<a href="mailto:manosbatsis@gmail.com?subject=Remote Contract"> email</a> or<a href="https://www.linkedin.com/in/manosbatsis"> linkedin</a></span></section></footer></div></body></html>
