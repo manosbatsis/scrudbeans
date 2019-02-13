@@ -28,6 +28,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Data
 public abstract class ModelDescriptor {
+
+	public static final String STACK_JPA = "jpa";
+
 	private TypeElement typeElement;
 
 	private final Boolean jpaEntity;
@@ -122,6 +125,10 @@ public abstract class ModelDescriptor {
 		memberType = asTypeElement(typeMirror).toString();
 		log.debug("getType for {}: {}", scrudModelMember.getSimpleName(), memberType);
 		return memberType;
+	}
+
+	public String getStack() {
+		return this.getJpaEntity() ? STACK_JPA : "";
 	}
 
 }

@@ -27,6 +27,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import lombok.NonNull;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +39,7 @@ public class ClassUtils {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClassUtils.class);
 
+	private static final String DOT = ".";
 	/**
 	 * Returns the (initialized) class represented by <code>className</code>
 	 * using the current thread's context class loader and wraps any exceptions
@@ -60,6 +63,16 @@ public class ClassUtils {
 			throw new RuntimeException(e);
 		}
 		return clazz;
+	}
+
+	/**
+	 * Break input into a pair consisting of the package and classname
+	 */
+	public static Pair<String, String> getPackageAndSimpleName(@NonNull String className) {
+		int lastDotIndex = className.lastIndexOf(DOT);
+		String simpleName = className.substring(lastDotIndex + 1);
+		String packageName = className.substring(0, className.length() - (simpleName.length() + 1));
+		return Pair.of(packageName, simpleName);
 	}
 
 	public static <T extends Object> T newInstance(Class<T> clazz) {

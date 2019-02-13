@@ -4,6 +4,8 @@ import static com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATIOM_JSON_
 import static com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATION_VND_API_PLUS_JSON_VALUE;
 import static com.github.manosbatsis.scrudbeans.api.util.Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.lang.model.element.Modifier;
@@ -13,10 +15,12 @@ import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.EntityModelDescriptor;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.ModelDescriptor;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.ScrudModelDescriptor;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
+import com.github.manosbatsis.scrudbeans.common.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.common.util.ScrudStringUtils;
 import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractModelServiceBackedController;
 import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractPersistableModelController;
@@ -28,8 +32,9 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 import io.swagger.annotations.Api;
-import org.apache.commons.lang3.ClassUtils;
+import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.atteo.evo.inflector.English;
 import org.mapstruct.Mapper;
 import org.slf4j.Logger;
@@ -52,6 +57,30 @@ class TypeSpecBuilder {
 			APPLICATIOM_JSON_VALUE + ", " +
 					MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE + ", " +
 					APPLICATION_VND_API_PLUS_JSON_VALUE;
+
+	public static final String CLASSNAME_KEY_REPOSITORY = "repository";
+
+	public static final String CLASSNAME_KEY_SERVICE_INTERFACE = "service";
+
+	public static final String CLASSNAME_KEY_SERVICE_IMPL = "serviceImpl";
+
+	public static final String CLASSNAME_KEY_CONTROLLER = "controller";
+
+	protected static Map<String, String> componentSuperClassnames = new HashMap<>();
+
+	static {
+		// Default repos
+		componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_REPOSITORY, ModelRepository.class.getCanonicalName());
+		// Default service interface per stack
+		componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_INTERFACE, ModelService.class.getCanonicalName());
+		componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_INTERFACE, PersistableModelService.class.getCanonicalName());
+		// Default service interface per stack
+		componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_IMPL, AbstractModelServiceImpl.class.getCanonicalName());
+		componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL, AbstractPersistableModelServiceImpl.class.getCanonicalName());
+		// Default service controller per stack
+		componentSuperClassnames.put(CLASSNAME_KEY_CONTROLLER, AbstractModelServiceBackedController.class.getCanonicalName());
+		componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER, AbstractPersistableModelController.class.getCanonicalName());
+	}
 	/**
 	 * Create a subclass {@link TypeSpec} of {@link AbstractPersistableModelController}
 	 * or {@link AbstractModelServiceBackedController} depending on whether 
@@ -64,9 +93,8 @@ class TypeSpecBuilder {
 	static TypeSpec createController(ScrudModelDescriptor descriptor) {
 		String className = descriptor.getSimpleName() + "Controller";
 		String beanName = ScrudStringUtils.withFirstCharToLowercase(className);
-		// Get controller superclass from annotation if exists, fallback to defaults otherwise
-		Class controllerSuperClass;
-		String controllerSuperClassName = descriptor.getScrudBean().controllerSuperClass();
+
+		// Content for Swagger annotations
 		String apiName = descriptor.getScrudBean().apiName();
 		if (StringUtils.isBlank(apiName)) {
 			// To plural, de-camelcase
@@ -77,18 +105,15 @@ class TypeSpecBuilder {
 			apiDescription = "Search or manage " +
 					ScrudStringUtils.decamelize(descriptor.getSimpleName()) + " entries";
 		}
+
+		// Controller superclass package/simple name: get from ScrudBean annotation if exists, fallback to defaults otherwise
+		String controllerSuperClassName = descriptor.getScrudBean().controllerSuperClass();
 		if (StringUtils.isBlank(controllerSuperClassName)) {
-			controllerSuperClass = descriptor.getJpaEntity() ? AbstractPersistableModelController.class : AbstractModelServiceBackedController.class;
+			controllerSuperClassName = getSuperclassName(descriptor, CLASSNAME_KEY_CONTROLLER);
 		}
-		else {
-			try {
-				controllerSuperClass = ClassUtils.getClass(controllerSuperClassName);
-			}
-			catch (ClassNotFoundException e) {
-				throw new RuntimeException(
-						"Could not obtain controllerSuperClass for ScrudBean " + descriptor.getQualifiedName(), e);
-			}
-		}
+		Pair<String, String> pkgAndName = ClassUtils.getPackageAndSimpleName(controllerSuperClassName);
+
+
 		return TypeSpec.classBuilder(className)
 				.addAnnotation(
 						AnnotationSpec.builder(RestController.class)
@@ -106,7 +131,7 @@ class TypeSpecBuilder {
 								.addMember("value", descriptor.getSimpleName() + ".class").build())
 				.superclass(
 						ParameterizedTypeName.get(
-								ClassName.get(controllerSuperClass),
+								ClassName.get(pkgAndName.getLeft(), pkgAndName.getRight()),
 								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
 								ClassName.bestGuess(descriptor.getIdType()),
 								ClassName.get(descriptor.getParentPackageName() + ".service", descriptor.getSimpleName() + "Service")))
@@ -124,10 +149,12 @@ class TypeSpecBuilder {
 	 */
 	static TypeSpec createServiceInterface(ScrudModelDescriptor descriptor) {
 		String className = descriptor.getSimpleName() + "Service";
+		Pair<String, String> pkgAndName = ClassUtils.getPackageAndSimpleName(
+				getSuperclassName(descriptor, CLASSNAME_KEY_SERVICE_INTERFACE));
 		return TypeSpec.interfaceBuilder(className)
 				.addSuperinterface(
 						ParameterizedTypeName.get(
-								ClassName.get(descriptor.getJpaEntity() ? PersistableModelService.class : ModelService.class),
+								ClassName.get(pkgAndName.getLeft(), pkgAndName.getRight()),
 								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
 								ClassName.bestGuess(descriptor.getIdType())))
 				.addModifiers(Modifier.PUBLIC)
@@ -145,14 +172,17 @@ class TypeSpecBuilder {
 	static TypeSpec createServiceImpl(ScrudModelDescriptor descriptor) {
 		String className = descriptor.getSimpleName() + "ServiceImpl";
 		String interfaceClassName = descriptor.getSimpleName() + "Service";
-		String beanName = "\"" + Character.toLowerCase(interfaceClassName.charAt(0)) + interfaceClassName.substring(1) + "\"";
+		String beanName = "\"" + Character.toLowerCase(interfaceClassName.charAt(0)) +
+				interfaceClassName.substring(1) + "\"";
+		Pair<String, String> pkgAndName = ClassUtils.getPackageAndSimpleName(
+				getSuperclassName(descriptor, CLASSNAME_KEY_SERVICE_IMPL));
 		return TypeSpec.classBuilder(className)
 				.addAnnotation(
 						AnnotationSpec.builder(Service.class)
 								.addMember("value", beanName).build())
 				.superclass(
 						ParameterizedTypeName.get(
-								ClassName.get(descriptor.getJpaEntity() ? AbstractPersistableModelServiceImpl.class : AbstractModelServiceImpl.class),
+								ClassName.get(pkgAndName.getLeft(), pkgAndName.getRight()),
 								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
 								ClassName.bestGuess(descriptor.getIdType()),
 								ClassName.get(descriptor.getParentPackageName() + ".repository", descriptor.getSimpleName() + "Repository")))
@@ -169,11 +199,13 @@ class TypeSpecBuilder {
 	 */
 	static TypeSpec createRepository(ScrudModelDescriptor descriptor) {
 		String className = descriptor.getSimpleName() + "Repository";
+		Pair<String, String> pkgAndName = ClassUtils.getPackageAndSimpleName(
+				getSuperclassName(descriptor, CLASSNAME_KEY_REPOSITORY));
 		return TypeSpec.interfaceBuilder(className)
 				.addAnnotation(Repository.class)
 				.addSuperinterface(
 						ParameterizedTypeName.get(
-								ClassName.get(ModelRepository.class),
+								ClassName.get(pkgAndName.getLeft(), pkgAndName.getRight()),
 								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
 								ClassName.bestGuess(descriptor.getIdType())))
 				.addModifiers(Modifier.PUBLIC)
@@ -247,4 +279,24 @@ class TypeSpecBuilder {
 				.addModifiers(Modifier.PUBLIC)
 				.build();
 	}
+
+	/**
+	 * Get the superclass type for the given component type.
+	 * @param descriptor the model descriptor
+	 * @param componentTypeKey the component type key, i.e. one of {@link TypeSpecBuilder#CLASSNAME_KEY_REPOSITORY}, {@link TypeSpecBuilder#CLASSNAME_KEY_SERVICE_INTERFACE}, {@link TypeSpecBuilder#CLASSNAME_KEY_SERVICE_IMPL}, {@link TypeSpecBuilder#CLASSNAME_KEY_CONTROLLER}
+	 */
+	public static String getSuperclassName(ScrudModelDescriptor descriptor, String componentTypeKey) {
+		return getSuperclassName(descriptor, componentTypeKey, null);
+	}
+
+	private static String getSuperclassName(
+			@NonNull ScrudModelDescriptor descriptor, @NonNull String componentTypeKey, String defaultClassname) {
+		// Get a default by stack if missing
+		if (Objects.isNull(defaultClassname)) defaultClassname =
+				componentSuperClassnames.get(descriptor.getStack() + componentTypeKey);
+		// Return the superclass name if configured, the default otherwise
+		return descriptor.getConfigProperties()
+				.getProperty("scrudbeans.processor." + descriptor.getStack() + "." + componentTypeKey, defaultClassname);
+	}
+
 }

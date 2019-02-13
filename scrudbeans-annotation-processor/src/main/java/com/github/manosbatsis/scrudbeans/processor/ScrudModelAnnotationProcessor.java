@@ -1,10 +1,12 @@
 package com.github.manosbatsis.scrudbeans.processor;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -17,6 +19,8 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.persistence.Entity;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
 
 import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
@@ -48,9 +52,13 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 
 	private Filer filer;
 
+	// Config properties, i.e. "application.properties" from the classpath
+	private Properties configProps;
+
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		// short-circuit if there are multiple rounds
 		if (complete) {
@@ -58,14 +66,15 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 			return true;
 		}
 		log.info("ScrudModelAnnotationProcessor processing started");
+		// Init a filer
 		this.filer = processingEnv.getFiler();
-
+		// Load config/properties
+		configProps = this.loadProperties();
 		// Create JPA query predicate factories for each entity in the source path
 		generateEntityPredicateFactories(roundEnv);
 		// Create other SCRUD components for each model annotated with ScrudBean
 		generateScrudComponents(roundEnv);
 		// Claiming that annotations have been processed by this processor
-
 		complete = true;
 		return true;
 	}
@@ -84,7 +93,7 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 					if (element instanceof TypeElement) {
 						final TypeElement typeElement = (TypeElement) element;
 						// Parse model to something more convenient
-						ScrudModelDescriptor descriptor = new ScrudModelDescriptor(processingEnv, typeElement);
+						ScrudModelDescriptor descriptor = new ScrudModelDescriptor(processingEnv, typeElement, configProps);
 						// Generate components for model
 						generateDtoMappers(descriptor);
 						createRepository(descriptor);
@@ -241,6 +250,21 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 			log.error("writeJavaFile: Error creating file for {}: " + e.getMessage(), fileObjectName, e);
 		}
 		return file;
+	}
+
+	private Properties loadProperties() {
+		Properties props = null;
+		try {
+			FileObject fileObject = this.filer
+					.getResource(StandardLocation.CLASS_OUTPUT, "", "application.properties");
+			props = new Properties();
+			props.load(fileObject.openInputStream());
+			log.debug("loadProperties, props: {}", props);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		return props;
 	}
 
 }

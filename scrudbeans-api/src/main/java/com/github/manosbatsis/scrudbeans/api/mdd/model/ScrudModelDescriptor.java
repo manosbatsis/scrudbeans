@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -31,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 public class ScrudModelDescriptor extends ModelDescriptor {
 
+
 	private final ScrudBean scrudBean;
 
 	private Map<String, String> oneToMany = new HashMap<>();
@@ -43,9 +45,18 @@ public class ScrudModelDescriptor extends ModelDescriptor {
 
 	private Set<String> dtoTypes;
 
-	public ScrudModelDescriptor(ProcessingEnvironment processingEnv, TypeElement typeElement) throws ScrudModelProcessorException {
+	private Properties configProperties;
+
+	public ScrudModelDescriptor(ProcessingEnvironment processingEnv, TypeElement typeElement, Properties props) throws ScrudModelProcessorException {
 		super(processingEnv, typeElement);
+		this.configProperties = props;
 		this.scrudBean = typeElement.getAnnotation(ScrudBean.class);
+		initDtoClassnames(typeElement);
+
+	}
+
+	/** Initialise the set of DTO classnames for this ScrudBean. Used to create mappers from/to this ScrudBean */
+	private void initDtoClassnames(TypeElement typeElement) {
 		// Get DTO classnames from "dtoTypes"
 		dtoTypes = toAnnotationClassNamesValueStream(typeElement, ScrudBean.class, "dtoTypes")
 				.filter(it -> !Object.class.getCanonicalName().equals(it))
@@ -90,4 +101,5 @@ public class ScrudModelDescriptor extends ModelDescriptor {
 	protected void scanMember(Types types, TypeElement currentTypeElement, Element memberElement) throws ScrudModelProcessorException {
 		checkIfMemberIsId(types, memberElement);
 	}
+
 }
