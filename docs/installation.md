@@ -31,7 +31,7 @@ To add the dependency with Maven:
 <dependency>
 	<groupId>com.github.manosbatsis.scrudbeans</groupId>
 	<artifactId>scrudbeans-spring-boot-starter</artifactId>
-	<version>0.7</version>
+	<version>0.8</version>
 </dependency>
 ```
 
@@ -41,7 +41,7 @@ To add the dependency with Gradle:
 
 ```groovy
 dependencies {
-	implementation 'com.github.manosbatsis.scrudbeans:scrudbeans-spring-boot-starter:0.7'
+	implementation 'com.github.manosbatsis.scrudbeans:scrudbeans-spring-boot-starter:0.8'
 }
 ```
 
