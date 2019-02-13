@@ -55,6 +55,7 @@ above. ScrudBeans will preserve any existing components and complete the structu
 ```
 
 When using Maven, you can browse the generated component sources in `target/generated-sources/annotations`.
+Gradle users can browse generated sources at `build/generated/source/apt/main`.
 
 ### Default Components
 
