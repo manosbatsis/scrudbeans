@@ -20,6 +20,7 @@ import javax.persistence.Id;
 
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -64,7 +65,7 @@ public abstract class ModelDescriptor {
 		for (Element e : currentTypeElement.getEnclosedElements()) {
 			this.scanMember(types, currentTypeElement, e);
 		}
-		currentTypeElement = asTypeElement(currentTypeElement.getSuperclass());
+		currentTypeElement = asTypeElement(types, currentTypeElement.getSuperclass());
 		if (!currentTypeElement.getQualifiedName().contentEquals(Object.class.getCanonicalName())) {
 			scanMembers(types, currentTypeElement);
 		}
@@ -82,7 +83,7 @@ public abstract class ModelDescriptor {
 	 * @return
 	 * @throws ScrudModelProcessorException
 	 */
-	protected TypeElement asTypeElement(TypeMirror typeMirror) throws ScrudModelProcessorException {
+	protected TypeElement asTypeElement(Types types, @NonNull TypeMirror typeMirror) throws ScrudModelProcessorException {
 		if (typeMirror.getKind() != TypeKind.DECLARED) {
 			throw new ScrudModelProcessorException();
 		}
@@ -122,7 +123,12 @@ public abstract class ModelDescriptor {
 			}
 
 		}
-		memberType = asTypeElement(typeMirror).toString();
+
+		// Get class/type name
+		if (typeMirror != null) {
+			memberType = asTypeElement(types, typeMirror).toString();
+		}
+
 		log.debug("getType for {}: {}", scrudModelMember.getSimpleName(), memberType);
 		return memberType;
 	}

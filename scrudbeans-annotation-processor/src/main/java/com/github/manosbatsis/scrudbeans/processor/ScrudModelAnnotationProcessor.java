@@ -40,8 +40,7 @@ import org.slf4j.LoggerFactory;
  * annotated with @{@link Entity}
  */
 @SupportedAnnotationTypes({
-		"com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean",
-		"javax.persistence.Entity"
+		"com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class ScrudModelAnnotationProcessor extends AbstractProcessor {
@@ -116,19 +115,22 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 	 * @param roundEnv The current compilation round environment
 	 */
 	private void generateEntityPredicateFactories(RoundEnvironment roundEnv) {
-		Set<? extends Element> entities = roundEnv.getElementsAnnotatedWith(Entity.class);
+		Set<? extends Element> entities = roundEnv.getElementsAnnotatedWith(ScrudBean.class);
 		for (final Element element : entities) {
 			try {
-				if (element instanceof TypeElement) {
-					final TypeElement typeElement = (TypeElement) element;
-					EntityModelDescriptor descriptor = new EntityModelDescriptor(processingEnv, typeElement);
-					createPredicateFactory(descriptor);
-				}
-				else {
-					log.warn("Not an instance of TypeElement but annotated with ScrudBean: {}", element.getSimpleName());
+				if (element.getAnnotation(Entity.class) != null) {
+					if (element instanceof TypeElement) {
+						log.debug("generateEntityPredicateFactories, processing element: {}", element.getSimpleName());
+						final TypeElement typeElement = (TypeElement) element;
+						EntityModelDescriptor descriptor = new EntityModelDescriptor(processingEnv, typeElement);
+						createPredicateFactory(descriptor);
+					}
+					else {
+						log.warn("Not an instance of TypeElement but annotated with ScrudBean: {}", element.getSimpleName());
+					}
 				}
 			}
-			catch (ScrudModelProcessorException e) {
+			catch (RuntimeException | ScrudModelProcessorException e) {
 				log.error("Error generating components for {}: " + e.getMessage(),
 						element.getSimpleName(), e);
 			}

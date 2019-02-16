@@ -1,6 +1,6 @@
 /**
  *
- * Restdude
+ * ScrudBeans: Model driven development for Spring Boot
  * -------------------------------------------------------------------
  *
  * Copyright © 2005 Manos Batsis (manosbatsis gmail)
@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * Meta-annotation (annotations used on other annotations)
  * used for marking all annotations that are
  * part of Restdude. Can be used for recognizing all
- * Restdude annotations generically, and in future also for
+ * ScrudBeans: Model driven development for Spring Boot annotations generically, and in future also for
  * passing other generic annotation configuration.
  */
 @Target({ElementType.ANNOTATION_TYPE})

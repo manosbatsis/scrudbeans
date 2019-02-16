@@ -12,6 +12,7 @@ create SCRUD components and services everytime your build runs.
 Model driven services are enabled per entity provided two conditions are met:
  
  - It must be annotated with `@ScrudBean`.
+ - It must have a non-primitive id.
  - It must implement `PersistableModel` or simply extend one of the abstract entities from the 
 `com.github.manosbatsis.scrudbeans.jpa.model` package.
 

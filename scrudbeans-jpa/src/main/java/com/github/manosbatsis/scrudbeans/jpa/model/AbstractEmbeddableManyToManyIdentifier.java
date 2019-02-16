@@ -1,6 +1,6 @@
 /**
  *
- * Restdude
+ * ScrudBeans: Model driven development for Spring Boot
  * -------------------------------------------------------------------
  *
  * Copyright © 2005 Manos Batsis (manosbatsis gmail)
