@@ -152,21 +152,31 @@ maximum length of two characters:
 public class Country extends AbstractAssignedIdPersistableModel<String> {/* ...*/ }
 ```
 
-### ManyToMany ID
+### Composite IDs
 
-Some times you need to assign additional attributes to a many-to-many relationship between models, 
-for example the `Friendship` between two `User`s, along with the requirement of using the two foreign 
-keys as the composite ID. This introduces some complexity in a number areas where the ID is handled, 
-like JSON (de)serialization and request mapping bindings of path or query parameters.
+Some times you need to use composite IDs in your models. This introduces some complexity in a number of 
+areas where the ID must be handled in a regular RESTful way, including request 
+mapping bindings of path or query parameters.
 
-For cases like these, you can easily create a mapping that "just works" in two steps. First, begin by  
-extending `AbstractEmbeddableManyToManyIdentifier` to create a new `@Embeddable` ID type:
+To help making this work transparently out of the box, ScrudBeans provides a number of embeddable ID 
+implementations you can extend from depending on the number of columns/fields needed for your composite ID, 
+namely `AbstractEmbeddableManyToManyIdentifier`, `AbstractEmbeddableTripleIdentifier`, 
+`AbstractEmbeddableQuadrupleIdentifier` and `AbstractEmbeddableQuintupleIdentifier`.
+
+For an example, consider a case where you need to assign additional attributes to a many-to-many 
+relationship between models, like a `Friendship` between two `User`s, along with the requirement 
+of using their two user keys as a composite ID. For cases like these, you can easily create a mapping 
+that "just works" in two steps. 
+
+First, begin by extending `AbstractEmbeddableManyToManyIdentifier` 
+to create a new `@Embeddable` ID type:
  
 
 ```java
 @Embeddable
 public class FriendshipIdentifier 
-	extends AbstractEmbeddableManyToManyIdentifier<User, String, User, String> implements Serializable {
+	extends AbstractEmbeddableManyToManyIdentifier<User, String, User, String> 
+	implements Serializable {
 
 	@Override
 	public User buildLeft(Serializable left) {
@@ -185,11 +195,23 @@ public class FriendshipIdentifier
 }
 ```
 
-Then, use the new identifier as the entity ID type of a `PersistableModel`:
+Depending on the identifier superclass, you'll need to implement a number of `buildX` methods as above. 
+
+Then, use the new `@Embeddable` identifier as the entity ID type of a `PersistableModel`:
 
 ```java
+@ScrudBean
 @Entity
 @Table(name = "friendship")
-@ScrudBean
-public class Friendship implements PersistableModel<FriendshipIdentifier> {/* ...*/ }
+public class Friendship implements PersistableModel<FriendshipIdentifier> {
+	
+	@NotNull
+	@ApiModelProperty(required = true)
+	@EmbeddedId
+	private FriendshipIdentifier id;
+	
+	// Other members...
+	
+}
 ```
+

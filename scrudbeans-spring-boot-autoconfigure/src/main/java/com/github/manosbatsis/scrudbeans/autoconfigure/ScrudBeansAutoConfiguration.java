@@ -2,7 +2,7 @@ package com.github.manosbatsis.scrudbeans.autoconfigure;
 
 import com.github.manosbatsis.scrudbeans.error.RestExceptionHandler;
 import com.github.manosbatsis.scrudbeans.jpa.binding.CustomEnumConverterFactory;
-import com.github.manosbatsis.scrudbeans.jpa.binding.StringToEmbeddableManyToManyIdConverterFactory;
+import com.github.manosbatsis.scrudbeans.jpa.binding.StringToEmbeddableCompositeIdConverterFactory;
 import com.github.manosbatsis.scrudbeans.jpa.fs.FilePersistenceConfigPostProcessor;
 import com.github.manosbatsis.scrudbeans.jpa.model.AbstractEmbeddableManyToManyIdentifier;
 import com.github.manosbatsis.scrudbeans.jpa.registry.JpaModelInfoRegistry;
@@ -41,7 +41,7 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
-		registry.addConverterFactory(new StringToEmbeddableManyToManyIdConverterFactory());
+		registry.addConverterFactory(new StringToEmbeddableCompositeIdConverterFactory());
 		registry.addConverterFactory(new CustomEnumConverterFactory());
 	}
 

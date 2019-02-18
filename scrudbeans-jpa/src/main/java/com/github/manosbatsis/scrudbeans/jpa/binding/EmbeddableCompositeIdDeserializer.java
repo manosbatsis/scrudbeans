@@ -31,28 +31,28 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractEmbeddableManyToManyIdentifier;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableCompositeIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EmbeddableManyToManyIdDeserializer<T extends AbstractEmbeddableManyToManyIdentifier> extends JsonDeserializer<T> implements ContextualDeserializer {
+public class EmbeddableCompositeIdDeserializer<T extends EmbeddableCompositeIdentifier> extends JsonDeserializer<T> implements ContextualDeserializer {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddableManyToManyIdDeserializer.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddableCompositeIdDeserializer.class);
 
 	private static final ConcurrentHashMap<Class, JsonDeserializer> typeSerializers = new ConcurrentHashMap<>();
 
 	private Class targetType;
 
-	public EmbeddableManyToManyIdDeserializer() {
+	public EmbeddableCompositeIdDeserializer() {
 	}
 
-	public EmbeddableManyToManyIdDeserializer(Class<?> targetType) {
+	public EmbeddableCompositeIdDeserializer(Class<?> targetType) {
 		this.targetType = targetType;
 	}
 
 	@Override
 	public Class handledType() {
-		return AbstractEmbeddableManyToManyIdentifier.class;
+		return EmbeddableCompositeIdentifier.class;
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class EmbeddableManyToManyIdDeserializer<T extends AbstractEmbeddableMany
 
 		// otherwise create and configure a new instance for the target type
 		if (deserializer == null) {
-			deserializer = new EmbeddableManyToManyIdDeserializer<T>(targetClass);
+			deserializer = new EmbeddableCompositeIdDeserializer<T>(targetClass);
 			typeSerializers.put(targetClass, deserializer);
 		}
 

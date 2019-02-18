@@ -20,20 +20,20 @@
  */
 package com.github.manosbatsis.scrudbeans.jpa.binding;
 
-import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableManyToManyIdentifier;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableCompositeIdentifier;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 
-public class StringToEmbeddableManyToManyIdConverterFactory implements ConverterFactory<String, EmbeddableManyToManyIdentifier> {
+public class StringToEmbeddableCompositeIdConverterFactory implements ConverterFactory<String, EmbeddableCompositeIdentifier> {
 
 	@Override
-	public <T extends EmbeddableManyToManyIdentifier> Converter<String, T> getConverter(Class<T> targetType) {
+	public <T extends EmbeddableCompositeIdentifier> Converter<String, T> getConverter(Class<T> targetType) {
 		return new StringToEmbeddableManyToManyIdConverter<T>(targetType);
 	}
 
 	@SuppressWarnings("rawtypes")
-	private final class StringToEmbeddableManyToManyIdConverter<T extends EmbeddableManyToManyIdentifier> implements Converter<String, T> {
+	private final class StringToEmbeddableManyToManyIdConverter<T extends EmbeddableCompositeIdentifier> implements Converter<String, T> {
 
 		private Class targetType;
 

@@ -53,12 +53,26 @@ import org.slf4j.LoggerFactory;
  * <code>
  * @Embeddable
  * public class FriendshipIdentifier
- * 		extends AbstractEmbeddableManyToManyIdentifier<User, String, User, String>
+ * 		extends AbstractEmbeddableQuadrupleIdentifier<
+ *  * 			User, String,
+ *  * 			SomeInnerLeftType, String,
+ *  * 			SomeInnerRightType, String,
+ *  * 			User, String>
  * 		implements Serializable {
  *
  *     @Override
  *     public User buildLeft(Serializable left) {
  *         return new User(left.toString());
+ *     }
+ *
+ *     @Override
+ *     public User buildInnerLeft(Serializable innerLeft) {
+ *         return new SomeInnerLeftType(innerLeft.toString());
+ *     }
+ *
+ *     @Override
+ *     public User buildInnerRight(Serializable innerRight) {
+ *         return new SomeInnerRightType(innerRight.toString());
  *     }
  *
  *     @Override
@@ -68,10 +82,14 @@ import org.slf4j.LoggerFactory;
  * }
  * </code>
  *
- * @param <L>   The type of the left MenyToOne relationship entity
- * @param <LPK> The type of the left MenyToOne relationship entity ID
- * @param <R>   The type of the right MenyToOne relationship entity
- * @param <RPK> The type of the right MenyToOne relationship entity ID
+ * @param <L>   The type of the left relationship entity
+ * @param <LPK> The type of the left relationship entity ID
+ * @param <IL>   The type of the inner left relationship entity
+ * @param <ILPK> The type of the inner left relationship entity ID
+ * @param <IR>   The type of the inner right relationship entity
+ * @param <IRPK> The type of the inner right relationship entity ID
+ * @param <R>   The type of the right relationship entity
+ * @param <RPK> The type of the right relationship entity ID
  * @see EmbeddableCompositeIdDeserializer
  * @see EmbeddableCompositeIdSerializer
  * @see StringToEmbeddableCompositeIdConverterFactory
@@ -79,12 +97,14 @@ import org.slf4j.LoggerFactory;
 @MappedSuperclass
 @JsonSerialize(using = EmbeddableCompositeIdSerializer.class)
 @JsonDeserialize(using = EmbeddableCompositeIdDeserializer.class)
-public abstract class AbstractEmbeddableManyToManyIdentifier<
+public abstract class AbstractEmbeddableQuadrupleIdentifier<
 		L extends PersistableModel<LPK>, LPK extends Serializable,
-		R extends PersistableModel<RPK>, RPK extends Serializable
-		> implements Serializable, EmbeddableCompositeIdentifier {
+		IL extends PersistableModel<ILPK>, ILPK extends Serializable,
+		IR extends PersistableModel<IRPK>, IRPK extends Serializable,
+		R extends PersistableModel<RPK>, RPK extends Serializable>
+		implements Serializable, EmbeddableCompositeIdentifier {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEmbeddableManyToManyIdentifier.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEmbeddableQuadrupleIdentifier.class);
 
 	public static final String SPLIT_CHAR = "_";
 
@@ -97,25 +117,45 @@ public abstract class AbstractEmbeddableManyToManyIdentifier<
 
 	@NotNull
 	@ApiModelProperty(required = true, example = "{id: '[id]'}")
+	@JoinColumn(name = "inner_left_id", nullable = false, updatable = false)
+	@ManyToOne(optional = false)
+	private IL innerLeft;
+
+	@NotNull
+	@ApiModelProperty(required = true, example = "{id: '[id]'}")
+	@JoinColumn(name = "inner_right_id", nullable = false, updatable = false)
+	@ManyToOne(optional = false)
+	private IR innerRight;
+
+	@NotNull
+	@ApiModelProperty(required = true, example = "{id: '[id]'}")
 	@JoinColumn(name = "right_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private R right;
 
-	public AbstractEmbeddableManyToManyIdentifier() {
+	public AbstractEmbeddableQuadrupleIdentifier() {
 	}
 
-	public AbstractEmbeddableManyToManyIdentifier(@NotNull String value) {
+	public AbstractEmbeddableQuadrupleIdentifier(@NotNull String value) {
 		init(value);
 	}
 
 	public abstract L buildLeft(Serializable left);
+
+	public abstract IL buildInnerLeft(Serializable innerLeft);
+
+	public abstract IR buildInnerRight(Serializable innerRight);
 
 	public abstract R buildRight(Serializable right);
 
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(EntityUtil.idOrNull(this.getLeft())).append(EntityUtil.idOrNull(this.getRight())).toHashCode();
+		return new HashCodeBuilder()
+				.append(EntityUtil.idOrNull(this.getLeft()))
+				.append(EntityUtil.idOrNull(this.getInnerLeft()))
+				.append(EntityUtil.idOrNull(this.getInnerRight()))
+				.append(EntityUtil.idOrNull(this.getRight())).toHashCode();
 	}
 
 	@Override
@@ -123,9 +163,12 @@ public abstract class AbstractEmbeddableManyToManyIdentifier<
 		if (obj == null) {
 			return false;
 		}
-		if (AbstractEmbeddableManyToManyIdentifier.class.isAssignableFrom(obj.getClass())) {
-			final AbstractEmbeddableManyToManyIdentifier other = (AbstractEmbeddableManyToManyIdentifier) obj;
-			return new EqualsBuilder().append(EntityUtil.idOrNull(this.getLeft()), EntityUtil.idOrNull(other.getLeft()))
+		if (AbstractEmbeddableQuadrupleIdentifier.class.isAssignableFrom(obj.getClass())) {
+			final AbstractEmbeddableQuadrupleIdentifier other = (AbstractEmbeddableQuadrupleIdentifier) obj;
+			return new EqualsBuilder()
+					.append(EntityUtil.idOrNull(this.getLeft()), EntityUtil.idOrNull(other.getLeft()))
+					.append(EntityUtil.idOrNull(this.getInnerLeft()), EntityUtil.idOrNull(other.getInnerLeft()))
+					.append(EntityUtil.idOrNull(this.getInnerRight()), EntityUtil.idOrNull(other.getInnerRight()))
 					.append(EntityUtil.idOrNull(this.getRight()), EntityUtil.idOrNull(other.getRight())).isEquals();
 		}
 		else {
@@ -136,30 +179,44 @@ public abstract class AbstractEmbeddableManyToManyIdentifier<
 	@Override
 	public void init(@NotNull String value) {
 		String[] parts = value.split(SPLIT_CHAR);
-		if (parts.length == 2) {
+		if (parts.length == 4 && StringUtils.isNoneBlank(parts[0], parts[1], parts[2], parts[3])) {
 			this.left = this.buildLeft(parts[0]);
-			this.right = this.buildRight(parts[1]);
+			this.innerLeft = this.buildInnerLeft(parts[1]);
+			this.innerRight = this.buildInnerRight(parts[2]);
+			this.right = this.buildRight(parts[3]);
 		}
-		else if (parts.length == 1) {
-			this.right = this.buildRight(parts[0]);
+		else {
+			throw new IllegalArgumentException("Given value must have four non-blank parts separated by '_'.");
 		}
 	}
 
 	@Override
 	public String toStringRepresentation() {
 
-		String sender = EntityUtil.idOrNEmpty(this.getLeft());
-		String recipient = EntityUtil.idOrNEmpty(this.getRight());
+		String left = EntityUtil.idOrNEmpty(this.getLeft());
+		String innerLeft = EntityUtil.idOrNEmpty(this.getInnerLeft());
+		String innerRight = EntityUtil.idOrNEmpty(this.getInnerRight());
+		String right = EntityUtil.idOrNEmpty(this.getRight());
 
-		StringBuffer s = new StringBuffer(sender);
-		if (StringUtils.isNoneBlank(sender, recipient)) {
-			s.append(SPLIT_CHAR);
+		StringBuffer s = new StringBuffer();
+		if (StringUtils.isNotBlank(left)) {
+			s.append(left);
 		}
-		s.append(recipient);
-
+		s.append(SPLIT_CHAR);
+		if (StringUtils.isNotBlank(innerLeft)) {
+			s.append(innerLeft);
+		}
+		s.append(SPLIT_CHAR);
+		if (StringUtils.isNotBlank(innerRight)) {
+			s.append(innerRight);
+		}
+		s.append(SPLIT_CHAR);
+		if (StringUtils.isNotBlank(right)) {
+			s.append(right);
+		}
 		String id = s.toString();
 
-		return StringUtils.isNotBlank(id) ? id : null;
+		return id.length() > 3 ? id : null;
 
 	}
 
@@ -174,6 +231,22 @@ public abstract class AbstractEmbeddableManyToManyIdentifier<
 
 	public void setLeft(L left) {
 		this.left = left;
+	}
+
+	public IL getInnerLeft() {
+		return innerLeft;
+	}
+
+	public void setInnerLeft(IL innerLeft) {
+		this.innerLeft = innerLeft;
+	}
+
+	public IR getInnerRight() {
+		return innerRight;
+	}
+
+	public void setInnerRight(IR innerRight) {
+		this.innerRight = innerRight;
 	}
 
 	public R getRight() {

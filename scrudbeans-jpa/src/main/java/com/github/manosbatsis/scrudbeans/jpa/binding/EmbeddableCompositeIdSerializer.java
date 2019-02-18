@@ -26,12 +26,12 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractEmbeddableManyToManyIdentifier;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableCompositeIdentifier;
 
-public class EmbeddableManyToManyIdSerializer extends JsonSerializer<AbstractEmbeddableManyToManyIdentifier> {
+public class EmbeddableCompositeIdSerializer extends JsonSerializer<EmbeddableCompositeIdentifier> {
 
 	@Override
-	public void serialize(AbstractEmbeddableManyToManyIdentifier id, JsonGenerator gen, SerializerProvider provider)
+	public void serialize(EmbeddableCompositeIdentifier id, JsonGenerator gen, SerializerProvider provider)
 			throws IOException, JsonProcessingException {
 
 		gen.writeString(id.toStringRepresentation());
@@ -39,7 +39,7 @@ public class EmbeddableManyToManyIdSerializer extends JsonSerializer<AbstractEmb
 
 	@Override
 	public Class handledType() {
-		return AbstractEmbeddableManyToManyIdentifier.class;
+		return EmbeddableCompositeIdentifier.class;
 	}
 
 }

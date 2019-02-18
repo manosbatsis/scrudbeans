@@ -20,29 +20,14 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.model;
 
-import java.io.Serializable;
-
 import javax.validation.constraints.NotNull;
-
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
 
 /**
  * Created by manos on 25/12/2016.
  */
-public interface EmbeddableManyToManyIdentifier<L extends PersistableModel<LPK>, LPK extends Serializable, R extends PersistableModel<RPK>, RPK extends Serializable> {
+public interface EmbeddableCompositeIdentifier {
+
 	void init(@NotNull String value);
-
-	void init(LPK left, @NotNull RPK right);
-
-	void init(L left, @NotNull R right);
-
 	String toStringRepresentation();
 
-	L getLeft();
-
-	void setLeft(L left);
-
-	R getRight();
-
-	void setRight(R right);
 }
