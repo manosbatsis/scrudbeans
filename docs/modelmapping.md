@@ -163,6 +163,8 @@ implementations you can extend from depending on the number of columns/fields ne
 namely `AbstractEmbeddableManyToManyIdentifier`, `AbstractEmbeddableTripleIdentifier`, 
 `AbstractEmbeddableQuadrupleIdentifier` and `AbstractEmbeddableQuintupleIdentifier`.
 
+> You can create custom composite IDs by implementing `EmbeddableCompositeIdentifier`.
+
 For an example, consider a case where you need to assign additional attributes to a many-to-many 
 relationship between models, like a `Friendship` between two `User`s, along with the requirement 
 of using their two user keys as a composite ID. For cases like these, you can easily create a mapping 

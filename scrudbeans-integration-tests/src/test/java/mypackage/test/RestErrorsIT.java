@@ -19,13 +19,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ScrudBeansSampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RestErrorsIntegrationTest extends AbstractRestAssueredIT {
+public class RestErrorsIT extends AbstractRestAssueredIT {
 
 	@Test
 	public void testNotFound() {
 		SimpleErrorResponse error = given()
 				.spec(defaultSpec())
-				.get("/products/invalid")
+				.get("api/rest/products/invalid")
 				.then()
 				.statusCode(404).extract().as(SimpleErrorResponse.class);
 
@@ -42,7 +42,7 @@ public class RestErrorsIntegrationTest extends AbstractRestAssueredIT {
 		SimpleErrorResponse error = given()
 				.spec(defaultSpec())
 				.body(discountCode)
-				.post("/discountCodes")
+				.post("api/rest/discountCodes")
 				.then()
 				.statusCode(400).extract().as(SimpleErrorResponse.class);
 
@@ -68,7 +68,7 @@ public class RestErrorsIntegrationTest extends AbstractRestAssueredIT {
 		discountCode1 = given()
 				.spec(defaultSpec())
 				.body(discountCode1)
-				.post("/discountCodes")
+				.post("/api/rest/discountCodes")
 				.then()
 				.statusCode(201).extract().as(DiscountCode.class);
 
@@ -78,7 +78,7 @@ public class RestErrorsIntegrationTest extends AbstractRestAssueredIT {
 		SimpleErrorResponse error = given()
 				.spec(defaultSpec())
 				.body(discountCode2)
-				.post("/discountCodes")
+				.post("/api/rest/discountCodes")
 				.then()
 				.statusCode(400).extract().as(SimpleErrorResponse.class);
 

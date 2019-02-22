@@ -72,6 +72,7 @@ import org.slf4j.LoggerFactory;
  * @param <LPK> The type of the left MenyToOne relationship entity ID
  * @param <R>   The type of the right MenyToOne relationship entity
  * @param <RPK> The type of the right MenyToOne relationship entity ID
+ * @see EmbeddableCompositeIdentifier
  * @see EmbeddableCompositeIdDeserializer
  * @see EmbeddableCompositeIdSerializer
  * @see StringToEmbeddableCompositeIdConverterFactory
@@ -90,13 +91,13 @@ public abstract class AbstractEmbeddableManyToManyIdentifier<
 
 
 	@NotNull
-	@ApiModelProperty(required = true, example = "{id: '[id]'}")
+	@ApiModelProperty(required = true, example = "{\"id\": \"[id]\"}")
 	@JoinColumn(name = "left_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private L left;
 
 	@NotNull
-	@ApiModelProperty(required = true, example = "{id: '[id]'}")
+	@ApiModelProperty(required = true, example = "{\"id\": \"[id]\"}")
 	@JoinColumn(name = "right_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private R right;

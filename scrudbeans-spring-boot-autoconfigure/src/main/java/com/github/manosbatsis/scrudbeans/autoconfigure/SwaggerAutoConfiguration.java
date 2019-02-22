@@ -21,12 +21,16 @@
 package com.github.manosbatsis.scrudbeans.autoconfigure;
 
 
+import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
+import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceCollectionDocument;
+import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceDocument;
+import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiResource;
+import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger.web.UiConfiguration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -73,20 +77,25 @@ public class SwaggerAutoConfiguration {
 				.select()
 				.apis(RequestHandlerSelectors.any())
 				.build()
-				.apiInfo(apiInfo());
-	}
-
-	@Bean
-	public UiConfiguration uiConfig() {
-		return new UiConfiguration((String) null);
+				.apiInfo(apiInfo())
+				.pathMapping("/")
+				.ignoredParameterTypes(
+						JsonApiModelResource.class,
+						JsonApiModelResourceDocument.class,
+						JsonApiModelResourceCollectionDocument.class,
+						JsonApiResource.class);
 	}
 
 	private ApiInfo apiInfo() {
-
-		Contact contact = new Contact(contactName, contactUrl, contactEmail);
-		return new ApiInfo(applicationName,
-				"Automatically-generated documentation based on [Swagger](http://swagger.io/) and created by [Springfox](http://springfox.github.io/springfox/).",
-				applicationVersion, "urn:tos", contactName, licenseName,
-				licenseUrl);
+		return new ApiInfoBuilder()
+				.title(applicationName)
+				.description("Automatically-generated documentation based on [Swagger](http://swagger.io/) and created by [Springfox](http://springfox.github.io/springfox/).")
+				.version(applicationVersion)
+				.contact(new Contact(contactName, contactUrl, contactEmail))
+				.license(licenseName)
+				.licenseUrl(licenseUrl)
+				.termsOfServiceUrl("urn:tos")
+				.build();
 	}
+
 }

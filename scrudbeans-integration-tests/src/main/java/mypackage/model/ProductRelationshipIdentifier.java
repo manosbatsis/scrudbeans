@@ -12,7 +12,8 @@ import io.swagger.annotations.ApiModel;
  * @see AbstractEmbeddableManyToManyIdentifier
  */
 @Embeddable
-@ApiModel(value = "ProductRelationshipIdentifier", description = "A composite identifier used an ID in ProductRelationship entities")
+@ApiModel(value = "ProductRelationshipIdentifier",
+		description = "A composite identifier used an ID in ProductRelationship entities")
 public class ProductRelationshipIdentifier extends AbstractEmbeddableManyToManyIdentifier<Product, String, Product, String> {
 
 	@Override

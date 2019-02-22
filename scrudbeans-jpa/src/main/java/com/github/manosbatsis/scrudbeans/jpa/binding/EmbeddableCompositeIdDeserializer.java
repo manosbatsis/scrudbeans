@@ -35,6 +35,10 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableCompositeIdenti
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Deserializer for {@link EmbeddableCompositeIdentifier} instances
+ * @param <T> the identifier implementation type
+ */
 public class EmbeddableCompositeIdDeserializer<T extends EmbeddableCompositeIdentifier> extends JsonDeserializer<T> implements ContextualDeserializer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddableCompositeIdDeserializer.class);

@@ -137,7 +137,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			consumes = APPLICATION_VND_API_PLUS_JSON_VALUE,
 			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ResponseStatus(HttpStatus.CREATED)
-	@ApiOperation(value = "Create a new JSON API resource")
+	@ApiOperation(value = "Create a new JSON API resource", hidden = true)
 	public JsonApiModelResourceDocument<T, PK> jsonApiPost(
 			@NonNull @RequestBody JsonApiModelResourceDocument<T, PK> document) {
 		// unwrap the submitted model and save
@@ -175,7 +175,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			method = RequestMethod.PUT,
 			consumes = APPLICATION_VND_API_PLUS_JSON_VALUE,
 			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
-	@ApiOperation(value = "Update a JSON API Document")
+	@ApiOperation(value = "Update a JSON API Document", hidden = true)
 	public JsonApiModelResourceDocument<T, PK> jsonApiPut(
 			@ApiParam(name = "id", required = true, value = "string")
 			@PathVariable PK id, @RequestBody JsonApiModelResourceDocument<T, PK> document) {
@@ -220,7 +220,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ApiOperation(
 			value = "Patch (partially update) a JSON API Document",
-			notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
+			notes = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.",
+			hidden = true)
 	public JsonApiModelResourceDocument<T, PK> jsonApiPatch(
 			@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id,
 			@RequestBody JsonApiModelResourceDocument<T, PK> document) {
@@ -260,7 +261,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ApiOperation(
 			value = "Get the full collection of JSON API Documents (no paging or criteria)",
-			notes = "Find all JSON API Documents, and return the full collection (i.e. VS a page of the total results)")
+			notes = "Find all JSON API Documents, and return the full collection (i.e. VS a page of the total results)",
+			hidden = true)
 	public JsonApiModelResourceCollectionDocument jsonApiGetAll() {
 		// obtain result models
 		Iterable<T> models = super.findAll();
@@ -320,7 +322,8 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ApiOperation(
 			value = "Search for resources (paginated).",
-			notes = "Find all resources matching the given criteria and return a paginated JSON API Document.")
+			notes = "Find all resources matching the given criteria and return a paginated JSON API Document.",
+			hidden = true)
 	public JsonApiModelResourceCollectionDocument<T, PK> jsonApiGetPage(
 			@ApiParam(name = PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
 			@RequestParam(value = PARAM_FILTER, required = false) String filter,
@@ -364,7 +367,7 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 			method = RequestMethod.GET,
 			consumes = APPLICATION_VND_API_PLUS_JSON_VALUE,
 			produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
-	@ApiOperation(value = "Find by id", notes = "Find a resource by it's identifier")
+	@ApiOperation(value = "Find by id", notes = "Find a resource by it's identifier", hidden = true)
 	public JsonApiModelResourceDocument<T, PK> jsonApiGetById(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id) {
 		return toDocument(super.findById(id));
 	}
@@ -419,7 +422,9 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 	 * GET has the same effect to both member and relationship endpoints
 	 */
 	@RequestMapping(value = {"{id}/{relationName}", "{id}/relationships/{relationName}"}, method = RequestMethod.GET, consumes = APPLICATION_VND_API_PLUS_JSON_VALUE, produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
-	@ApiOperation(value = "Find related by root id", notes = "Find the related resource for the given relation name and identifier")
+	@ApiOperation(value = "Find related by root id",
+			notes = "Find the related resource for the given relation name and identifier",
+			hidden = true)
 	public JsonApiDocument jsonApiGetRelated(
 			@ApiParam(name = PARAM_PK, required = true, value = "string") @PathVariable PK id,
 			@ApiParam(name = PARAM_RELATION_NAME, required = true, value = "string") @PathVariable String relationName,
@@ -485,7 +490,10 @@ public class AbstractPersistableModelController<T extends PersistableModel<PK>, 
 
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE, consumes = APPLICATION_VND_API_PLUS_JSON_VALUE, produces = APPLICATION_VND_API_PLUS_JSON_VALUE)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@ApiOperation(value = "Delete a resource", notes = "Delete a resource by its identifier. ", httpMethod = "DELETE")
+	@ApiOperation(value = "Delete a resource",
+			notes = "Delete a resource by its identifier. ",
+			httpMethod = "DELETE",
+			hidden = true)
 	public void jsonApiDelete(@ApiParam(name = "id", required = true, value = "string") @PathVariable PK id) {
 		super.delete(id);
 	}

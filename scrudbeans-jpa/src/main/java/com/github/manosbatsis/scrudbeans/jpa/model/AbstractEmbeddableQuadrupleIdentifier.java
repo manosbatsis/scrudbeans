@@ -90,6 +90,7 @@ import org.slf4j.LoggerFactory;
  * @param <IRPK> The type of the inner right relationship entity ID
  * @param <R>   The type of the right relationship entity
  * @param <RPK> The type of the right relationship entity ID
+ * @see EmbeddableCompositeIdentifier
  * @see EmbeddableCompositeIdDeserializer
  * @see EmbeddableCompositeIdSerializer
  * @see StringToEmbeddableCompositeIdConverterFactory
@@ -110,25 +111,25 @@ public abstract class AbstractEmbeddableQuadrupleIdentifier<
 
 
 	@NotNull
-	@ApiModelProperty(required = true, example = "{id: '[id]'}")
+	@ApiModelProperty(required = true, example = "{\"id\": \"[id]\"}")
 	@JoinColumn(name = "left_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private L left;
 
 	@NotNull
-	@ApiModelProperty(required = true, example = "{id: '[id]'}")
+	@ApiModelProperty(required = true, example = "{\"id\": \"[id]\"}")
 	@JoinColumn(name = "inner_left_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private IL innerLeft;
 
 	@NotNull
-	@ApiModelProperty(required = true, example = "{id: '[id]'}")
+	@ApiModelProperty(required = true, example = "{\"id\": \"[id]\"}")
 	@JoinColumn(name = "inner_right_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private IR innerRight;
 
 	@NotNull
-	@ApiModelProperty(required = true, example = "{id: '[id]'}")
+	@ApiModelProperty(required = true, example = "{\"id\": \"[id]\"}")
 	@JoinColumn(name = "right_id", nullable = false, updatable = false)
 	@ManyToOne(optional = false)
 	private R right;

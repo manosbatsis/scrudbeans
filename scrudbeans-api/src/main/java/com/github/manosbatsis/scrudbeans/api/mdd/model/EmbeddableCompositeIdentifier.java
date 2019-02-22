@@ -20,14 +20,28 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.model;
 
+import java.io.Serializable;
+
 import javax.validation.constraints.NotNull;
 
 /**
- * Created by manos on 25/12/2016.
+ * An interface for composite identifiers. Implementations are handled
+ * transparently by ScrudBeans in a regular RESTful way, including request
+ * mapping bindings of path or query parameters.
  */
-public interface EmbeddableCompositeIdentifier {
+public interface EmbeddableCompositeIdentifier extends Serializable {
 
+	public static final String SPLIT_CHAR = "_";
+
+	/**
+	 * Initialise using the given string representation
+	 * @param value the string representation of this composite ID
+	 */
 	void init(@NotNull String value);
+
+	/**
+	 * Get the string representation of this composite ID
+	 */
 	String toStringRepresentation();
 
 }

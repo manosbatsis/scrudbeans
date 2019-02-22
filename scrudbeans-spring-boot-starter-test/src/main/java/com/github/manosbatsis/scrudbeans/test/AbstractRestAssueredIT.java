@@ -55,7 +55,6 @@ public abstract class AbstractRestAssueredIT {
 	private static final RequestSpecification SPEC_JSON = new RequestSpecBuilder()
 			.setContentType(MIME_APPLICATION_JSON_UTF8)
 			.setAccept(MIME_APPLICATION_JSON_UTF8)
-			.setBasePath("api/rest")
 			.build();
 
 	@LocalServerPort
@@ -76,7 +75,6 @@ public abstract class AbstractRestAssueredIT {
 	@BeforeAll
 	public void setUp() {
 		RestAssured.port = port;
-		RestAssured.basePath = "api/rest";
 		RestAssured.urlEncodingEnabled = true;
 		// configure our object mapper
 		RestAssured.config = RestAssuredConfig.config().objectMapperConfig(

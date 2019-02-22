@@ -25,6 +25,9 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableCompositeIdenti
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 
+/**
+ * Converter factory targeting {@link EmbeddableCompositeIdentifier} instances
+ */
 public class StringToEmbeddableCompositeIdConverterFactory implements ConverterFactory<String, EmbeddableCompositeIdentifier> {
 
 	@Override
@@ -32,6 +35,11 @@ public class StringToEmbeddableCompositeIdConverterFactory implements ConverterF
 		return new StringToEmbeddableManyToManyIdConverter<T>(targetType);
 	}
 
+
+	/**
+	 * Converter for {@link EmbeddableCompositeIdentifier} identifier instances
+	 * @param <T> the identifier implementation type
+	 */
 	@SuppressWarnings("rawtypes")
 	private final class StringToEmbeddableManyToManyIdConverter<T extends EmbeddableCompositeIdentifier> implements Converter<String, T> {
 

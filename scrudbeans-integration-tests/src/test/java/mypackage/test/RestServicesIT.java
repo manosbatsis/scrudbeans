@@ -30,7 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ScrudBeansSampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
+public class RestServicesIT extends AbstractRestAssueredIT {
 
 
 	@Test
@@ -39,7 +39,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 		Product[] products = given()
 				.spec(defaultSpec())
 				.queryParam("page", "no")
-				.get("/products")
+				.get("/api/rest/products")
 				.then()
 				.statusCode(200).extract().as(Product[].class);
 		// expecting at least one order created on application startup
@@ -57,7 +57,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 		ProductsPage products = given()
 				.spec(defaultSpec())
 				.queryParam("name", "LOTR %")
-				.get("/products")
+				.get("/api/rest/products")
 				.then()
 				.statusCode(200).extract().as(ProductsPage.class);
 		// expecting three books
@@ -72,7 +72,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 		order = given()
 				.spec(defaultSpec())
 				.body(order)
-				.post("/orders")
+				.post("/api/rest/orders")
 				.then()
 				.statusCode(201).extract().as(Order.class);
 		// Test Update
@@ -81,7 +81,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 		order = given()
 				.spec(defaultSpec())
 				.body(order)
-				.put("/orders/" + order.getId())
+				.put("/api/rest/orders/" + order.getId())
 				.then()
 				.statusCode(200).extract().as(Order.class);
 		assertEquals(email + "_updated", order.getEmail());
@@ -95,7 +95,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 		order = given()
 				.spec(defaultSpec())
 				.body(orderMap)
-				.put("/orders/" + order.getId())
+				.put("/api/rest/orders/" + order.getId())
 				.then()
 				.statusCode(200).extract().as(Order.class);
 		assertEquals(email + "_updated_patched", order.getEmail());
@@ -105,7 +105,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 		// verify order was created and can be retrieved
 		order = given()
 				.spec(defaultSpec())
-				.get("/orders/" + order.getId())
+				.get("/api/rest/orders/" + order.getId())
 				.then()
 				.statusCode(200).extract().as(Order.class);
 		assertEquals(email + "_updated_patched", order.getEmail());
@@ -120,7 +120,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 			given()
 					.spec(defaultSpec())
 					.body(orderLine)
-					.post("/orderLines")
+					.post("/api/rest/orderLines")
 					.then()
 					.statusCode(201).extract().as(OrderLine.class);
 		}
@@ -137,7 +137,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 				// >= day-start and <= day-end
 				.param("filter",
 						"createdDate=ge=" + startOfDay + ";createdDate=le=" + endOfDay)
-				.get("/orders")
+				.get("/api/rest/orders")
 				.then()
 				.statusCode(200).extract().as(OrdersPage.class);
 
@@ -152,7 +152,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 				// >= day-start and <= day-end
 				.param("filter",
 						"createdDate=ge=" + startOfDay + ";createdDate=le=" + endOfDay)
-				.get("/orders")
+				.get("/api/rest/orders")
 				.then()
 				.statusCode(200).extract().as(OrdersPage.class);
 
@@ -168,7 +168,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 		ProductsPage products = given()
 				.spec(defaultSpec())
 				.queryParam("name", "LOTR %")
-				.get("/products")
+				.get("/api/rest/products")
 				.then()
 				.statusCode(200).extract().as(ProductsPage.class);
 		// Create ProductRelationship for each combination
@@ -186,7 +186,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 					relationship = given()
 							.spec(defaultSpec())
 							.body(relationship)
-							.post("/productRelationships")
+							.post("/api/rest/productRelationships")
 							.then()
 							.statusCode(201).extract().as(ProductRelationship.class);
 					// Test Update
@@ -194,7 +194,7 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 					relationship = given()
 							.spec(defaultSpec())
 							.body(relationship)
-							.put("/productRelationships" + '/' + relationship.getId())
+							.put("/api/rest/productRelationships" + '/' + relationship.getId())
 							.then()
 							.statusCode(200).extract().as(ProductRelationship.class);
 					// Test Patch
@@ -203,13 +203,13 @@ public class RestServicesIntegrationTest extends AbstractRestAssueredIT {
 					relationship = given()
 							.spec(defaultSpec())
 							.body(patch)
-							.put("/productRelationships" + '/' + relationship.getId())
+							.put("/api/rest/productRelationships" + '/' + relationship.getId())
 							.then()
 							.statusCode(200).extract().as(ProductRelationship.class);
 					// Test Read
 					relationship = given()
 							.spec(defaultSpec())
-							.get("/productRelationships" + '/' + relationship.getId())
+							.get("/api/rest/productRelationships" + '/' + relationship.getId())
 							.then()
 							.statusCode(200).extract().as(ProductRelationship.class);
 					assertEquals(description + "_updated_patched", relationship.getDescription());

@@ -28,6 +28,9 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableCompositeIdentifier;
 
+/**
+ * Serializer for {@link EmbeddableCompositeIdentifier} instances
+ */
 public class EmbeddableCompositeIdSerializer extends JsonSerializer<EmbeddableCompositeIdentifier> {
 
 	@Override
