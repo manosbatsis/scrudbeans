@@ -28,7 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiDocument;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiLink;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
@@ -72,7 +72,7 @@ import org.springframework.data.domain.Sort;
  *
  *
  */
-public class JsonApiModelBasedDocumentBuilder<T extends Model<PK>, PK extends Serializable> {
+public class JsonApiModelBasedDocumentBuilder<T extends IdModel<PK>, PK extends Serializable> {
 
 
 	private String jsonType;

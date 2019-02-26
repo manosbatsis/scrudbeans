@@ -24,7 +24,7 @@ package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceDocument;
 import io.swagger.annotations.ApiModel;
@@ -40,7 +40,7 @@ import io.swagger.annotations.ApiModel;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @ApiModel(value = "Document (JSON-API)", description = SimpleModelResourceDocument.CLASS_DESCRIPTION)
-public class SimpleModelResourceDocument<T extends Model<PK>, PK extends Serializable> extends AbstractJsonApiDocument<JsonApiModelResource<T, PK>> implements JsonApiModelResourceDocument<T, PK> {
+public class SimpleModelResourceDocument<T extends IdModel<PK>, PK extends Serializable> extends AbstractJsonApiDocument<JsonApiModelResource<T, PK>> implements JsonApiModelResourceDocument<T, PK> {
 
 	public static final String CLASS_DESCRIPTION = "A Document that may contain up to a single Resource model (as defined by JSON API 1.1)";
 

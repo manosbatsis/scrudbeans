@@ -29,7 +29,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
@@ -87,7 +87,7 @@ public class HypermediaUtils {
 		return links;
 	}
 
-	public static List<Link> buileHateoasLinks(@NonNull Model model, ModelInfo modelInfo) {
+	public static List<Link> buileHateoasLinks(@NonNull IdModel model, ModelInfo modelInfo) {
 		List<Link> links = null;
 		if (model.getId() != null && modelInfo != null) {
 
@@ -117,7 +117,7 @@ public class HypermediaUtils {
 		return links;
 	}
 
-	public static <RT extends Model<RID>, RID extends Serializable> ModelResource<RT> toHateoasResource(RT model, ModelInfo<RT, RID> modelInfo) {
+	public static <RT extends IdModel<RID>, RID extends Serializable> ModelResource<RT> toHateoasResource(RT model, ModelInfo<RT, RID> modelInfo) {
 		Class<RT> modelType = (modelInfo != null) ? modelInfo.getModelType() : (Class<RT>) model.getClass();
 		ModelResource<RT> resource = new ModelResource<>(modelInfo.getUriComponent(), model);
 		List<Link> links = HypermediaUtils.buileHateoasLinks(model, modelInfo);
@@ -133,7 +133,7 @@ public class HypermediaUtils {
 	 *
 	 * @param models
 	 */
-	public static <RT extends Model> ModelResources<RT> toHateoasResources(@NonNull Iterable<RT> models, Class<RT> modelType, ModelInfoRegistry modelInfoRegistry) {
+	public static <RT extends IdModel> ModelResources<RT> toHateoasResources(@NonNull Iterable<RT> models, Class<RT> modelType, ModelInfoRegistry modelInfoRegistry) {
 		log.debug("toHateoasResources");
 		LinkedList<ModelResource<RT>> wrapped = new LinkedList<>();
 		ModelInfo modelInfo;
@@ -150,7 +150,7 @@ public class HypermediaUtils {
 	 * @param model the model to wrap
 	 * @return
 	 */
-	public static <RT extends Model<RID>, RID extends Serializable> JsonApiModelResourceDocument<RT, RID> toDocument(RT model, ModelInfo<RT, RID> modelInfo) {
+	public static <RT extends IdModel<RID>, RID extends Serializable> JsonApiModelResourceDocument<RT, RID> toDocument(RT model, ModelInfo<RT, RID> modelInfo) {
 		log.debug("toDocument");
 
 		JsonApiModelResourceDocument<RT, RID> doc = new JsonApiModelBasedDocumentBuilder<RT, RID>(modelInfo.getUriComponent())
@@ -165,7 +165,7 @@ public class HypermediaUtils {
 		return doc;
 	}
 
-	public static <M extends Model> PagedModelResources<M> toHateoasPagedResources(@NonNull ParamsAwarePage<M> page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName, ModelInfoRegistry modelInfoRegistry) {
+	public static <M extends IdModel> PagedModelResources<M> toHateoasPagedResources(@NonNull ParamsAwarePage<M> page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName, ModelInfoRegistry modelInfoRegistry) {
 
 		PagedResources.PageMetadata paginationInfo = new PagedResources.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements(), page.getTotalPages());
 		List<Link> links = HypermediaUtils.buileHateoasLinks(page, request, pageNumberParamName);

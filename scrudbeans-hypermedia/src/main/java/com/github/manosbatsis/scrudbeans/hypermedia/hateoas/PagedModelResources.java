@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import lombok.Getter;
 
 import org.springframework.hateoas.Link;
@@ -34,7 +34,7 @@ import org.springframework.hateoas.PagedResources;
  * Created by manos on 21/2/2017.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PagedModelResources<M extends Model> extends PagedResources<ModelResource<M>> {
+public class PagedModelResources<M extends IdModel> extends PagedResources<ModelResource<M>> {
 
 
 	@Getter private Map<String, String[]> urlParameters;

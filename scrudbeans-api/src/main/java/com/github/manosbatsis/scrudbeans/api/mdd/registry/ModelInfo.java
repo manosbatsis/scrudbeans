@@ -23,14 +23,14 @@ package com.github.manosbatsis.scrudbeans.api.mdd.registry;
 import java.io.Serializable;
 import java.util.Set;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
 
 /**
  * Contains metadata for a specific Model class.
  */
-public interface ModelInfo<T extends Model<PK>, PK extends Serializable> {
+public interface ModelInfo<T extends IdModel<PK>, PK extends Serializable> {
 	String getRequestMapping();
 
 	void setRequestMapping(String pattern);

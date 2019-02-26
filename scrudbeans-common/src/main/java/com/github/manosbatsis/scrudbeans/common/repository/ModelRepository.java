@@ -26,7 +26,8 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
 
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 
 import org.springframework.data.domain.Page;
@@ -46,7 +47,7 @@ import org.springframework.data.repository.NoRepositoryBean;
  * @see Page
  */
 @NoRepositoryBean
-public interface ModelRepository<T extends PersistableModel<PK>, PK extends Serializable>
+public interface ModelRepository<T extends IdModel<PK>, PK extends Serializable>
 		extends JpaRepository<T, PK>, JpaSpecificationExecutor<T> {
 
 	EntityManager getEntityManager();
@@ -100,6 +101,6 @@ public interface ModelRepository<T extends PersistableModel<PK>, PK extends Seri
 	 * @param fieldInfo the attribute name of the relationship
 	 * @return the single entity in the other side of the relation if any, null otherwise
 	 */
-	<RT extends PersistableModel> RT findRelatedEntityByOwnId(PK id, FieldInfo fieldInfo);
+	<RT extends SettableIdModel> RT findRelatedEntityByOwnId(PK id, FieldInfo fieldInfo);
 
 }

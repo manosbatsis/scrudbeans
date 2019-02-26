@@ -27,7 +27,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
@@ -42,7 +42,7 @@ import org.springframework.data.jpa.domain.Specification;
  * @param <T> the {@link Root} entity model type
  */
 @Slf4j
-public class PredicateFactorySpecification<T extends Model> implements Specification<T> {
+public class PredicateFactorySpecification<T extends IdModel> implements Specification<T> {
 
 	private final ConversionService conversionService;
 

@@ -42,7 +42,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ComputedRelationship;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldMappingType;
@@ -67,7 +67,7 @@ import org.springframework.core.GenericTypeResolver;
 public class FieldInfoImpl implements FieldInfo {
 
 
-	public static FieldInfo create(@NonNull Class<? extends Model> modelType, PropertyDescriptor property) {
+	public static FieldInfo create(@NonNull Class<? extends IdModel> modelType, PropertyDescriptor property) {
 		FieldInfo fieldInfo = null;
 		Field field = FieldUtils.getField(modelType, property.getName(), true);
 
@@ -93,7 +93,7 @@ public class FieldInfoImpl implements FieldInfo {
 
 	@Getter private FieldMappingType fieldMappingType;
 
-	@Getter private Class<? extends Model> fieldModelType;
+	@Getter private Class<? extends IdModel> fieldModelType;
 
 	@Setter private String reverseFieldName = null;
 
@@ -114,7 +114,7 @@ public class FieldInfoImpl implements FieldInfo {
 	@Getter private ModelInfo relatedModelInfo;
 
 
-	private FieldInfoImpl(@NonNull Class<? extends Model> modelType, @NonNull PropertyDescriptor property, @NonNull Field field, @NonNull Method getter, @NonNull Method setter) {
+	private FieldInfoImpl(@NonNull Class<? extends IdModel> modelType, @NonNull PropertyDescriptor property, @NonNull Field field, @NonNull Method getter, @NonNull Method setter) {
 		// add basic info
 		this.fieldType = property.getPropertyType();
 		this.fieldName = property.getName();
@@ -129,8 +129,8 @@ public class FieldInfoImpl implements FieldInfo {
 
 		// set the Modelnfo for if a relationship
 		if (this.isLinkableResource()) {//if(this.isRelationship()){
-			if (Model.class.isAssignableFrom(this.fieldType)) {
-				this.fieldModelType = (Class<? extends Model>) this.fieldType;
+			if (IdModel.class.isAssignableFrom(this.fieldType)) {
+				this.fieldModelType = (Class<? extends IdModel>) this.fieldType;
 			}
 			// if collection but not a Map
 			else if (Collection.class.isAssignableFrom(this.fieldType) && !Map.class.isAssignableFrom(this.fieldType)) {
@@ -143,14 +143,14 @@ public class FieldInfoImpl implements FieldInfo {
 					String tName = t.getTypeName();
 					log.debug("FieldInfoImpl, var: {}, t.getTypeName: '{}', tName: '{}'", var, t.getTypeName(), tName);
 					if (tName.contains(".")) {
-						this.fieldModelType = (Class<? extends Model>) ClassUtils.getClass(tName);
+						this.fieldModelType = (Class<? extends IdModel>) ClassUtils.getClass(tName);
 					}
 				}
 				if (this.fieldModelType == null) {
 					String tName = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName();
 					log.debug("FieldInfoImpl, tName: '{}'", tName);
 					if (tName.contains(".")) {
-						this.fieldModelType = (Class<? extends Model>) ClassUtils.getClass(tName);
+						this.fieldModelType = (Class<? extends IdModel>) ClassUtils.getClass(tName);
 					}
 				}
 				Class<?> resolved = GenericTypeResolver.resolveTypeArgument(fieldType, pType.getClass());

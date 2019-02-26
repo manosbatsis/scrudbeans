@@ -25,7 +25,7 @@ import java.io.Serializable;
 import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.jpa.validation.Unique;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -38,7 +38,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @XmlRootElement
 @MappedSuperclass
 @Unique
-public abstract class AbstractPersistableModel<PK extends Serializable> implements PersistableModel<PK> {
+public abstract class AbstractPersistableModel<PK extends Serializable> implements SettableIdModel<PK> {
 	private static final long serialVersionUID = -6009587976502456848L;
 
 	public AbstractPersistableModel() {

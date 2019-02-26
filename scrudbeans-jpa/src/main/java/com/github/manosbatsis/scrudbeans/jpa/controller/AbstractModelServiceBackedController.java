@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
@@ -91,7 +91,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @param <PK> Resource id type, usually Long or String
  * @param <S>  The service class
  */
-public class AbstractModelServiceBackedController<T extends PersistableModel<PK>, PK extends Serializable, S extends ModelService<T, PK>> implements InitializingBean {
+public class AbstractModelServiceBackedController<T extends SettableIdModel<PK>, PK extends Serializable, S extends ModelService<T, PK>> implements InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceBackedController.class);
 
@@ -197,7 +197,7 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 	 *
 	 * @param page
 	 */
-	protected <RT extends PersistableModel> PagedModelResources<RT> toHateoasPagedResources(@NonNull ParamsAwarePage<RT> page, @NonNull Class<RT> modelType, @NonNull String pageNumberParamName) {
+	protected <RT extends SettableIdModel> PagedModelResources<RT> toHateoasPagedResources(@NonNull ParamsAwarePage<RT> page, @NonNull Class<RT> modelType, @NonNull String pageNumberParamName) {
 		ModelInfo rootModelInfo = this.mmdelInfoRegistry.getEntryFor(modelType);
 
 		// long size, long number, long totalElements, long totalPages
@@ -254,7 +254,7 @@ public class AbstractModelServiceBackedController<T extends PersistableModel<PK>
 	 * @param <RT>
 	 * @param <RPK>
 	 */
-	protected <RT extends PersistableModel<RPK>, RPK extends Serializable> JsonApiModelResourceCollectionDocument<RT, RPK> toPageDocument(@NonNull ParamsAwarePage<RT> page, @NonNull ModelInfo<RT, RPK> modelInfo, @NonNull String pageNumberParamName) {
+	protected <RT extends SettableIdModel<RPK>, RPK extends Serializable> JsonApiModelResourceCollectionDocument<RT, RPK> toPageDocument(@NonNull ParamsAwarePage<RT> page, @NonNull ModelInfo<RT, RPK> modelInfo, @NonNull String pageNumberParamName) {
 		JsonApiModelResourceCollectionDocument<RT, RPK> doc = new JsonApiModelBasedDocumentBuilder<RT, RPK>(this.getModelInfo().getUriComponent())
 				.withData(page)
 				.buildModelCollectionDocument();

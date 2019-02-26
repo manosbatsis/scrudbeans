@@ -23,7 +23,7 @@ package com.github.manosbatsis.scrudbeans.jpa.controller;
 import java.io.Serializable;
 import java.util.List;
 
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.exception.NotImplementedException;
 import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import io.swagger.annotations.ApiOperation;
@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * Base class for model controllers not allowing HTTP DELETE
  * operations.
  */
-public abstract class AbstractNoDeletePersistableModelController<T extends PersistableModel<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
+public abstract class AbstractNoDeletePersistableModelController<T extends SettableIdModel<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
 		extends AbstractPersistableModelController<T, PK, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractNoDeletePersistableModelController.class);

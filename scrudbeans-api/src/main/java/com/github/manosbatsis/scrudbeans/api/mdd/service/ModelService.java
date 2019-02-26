@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 
 /**
  * CRUD Service interface.
@@ -34,7 +34,7 @@ import com.github.manosbatsis.scrudbeans.api.domain.Model;
  * @param <PK>
  *            Resource id type, usually Long or String
  */
-public interface ModelService<T extends Model<PK>, PK extends Serializable> extends BaseService {
+public interface ModelService<T extends IdModel<PK>, PK extends Serializable> extends BaseService {
 
 
 	/**

@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
@@ -99,7 +99,7 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
 		for (String basePackage : basePackages) {
 			Set<BeanDefinition> entityBeanDefs = EntityUtil.findAllModels(basePackage);
 			for (BeanDefinition beanDef : entityBeanDefs) {
-				Class<? extends Model> modelType = (Class<? extends Model>) ClassUtils.getClass(beanDef.getBeanClassName());
+				Class<? extends IdModel> modelType = (Class<? extends IdModel>) ClassUtils.getClass(beanDef.getBeanClassName());
 				this.addEntryFor(modelType);
 			}
 		}
@@ -149,7 +149,7 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
 		}
 	}
 
-	protected <T extends Model<PK>, PK extends Serializable> void addEntryFor(Class<T> modelClass) {
+	protected <T extends IdModel<PK>, PK extends Serializable> void addEntryFor(Class<T> modelClass) {
 		Assert.notNull(modelClass, "Parameter modelClass cannot be null");
 
 		// ignore abstract classes

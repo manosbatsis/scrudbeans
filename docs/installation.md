@@ -31,7 +31,7 @@ To add the dependency with Maven:
 <dependency>
 	<groupId>com.github.manosbatsis.scrudbeans</groupId>
 	<artifactId>scrudbeans-spring-boot-starter</artifactId>
-	<version>0.11</version>
+	<version>0.12-SNAPSHOT</version>
 </dependency>
 ```
 

@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
 import com.github.manosbatsis.scrudbeans.common.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.jpa.specification.factory.BooleanPredicateFactory;
@@ -50,7 +50,7 @@ import org.springframework.util.Assert;
  * of org.springframework.data.domain.Persistable
  */
 @Slf4j
-public class SpecificationUtils<T extends PersistableModel<PK>, PK extends Serializable> {
+public class SpecificationUtils<T extends SettableIdModel<PK>, PK extends Serializable> {
 
 	private static final HashMap<String, Class> FIELD_TYPE_CACHE = new HashMap<String, Class>();
 

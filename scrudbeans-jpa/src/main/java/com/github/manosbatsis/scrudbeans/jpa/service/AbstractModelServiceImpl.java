@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @param <PK>
  * @param <R>
  */
-public abstract class AbstractModelServiceImpl<T extends Model<PK>, PK extends Serializable>
+public abstract class AbstractModelServiceImpl<T extends IdModel<PK>, PK extends Serializable>
 		extends AbstractBaseServiceImpl
 		implements ModelService<T, PK> {
 

@@ -21,7 +21,7 @@
 package com.github.manosbatsis.scrudbeans.hypermedia.hateoas;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -33,7 +33,7 @@ import org.springframework.hateoas.Resource;
  * Created by manos on 20/2/2017.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class ModelResource<T extends Model> extends Resource<T> {
+public class ModelResource<T extends IdModel> extends Resource<T> {
 
 	/**
 	 * Equivalent to JSON API document type

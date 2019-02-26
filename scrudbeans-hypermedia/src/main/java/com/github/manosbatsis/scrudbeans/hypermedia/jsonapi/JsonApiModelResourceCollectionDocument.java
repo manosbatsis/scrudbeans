@@ -23,7 +23,7 @@ package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi;
 import java.io.Serializable;
 import java.util.Collection;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 
 /**
  * A Document that may contain multiple model-based Resources according to JSON API 1.1
@@ -32,6 +32,6 @@ import com.github.manosbatsis.scrudbeans.api.domain.Model;
  * @param <PK> the JSON API Resource model key type
  *
  */
-public interface JsonApiModelResourceCollectionDocument<T extends Model<PK>, PK extends Serializable> extends JsonApiResourceCollectionDocument<Collection<JsonApiModelResource<T, PK>>, JsonApiModelResource<T, PK>> {
+public interface JsonApiModelResourceCollectionDocument<T extends IdModel<PK>, PK extends Serializable> extends JsonApiResourceCollectionDocument<Collection<JsonApiModelResource<T, PK>>, JsonApiModelResource<T, PK>> {
 
 }

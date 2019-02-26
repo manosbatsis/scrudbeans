@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
@@ -53,7 +53,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
  * @param <PK> the entity PK type
  */
 @Service
-public interface PersistableModelService<T extends PersistableModel<PK>, PK extends Serializable>
+public interface PersistableModelService<T extends SettableIdModel<PK>, PK extends Serializable>
 		extends ModelService<T, PK> {
 
 	String PRE_AUTHORIZATION_PREFIX = "SERVICE_";
@@ -85,7 +85,7 @@ public interface PersistableModelService<T extends PersistableModel<PK>, PK exte
 	 * @param pageable the page config
 	 * @return the page of results, may be <code>null</code>
 	 */
-	<M extends PersistableModel<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable);
+	<M extends SettableIdModel<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable);
 
 	/**
 	 * Find resources page-by-page
@@ -102,10 +102,10 @@ public interface PersistableModelService<T extends PersistableModel<PK>, PK exte
 	 * @param fieldInfo the member/relation name
 	 * @return the single related entity, if any
 	 */
-	PersistableModel findRelatedSingle(PK id, FieldInfo fieldInfo);
+	SettableIdModel findRelatedSingle(PK id, FieldInfo fieldInfo);
 
 	/**
-	 * @see ModelRepository#validateConstraints(PersistableModel)
+	 * @see ModelRepository#validateConstraints(SettableIdModel)
 	 */
 	Set<ConstraintViolation<T>> validateConstraints(T resource);
 

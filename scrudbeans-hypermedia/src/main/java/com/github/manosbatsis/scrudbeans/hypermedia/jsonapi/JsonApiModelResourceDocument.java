@@ -23,7 +23,7 @@ package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelResourceDocument;
 
 /**
@@ -35,6 +35,6 @@ import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelR
  * @param <PK> the JSON API Resource model key type
  */
 @JsonDeserialize(as = SimpleModelResourceDocument.class)
-public interface JsonApiModelResourceDocument<T extends Model<PK>, PK extends Serializable> extends JsonApiResourceDocument<JsonApiModelResource<T, PK>, T, PK> {
+public interface JsonApiModelResourceDocument<T extends IdModel<PK>, PK extends Serializable> extends JsonApiResourceDocument<JsonApiModelResource<T, PK>, T, PK> {
 
 }

@@ -23,7 +23,7 @@ package com.github.manosbatsis.scrudbeans.jpa.rsql;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.jpa.specification.PredicateFactorySpecification;
 import cz.jirutka.rsql.parser.ast.ComparisonNode;
@@ -41,7 +41,7 @@ import org.springframework.data.jpa.domain.Specifications;
  * Used by {@link RsqlSpecVisitor} to generate {@link Specification}-based predicates from individual RSQL {@link Node}s
  */
 @Slf4j
-public class RsqlSpecBuilder<T extends Model> {
+public class RsqlSpecBuilder<T extends IdModel> {
 
 	private final ModelInfo modelInfo;
 

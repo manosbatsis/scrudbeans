@@ -39,7 +39,8 @@ import javax.persistence.criteria.Selection;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.exception.BeanValidationException;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
@@ -58,7 +59,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 
-public class BaseRepositoryImpl<T extends PersistableModel<PK>, PK extends Serializable> extends SimpleJpaRepository<T, PK>
+public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
+		extends SimpleJpaRepository<T, PK>
 		implements ModelRepository<T, PK> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(BaseRepositoryImpl.class);
@@ -189,7 +191,7 @@ public class BaseRepositoryImpl<T extends PersistableModel<PK>, PK extends Seria
 	 * @return
 	 */
 	@Override
-	public <RT extends PersistableModel> RT findRelatedEntityByOwnId(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
+	public <RT extends SettableIdModel> RT findRelatedEntityByOwnId(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
 		if (!fieldInfo.getFieldMappingType().isToOne()) {
 			throw new IllegalArgumentException("Field " + fieldInfo.getFieldName() + " is not a relation to a single entity");
 		}

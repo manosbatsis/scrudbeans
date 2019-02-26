@@ -20,7 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.jpa.rsql;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import cz.jirutka.rsql.parser.ast.AndNode;
 import cz.jirutka.rsql.parser.ast.ComparisonNode;
@@ -34,7 +34,7 @@ import org.springframework.data.jpa.domain.Specification;
 /**
  * Used to generate a {@link Specification}-based query from a root RSQL {@link cz.jirutka.rsql.parser.ast.Node}
  */
-public class RsqlSpecVisitor<T extends Model> implements RSQLVisitor<Specification<T>, Void> {
+public class RsqlSpecVisitor<T extends IdModel> implements RSQLVisitor<Specification<T>, Void> {
 
 	private RsqlSpecBuilder<T> builder;
 

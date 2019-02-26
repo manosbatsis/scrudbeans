@@ -22,7 +22,7 @@ package com.github.manosbatsis.scrudbeans.api.mdd.registry;
 
 import java.util.Optional;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -48,7 +48,7 @@ public interface FieldInfo {
 	/**
 	 * Get the member model type for example <code>Book</code> for a book entity or entity collection
 	 */
-	Class<? extends Model> getFieldModelType();
+	Class<? extends IdModel> getFieldModelType();
 
 	/**
 	 * Get the reverse relationship path if any

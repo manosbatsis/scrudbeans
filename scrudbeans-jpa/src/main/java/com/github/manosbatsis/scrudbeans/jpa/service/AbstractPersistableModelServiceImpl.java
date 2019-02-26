@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistence;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
@@ -65,14 +65,14 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 //import com.github.manosbatsis.scrudbeans.api.domain.users.model.User;
 
 /**
- * SCRUD service handling a specific type of {@link PersistableModel} using a {@link ModelRepository}
+ * SCRUD service handling a specific type of {@link SettableIdModel} using a {@link ModelRepository}
  *
  * @param <T>  Your resource class to manage, usually an entity class
  * @param <PK> Resource id type, usually Long or String
  * @param <R>  The repository class to automatically inject
  */
 @Slf4j
-public class AbstractPersistableModelServiceImpl<T extends PersistableModel<PK>, PK extends Serializable, R extends ModelRepository<T, PK>>
+public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, PK extends Serializable, R extends ModelRepository<T, PK>>
 		extends AbstractBaseServiceImpl
 		implements PersistableModelService<T, PK> {
 
@@ -260,7 +260,7 @@ public class AbstractPersistableModelServiceImpl<T extends PersistableModel<PK>,
 	 * {@inheritDoc}
 	 */
 	@Override
-	public PersistableModel findRelatedSingle(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
+	public SettableIdModel findRelatedSingle(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
 		// throw error if not valid or linkable relationship
 		if (!fieldInfo.isLinkableResource() || !fieldInfo.isToOne()) {
 			throw new IllegalArgumentException("Related must be linkable and *ToOne");
@@ -272,7 +272,7 @@ public class AbstractPersistableModelServiceImpl<T extends PersistableModel<PK>,
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <M extends PersistableModel<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable) {
+	public <M extends SettableIdModel<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable) {
 		ModelRepository<M, MID> repo = (ModelRepository) this.repositoryRegistryService.getRepositoryFor(entityType);
 
 		if (repo == null) {

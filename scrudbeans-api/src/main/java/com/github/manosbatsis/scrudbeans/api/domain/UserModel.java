@@ -33,7 +33,7 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * Created by manos on 4/2/2017.
  */
-public interface UserModel extends Model<String> {
+public interface UserModel extends IdModel<String> {
 
 	Locale getLocaleObject();
 

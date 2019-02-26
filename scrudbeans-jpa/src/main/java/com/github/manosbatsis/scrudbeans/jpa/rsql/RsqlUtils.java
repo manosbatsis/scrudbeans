@@ -28,7 +28,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
 import cz.jirutka.rsql.parser.RSQLParser;
@@ -81,7 +81,7 @@ public class RsqlUtils {
 	 * @param ignoreNamesForSpecification the URL parameter names to ignore if no <code>filter</code>> param is present
 	 * @return the resulting specification
 	 */
-	public static <M extends PersistableModel<MID>, MID extends Serializable> Specification<M>
+	public static <M extends SettableIdModel<MID>, MID extends Serializable> Specification<M>
 	buildSpecification(
 			ModelInfo<M, MID> modelInfo,
 			ConversionService conversionService,

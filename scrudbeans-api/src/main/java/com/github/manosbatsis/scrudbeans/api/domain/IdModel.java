@@ -23,10 +23,20 @@ package com.github.manosbatsis.scrudbeans.api.domain;
 import java.io.Serializable;
 
 /**
- * Base interface for persistable entity models
- * @param <PK> The primary key type, Serializable
+ * Base interface for model objects
+ * @param <PK> The primary key type, if any
  */
-public interface PersistableModel<PK extends Serializable> extends Model<PK> {
+public interface IdModel<PK extends Serializable> extends Serializable {
+
+	/**
+	 * The primary key, field name.
+	 */
+	String PK_FIELD_NAME = "id";
+
+	/**
+	 * Get the entity's primary key.
+	 */
+	PK getId();
 
 
 }

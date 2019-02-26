@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manosbatsis.scrudbeans.api.domain.Model;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceCollectionDocument;
 import io.swagger.annotations.ApiModel;
@@ -40,7 +40,7 @@ import io.swagger.annotations.ApiModel;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @ApiModel(value = "Collection Document (JSON-API)", description = SimpleModelResourceDocument.CLASS_DESCRIPTION)
-public class SimpleModelResourceCollectionDocument<T extends Model<PK>, PK extends Serializable>
+public class SimpleModelResourceCollectionDocument<T extends IdModel<PK>, PK extends Serializable>
 		extends AbstractJsonApiDocument<Collection<JsonApiModelResource<T, PK>>>
 		implements JsonApiModelResourceCollectionDocument<T, PK> {
 

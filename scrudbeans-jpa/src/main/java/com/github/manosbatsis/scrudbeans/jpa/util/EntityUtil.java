@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedBean;
@@ -173,11 +173,11 @@ public class EntityUtil {
 		return caseSensitive;
 	}
 
-	public static <PK extends Serializable> PK idOrNull(PersistableModel<PK> user) {
+	public static <PK extends Serializable> PK idOrNull(IdModel<PK> user) {
 		return user != null ? user.getId() : null;
 	}
 
-	public static String idOrNEmpty(PersistableModel entity) {
+	public static String idOrNEmpty(IdModel entity) {
 		return entity != null ? entity.getId().toString() : StringUtils.EMPTY;
 	}
 }

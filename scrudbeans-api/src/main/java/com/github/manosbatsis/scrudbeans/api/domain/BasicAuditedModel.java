@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 /**
  * Includes basic audit details, i.e. date and user for creation and latest update
  */
-public interface BasicAuditedModel<PK extends Serializable, U extends Serializable> extends PersistableModel<PK> {
+public interface BasicAuditedModel<PK extends Serializable, U extends Serializable> extends SettableIdModel<PK> {
 
 	U getCreatedBy();
 

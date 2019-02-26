@@ -35,7 +35,7 @@ import javax.persistence.criteria.Root;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import com.github.manosbatsis.scrudbeans.api.domain.PersistableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.jpa.util.EntityUtil;
 import com.github.manosbatsis.scrudbeans.jpa.util.ValidatorUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @see Unique
  */
 @Slf4j
-public class UniqueValidator implements ConstraintValidator<Unique, PersistableModel> {
+public class UniqueValidator implements ConstraintValidator<Unique, SettableIdModel> {
 
 	private EntityManager entityManager;
 
@@ -64,7 +64,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, PersistableM
 
 	@Override
 	@Transactional(readOnly = true)
-	public boolean isValid(PersistableModel value, ConstraintValidatorContext constraintValidatorContext) {
+	public boolean isValid(SettableIdModel value, ConstraintValidatorContext constraintValidatorContext) {
 		log.debug("isValid pathFragment: {}", value);
 		boolean valid = true;
 		// skip validation if null
@@ -78,7 +78,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, PersistableM
 				List<String> uniqueFieldNames = ValidatorUtil.getUniqueFieldNames(domainClass);
 
 				// get records matching the unique field values
-				List<PersistableModel> resultSet = getViolatingRecords(value, domainClass, uniqueFieldNames);
+				List<SettableIdModel> resultSet = getViolatingRecords(value, domainClass, uniqueFieldNames);
 
 				// process violating records
 				if (!resultSet.isEmpty()) {
@@ -87,7 +87,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, PersistableM
 					// as it will point to  the object instead of the property
 					constraintValidatorContext.disableDefaultConstraintViolation();
 
-					for (PersistableModel match : resultSet) {
+					for (SettableIdModel match : resultSet) {
 						if (!match.getId().equals(value.getId())) {
 							for (String propertyName : uniqueFieldNames) {
 								Object newValue = PropertyUtils.getProperty(value, propertyName);
@@ -123,12 +123,12 @@ public class UniqueValidator implements ConstraintValidator<Unique, PersistableM
 
 	}
 
-	private List<PersistableModel> getViolatingRecords(PersistableModel value, Class domainClass, List<String> uniqueFieldNames) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	private List<SettableIdModel> getViolatingRecords(SettableIdModel value, Class domainClass, List<String> uniqueFieldNames) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 		log.debug("getViolatingRecords, for pathFragment: {}, uniqueFieldNames: {}", value, uniqueFieldNames);
 		CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
 		CriteriaQuery criteriaQuery = criteriaBuilder.createQuery(domainClass);
-		Root<? extends PersistableModel<Serializable>> root = criteriaQuery.from(domainClass);
+		Root<? extends SettableIdModel<Serializable>> root = criteriaQuery.from(domainClass);
 		List<Predicate> predicates = new ArrayList<Predicate>(uniqueFieldNames.size());
 		for (String propertyName : uniqueFieldNames) {
 			log.debug("getViolatingRecords, adding predicate for field: {}", propertyName);
@@ -138,7 +138,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, PersistableM
 		}
 
 		criteriaQuery.where(predicates.toArray(new Predicate[predicates.size()]));
-		TypedQuery<PersistableModel> typedQuery = this.entityManager.createQuery(criteriaQuery);
+		TypedQuery<SettableIdModel> typedQuery = this.entityManager.createQuery(criteriaQuery);
 
 		// tell JPA not to flush just vbecause we want to check existing records
 		typedQuery.setFlushMode(FlushModeType.COMMIT);
