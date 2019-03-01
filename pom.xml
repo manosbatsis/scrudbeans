@@ -102,6 +102,7 @@
 		<module>scrudbeans-spring-boot-autoconfigure</module>
 		<module>scrudbeans-spring-boot-starter</module>
 		<module>scrudbeans-spring-boot-starter-test</module>
+		<module>scrudbeans-swagger-codegen</module>
 	</modules>
 
 	<dependencyManagement>
@@ -117,6 +118,11 @@
 			<dependency>
 				<groupId>io.springfox</groupId>
 				<artifactId>springfox-swagger2</artifactId>
+				<version>${springfox-swagger.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.springfox</groupId>
+				<artifactId>springfox-bean-validators</artifactId>
 				<version>${springfox-swagger.version}</version>
 			</dependency>
 			<dependency>

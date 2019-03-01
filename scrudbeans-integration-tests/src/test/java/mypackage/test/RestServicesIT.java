@@ -12,6 +12,7 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.manosbatsis.scrudbeans.test.AbstractRestAssueredIT;
 import com.github.manosbatsis.scrudbeans.test.TestableParamsAwarePage;
 import lombok.extern.slf4j.Slf4j;
@@ -217,6 +218,23 @@ public class RestServicesIT extends AbstractRestAssueredIT {
 			}
 		}
 
+	}
+
+	@Test
+	public void testJsonSchema() throws Exception {
+		// --------------------------------
+		// Gwt user schema
+		// --------------------------------
+		JsonNode schema = given().spec(defaultSpec())
+				.log().all()
+				.get("/api/rest/products/jsonschema")
+				.then()
+				.log().all()
+				.assertThat()
+				.statusCode(200)
+				// get model
+				.extract().as(JsonNode.class);
+		log.debug("testJsonSchema: \n{}", schema.toString());
 	}
 
 	// Help RestAssured's mapping

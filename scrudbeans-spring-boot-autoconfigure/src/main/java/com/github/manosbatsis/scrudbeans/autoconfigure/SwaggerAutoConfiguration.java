@@ -35,7 +35,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Autoconfigures Springfox and Swagger UI based on the following application properties:
@@ -46,7 +45,6 @@ import org.springframework.context.annotation.Configuration;
  *
  */
 @EnableSwagger2
-@Configuration
 public class SwaggerAutoConfiguration {
 
 	@Value("${spring.application.name}")
