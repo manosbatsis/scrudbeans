@@ -154,16 +154,27 @@ maximum length of two characters:</p>
 })
 <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Country</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractAssignedIdPersistableModel</span>&lt;<span class="hljs-title">String</span>&gt; </span>{<span class="hljs-comment">/* ...*/</span> }
 </code></pre>
-<h3><a class="anchor" aria-hidden="true" id="manytomany-id"></a><a href="#manytomany-id" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>ManyToMany ID</h3>
-<p>Some times you need to assign additional attributes to a many-to-many relationship between models,
-for example the <code>Friendship</code> between two <code>User</code>s, along with the requirement of using the two foreign
-keys as the composite ID. This introduces some complexity in a number areas where the ID is handled,
-like JSON (de)serialization and request mapping bindings of path or query parameters.</p>
-<p>For cases like these, you can easily create a mapping that &quot;just works&quot; in two steps. First, begin by<br>
-extending <code>AbstractEmbeddableManyToManyIdentifier</code> to create a new <code>@Embeddable</code> ID type:</p>
+<h3><a class="anchor" aria-hidden="true" id="composite-ids"></a><a href="#composite-ids" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Composite IDs</h3>
+<p>Some times you need to use composite IDs in your models. This introduces some complexity in a number of
+areas where the ID must be handled in a regular RESTful way, including request
+mapping bindings of path or query parameters.</p>
+<p>To help making this work transparently out of the box, ScrudBeans provides a number of embeddable ID
+implementations you can extend from depending on the number of columns/fields needed for your composite ID,
+namely <code>AbstractEmbeddableManyToManyIdentifier</code>, <code>AbstractEmbeddableTripleIdentifier</code>,
+<code>AbstractEmbeddableQuadrupleIdentifier</code> and <code>AbstractEmbeddableQuintupleIdentifier</code>.</p>
+<blockquote>
+<p>You can create custom composite IDs by implementing <code>EmbeddableCompositeIdentifier</code>.</p>
+</blockquote>
+<p>For an example, consider a case where you need to assign additional attributes to a many-to-many
+relationship between models, like a <code>Friendship</code> between two <code>User</code>s, along with the requirement
+of using their two user keys as a composite ID. For cases like these, you can easily create a mapping
+that &quot;just works&quot; in two steps.</p>
+<p>First, begin by extending <code>AbstractEmbeddableManyToManyIdentifier</code>
+to create a new <code>@Embeddable</code> ID type:</p>
 <pre><code class="hljs css language-java"><span class="hljs-meta">@Embeddable</span>
 <span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">FriendshipIdentifier</span> 
-    <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractEmbeddableManyToManyIdentifier</span>&lt;<span class="hljs-title">User</span>, <span class="hljs-title">String</span>, <span class="hljs-title">User</span>, <span class="hljs-title">String</span>&gt; <span class="hljs-keyword">implements</span> <span class="hljs-title">Serializable</span> </span>{
+    <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractEmbeddableManyToManyIdentifier</span>&lt;<span class="hljs-title">User</span>, <span class="hljs-title">String</span>, <span class="hljs-title">User</span>, <span class="hljs-title">String</span>&gt; 
+    <span class="hljs-keyword">implements</span> <span class="hljs-title">Serializable</span> </span>{
 
     <span class="hljs-meta">@Override</span>
     <span class="hljs-function"><span class="hljs-keyword">public</span> User <span class="hljs-title">buildLeft</span><span class="hljs-params">(Serializable left)</span> </span>{
@@ -181,10 +192,20 @@ extending <code>AbstractEmbeddableManyToManyIdentifier</code> to create a new <c
 
 }
 </code></pre>
-<p>Then, use the new identifier as the entity ID type of a <code>PersistableModel</code>:</p>
-<pre><code class="hljs css language-java"><span class="hljs-meta">@Entity</span>
+<p>Depending on the identifier superclass, you'll need to implement a number of <code>buildX</code> methods as above.</p>
+<p>Then, use the new <code>@Embeddable</code> identifier as the entity ID type of a <code>PersistableModel</code>:</p>
+<pre><code class="hljs css language-java"><span class="hljs-meta">@ScrudBean</span>
+<span class="hljs-meta">@Entity</span>
 <span class="hljs-meta">@Table</span>(name = <span class="hljs-string">"friendship"</span>)
-<span class="hljs-meta">@ScrudBean</span>
-<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Friendship</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">PersistableModel</span>&lt;<span class="hljs-title">FriendshipIdentifier</span>&gt; </span>{<span class="hljs-comment">/* ...*/</span> }
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Friendship</span> <span class="hljs-keyword">implements</span> <span class="hljs-title">PersistableModel</span>&lt;<span class="hljs-title">FriendshipIdentifier</span>&gt; </span>{
+    
+    <span class="hljs-meta">@NotNull</span>
+    <span class="hljs-meta">@ApiModelProperty</span>(required = <span class="hljs-keyword">true</span>)
+    <span class="hljs-meta">@EmbeddedId</span>
+    <span class="hljs-keyword">private</span> FriendshipIdentifier id;
+    
+    <span class="hljs-comment">// Other members...</span>
+    
+}
 </code></pre>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/scrudbeans/docs/installation"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/scrudbeans/docs/restfulservices"><span>RESTful Services</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#mapping-prerequisites">Mapping Prerequisites</a></li><li><a href="#mapping-example">Mapping Example</a></li><li><a href="#relevant-annotations">Relevant Annotations</a><ul class="toc-headings"><li><a href="#scrudbean">ScrudBean</a></li><li><a href="#validation">Validation</a></li><li><a href="#documentation">Documentation</a></li></ul></li><li><a href="#base-models">Base Models</a><ul class="toc-headings"><li><a href="#uuid">UUID</a></li><li><a href="#auto-increment">Auto Increment</a></li><li><a href="#assigned-ids">Assigned IDs</a></li><li><a href="#manytomany-id">ManyToMany ID</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="copyright"><a href="http://manosbatsis.github.io/">Copyright © 2019 Manos Batsis</a>.<span> Got a remote contract? Contact me by<a href="mailto:manosbatsis@gmail.com?subject=Remote Contract"> email</a> or<a href="https://www.linkedin.com/in/manosbatsis"> linkedin</a></span></section></footer></div></body></html>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/scrudbeans/docs/installation"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/scrudbeans/docs/restfulservices"><span>RESTful Services</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#mapping-prerequisites">Mapping Prerequisites</a></li><li><a href="#mapping-example">Mapping Example</a></li><li><a href="#relevant-annotations">Relevant Annotations</a><ul class="toc-headings"><li><a href="#scrudbean">ScrudBean</a></li><li><a href="#validation">Validation</a></li><li><a href="#documentation">Documentation</a></li></ul></li><li><a href="#base-models">Base Models</a><ul class="toc-headings"><li><a href="#uuid">UUID</a></li><li><a href="#auto-increment">Auto Increment</a></li><li><a href="#assigned-ids">Assigned IDs</a></li><li><a href="#composite-ids">Composite IDs</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="copyright"><a href="http://manosbatsis.github.io/">Copyright © 2019 Manos Batsis</a>.<span> Got a remote contract? Contact me by<a href="mailto:manosbatsis@gmail.com?subject=Remote Contract"> email</a> or<a href="https://www.linkedin.com/in/manosbatsis"> linkedin</a></span></section></footer></div></body></html>

@@ -49,7 +49,7 @@ components and expose a RESTful services for SCRUD: Search, Create, Update and D
 <tr><td>GET</td><td>/api/rest/orders/{id}</td><td>Fetch the order matching the id</td></tr>
 <tr><td>GET</td><td>/api/rest/orders/{id}/relationships/{relation}</td><td>Fetch the related object for the order matching the id</td></tr>
 <tr><td>GET</td><td>/api/rest/orders?email=%25startsWith</td><td>Search based on model properties using simple name-value pairs as URL query string parameters (paged)</td></tr>
-<tr><td>GET</td><td>/api/rest/orders?filter=createdDate=ge=2018-12-10T00:00;createdDate=le=2018-12-10T23:59:59</td><td>Search based on model properties using an <a href="https://manosbatsis.github.io/restdude/rsql.html">RSQL or FIQL</a> filter (paged)</td></tr>
+<tr><td>GET</td><td>/api/rest/orders?filter=createdDate=ge=2018-12-10T00:00;createdDate=le=2018-12-10T23:59:59</td><td>Search based on model properties using an <a href="https://manosbatsis.github.io/scrudbeans/docs/rsqlsupport">RSQL or FIQL</a> filter (paged)</td></tr>
 <tr><td>GET</td><td>/api/rest/orders?page=no</td><td>Get all orders</td></tr>
 <tr><td>POST</td><td>/api/rest/orders</td><td>Create a new order</td></tr>
 <tr><td>PUT</td><td>/api/rest/orders/{id}</td><td>Update the order matching the id</td></tr>
