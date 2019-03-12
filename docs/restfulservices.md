@@ -13,7 +13,7 @@ Method | Path    | Description
 GET    | /api/rest/orders/{id} | Fetch the order matching the id
 GET    | /api/rest/orders/{id}/relationships/{relation} | Fetch the related object for the order matching the id
 GET    | /api/rest/orders?email=%25startsWith | Search based on model properties using simple name-value pairs as URL query string parameters (paged)
-GET    | /api/rest/orders?filter=createdDate=ge=2018-12-10T00:00;createdDate=le=2018-12-10T23:59:59 | Search based on model properties using an [RSQL or FIQL](https://manosbatsis.github.io/restdude/rsql.html) filter (paged)
+GET    | /api/rest/orders?filter=createdDate=ge=2018-12-10T00:00;createdDate=le=2018-12-10T23:59:59 | Search based on model properties using an [RSQL or FIQL](https://manosbatsis.github.io/scrudbeans/docs/rsqlsupport) filter (paged)
 GET    | /api/rest/orders?page=no | Get all orders
 POST   | /api/rest/orders      | Create a new order
 PUT    | /api/rest/orders/{id} | Update the order matching the id

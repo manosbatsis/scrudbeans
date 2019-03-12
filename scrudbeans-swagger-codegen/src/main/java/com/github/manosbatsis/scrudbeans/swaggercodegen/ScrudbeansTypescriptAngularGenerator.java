@@ -11,8 +11,8 @@ import org.apache.commons.lang3.StringUtils;
  * i.e. "typescript-angular"
  */
 public class ScrudbeansTypescriptAngularGenerator extends TypeScriptAngularClientCodegen {
-
-	private static final Pattern patternForTrailingNumerics = Pattern.compile(".*[0-9]+$");
+/*
+	private static final Pattern patternToMatchTrailingNumerics = Pattern.compile(".*[0-9]+$");
 	private static final Pattern patternToRemoveTrailingNumerics = Pattern.compile("\\d*$");
 	private static final String[] suffixes = {
 			"UsingGET", "UsingPOST", "UsingPUT", "UsingDELETE", "UsingOPTIONS", "UsingPATCH",
@@ -27,7 +27,7 @@ public class ScrudbeansTypescriptAngularGenerator extends TypeScriptAngularClien
 		}
 
 		// Remove numeric suffix if found
-		if (patternForTrailingNumerics.matcher(operationId).matches()) {
+		if (patternToMatchTrailingNumerics.matcher(operationId).matches()) {
 			operationId = patternToRemoveTrailingNumerics.matcher(operationId).replaceAll("");
 		}
 		// Remove trailing underscore
@@ -53,5 +53,5 @@ public class ScrudbeansTypescriptAngularGenerator extends TypeScriptAngularClien
 		}
 		return original;
 	}
-
+*/
 }

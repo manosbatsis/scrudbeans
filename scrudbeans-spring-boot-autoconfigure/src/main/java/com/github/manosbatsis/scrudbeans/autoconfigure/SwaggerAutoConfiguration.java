@@ -21,10 +21,6 @@
 package com.github.manosbatsis.scrudbeans.autoconfigure;
 
 
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceCollectionDocument;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceDocument;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiResource;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -76,12 +72,7 @@ public class SwaggerAutoConfiguration {
 				.apis(RequestHandlerSelectors.any())
 				.build()
 				.apiInfo(apiInfo())
-				.pathMapping("/")
-				.ignoredParameterTypes(
-						JsonApiModelResource.class,
-						JsonApiModelResourceDocument.class,
-						JsonApiModelResourceCollectionDocument.class,
-						JsonApiResource.class);
+				.pathMapping("/");
 	}
 
 	private ApiInfo apiInfo() {
