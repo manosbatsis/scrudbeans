@@ -54,6 +54,10 @@ public class RsqlUtils {
 
 	private static final String AUTO = "=auto=";
 
+	private static final String IS_NULL = "=isnull=";
+
+	private static final String IS_NOT_NULL = "=isnull=";
+
 	static {
 		operatorMappings.put(RSQLOperators.EQUAL, PredicateOperator.EQUAL);
 		operatorMappings.put(RSQLOperators.GREATER_THAN, PredicateOperator.GREATER_THAN);
@@ -65,8 +69,14 @@ public class RsqlUtils {
 		operatorMappings.put(RSQLOperators.NOT_IN, PredicateOperator.NOT_IN);
 
 		ComparisonOperator auto = new ComparisonOperator(AUTO, true);
+		ComparisonOperator isNull = new ComparisonOperator(IS_NULL, true);
+		ComparisonOperator isNotNull = new ComparisonOperator(IS_NOT_NULL, true);
 		OPERATORS.add(auto);
+		OPERATORS.add(isNull);
+		OPERATORS.add(isNotNull);
 		operatorMappings.put(auto, PredicateOperator.AUTO);
+		operatorMappings.put(isNull, PredicateOperator.IS_NULL);
+		operatorMappings.put(isNotNull, PredicateOperator.IS_NOT_NULL);
 	}
 
 	/**

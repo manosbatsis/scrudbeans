@@ -32,5 +32,7 @@ public enum PredicateOperator {
 	LESS_THAN_OR_EQUAL,
 	IN,
 	NOT_IN,
-	AUTO;
+	AUTO,
+	IS_NULL,
+	IS_NOT_NULL;
 }

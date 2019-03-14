@@ -95,24 +95,6 @@ public class AbstractModelServiceBackedController<T extends SettableIdModel<PK>,
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceBackedController.class);
 
-	protected static final String PARAM_RELATION_NAME = "relationName";
-
-	protected static final String PARAM_FILTER = "filter";
-
-	protected static final String PARAM_JSONAPI_PAGE_NUMBER = "page[number]";
-
-	protected static final String PARAM_JSONAPI_PAGE_SIZE = "page[size]";
-
-	protected static final String PARAM_SORT = "sort";
-
-	protected static final String PARAM_PK = "id";
-
-	protected static final String PARAM_PAGE_NUMBER = "_pn";
-
-	protected static final String PARAM_PAGE_SIZE = "_ps";
-
-	protected static final String[] PARAMS_IGNORE_FOR_CRITERIA = {PARAM_RELATION_NAME, PARAM_FILTER, PARAM_JSONAPI_PAGE_NUMBER, PARAM_JSONAPI_PAGE_SIZE, PARAM_SORT, PARAM_PK, PARAM_PAGE_NUMBER, PARAM_PAGE_SIZE};
-
 	private ModelInfo modelInfo;
 
 	@Autowired

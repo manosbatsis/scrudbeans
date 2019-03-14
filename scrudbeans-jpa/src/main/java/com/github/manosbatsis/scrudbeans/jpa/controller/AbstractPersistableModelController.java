@@ -280,14 +280,14 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 			+ "Predefined paging properties are _pn (page number), _ps (page size) and sort. All serialized member names "
 			+ "of the resource are supported as search criteria in the form of HTTP URL parameters.")
 	public ParamsAwarePageImpl<T> plainJsonGetPage(
-			@ApiParam(name = PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
-			@RequestParam(value = PARAM_FILTER, required = false) String filter,
-			@ApiParam(name = PARAM_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
-			@RequestParam(value = PARAM_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
-			@ApiParam(name = PARAM_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]")
-			@RequestParam(value = PARAM_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
-			@ApiParam(name = PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
-			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
+			@ApiParam(name = SpecificationsBuilder.PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
+			@RequestParam(value = SpecificationsBuilder.PARAM_FILTER, required = false) String filter,
+			@ApiParam(name = SpecificationsBuilder.PARAM_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
+			@RequestParam(value = SpecificationsBuilder.PARAM_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
+			@ApiParam(name = SpecificationsBuilder.PARAM_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]")
+			@RequestParam(value = SpecificationsBuilder.PARAM_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
+			@ApiParam(name = SpecificationsBuilder.PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
+			@RequestParam(value = SpecificationsBuilder.PARAM_SORT, required = false, defaultValue = "id") String sort) {
 		Pageable pageable = PageableUtil.buildPageable(page, size, sort);
 		return this.<T>findPaginated(pageable, null);
 	}
@@ -303,14 +303,14 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 					+ "Predefined paging properties are _pn (page number), _ps (page size) and sort. All serialized member names "
 					+ "of the resource are supported as search criteria in the form of HTTP URL parameters.")
 	public PagedModelResources<T> hateoasGetPage(
-			@ApiParam(name = PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
-			@RequestParam(value = PARAM_FILTER, required = false) String filter,
-			@ApiParam(name = PARAM_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
-			@RequestParam(value = PARAM_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
-			@ApiParam(name = PARAM_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]")
-			@RequestParam(value = PARAM_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
-			@ApiParam(name = PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
-			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
+			@ApiParam(name = SpecificationsBuilder.PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
+			@RequestParam(value = SpecificationsBuilder.PARAM_FILTER, required = false) String filter,
+			@ApiParam(name = SpecificationsBuilder.PARAM_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
+			@RequestParam(value = SpecificationsBuilder.PARAM_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
+			@ApiParam(name = SpecificationsBuilder.PARAM_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]")
+			@RequestParam(value = SpecificationsBuilder.PARAM_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
+			@ApiParam(name = SpecificationsBuilder.PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
+			@RequestParam(value = SpecificationsBuilder.PARAM_SORT, required = false, defaultValue = "id") String sort) {
 		Pageable pageable = PageableUtil.buildPageable(page, size, sort);
 		return this.toHateoasPagedResources(
 				this.<T>findPaginated(pageable, null), "_pn");
@@ -325,14 +325,14 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 			notes = "Find all resources matching the given criteria and return a paginated JSON API Document.",
 			hidden = true)
 	public JsonApiModelResourceCollectionDocument<T, PK> jsonApiGetPage(
-			@ApiParam(name = PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
-			@RequestParam(value = PARAM_FILTER, required = false) String filter,
-			@ApiParam(name = PARAM_JSONAPI_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
-			@RequestParam(value = PARAM_JSONAPI_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
-			@ApiParam(name = PARAM_JSONAPI_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]")
-			@RequestParam(value = PARAM_JSONAPI_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
-			@ApiParam(name = PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
-			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
+			@ApiParam(name = SpecificationsBuilder.PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
+			@RequestParam(value = SpecificationsBuilder.PARAM_FILTER, required = false) String filter,
+			@ApiParam(name = SpecificationsBuilder.PARAM_JSONAPI_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
+			@RequestParam(value = SpecificationsBuilder.PARAM_JSONAPI_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
+			@ApiParam(name = SpecificationsBuilder.PARAM_JSONAPI_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]")
+			@RequestParam(value = SpecificationsBuilder.PARAM_JSONAPI_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
+			@ApiParam(name = SpecificationsBuilder.PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
+			@RequestParam(value = SpecificationsBuilder.PARAM_SORT, required = false, defaultValue = "id") String sort) {
 		Pageable pageable = PageableUtil.buildPageable(page, size, sort);
 		return toPageDocument(this.<T>findPaginated(pageable, null));
 	}
@@ -377,16 +377,16 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 	@RequestMapping(value = {"{id}/{relationName}", "{id}/relationships/{relationName}"}, method = RequestMethod.GET)
 	@ApiOperation(value = "Find related by root id", notes = "Find the related resource for the given relation name and identifier")
 	public ResponseEntity plainJsonGetRelated(
-			@ApiParam(name = PARAM_PK, required = true, value = "string") @PathVariable PK id,
-			@ApiParam(name = PARAM_RELATION_NAME, required = true, value = "string") @PathVariable String relationName,
-			@ApiParam(name = PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
-			@RequestParam(value = PARAM_FILTER, required = false) String filter,
-			@ApiParam(name = PARAM_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
-			@RequestParam(value = PARAM_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
-			@ApiParam(name = PARAM_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]", defaultValue = "10")
-			@RequestParam(value = PARAM_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
-			@ApiParam(name = PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
-			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
+			@ApiParam(name = SpecificationsBuilder.PARAM_PK, required = true, value = "string") @PathVariable PK id,
+			@ApiParam(name = SpecificationsBuilder.PARAM_RELATION_NAME, required = true, value = "string") @PathVariable String relationName,
+			@ApiParam(name = SpecificationsBuilder.PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
+			@RequestParam(value = SpecificationsBuilder.PARAM_FILTER, required = false) String filter,
+			@ApiParam(name = SpecificationsBuilder.PARAM_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
+			@RequestParam(value = SpecificationsBuilder.PARAM_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
+			@ApiParam(name = SpecificationsBuilder.PARAM_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]", defaultValue = "10")
+			@RequestParam(value = SpecificationsBuilder.PARAM_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
+			@ApiParam(name = SpecificationsBuilder.PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
+			@RequestParam(value = SpecificationsBuilder.PARAM_SORT, required = false, defaultValue = "id") String sort) {
 
 		// get the field info for the relation, if any
 		FieldInfo fieldInfo = this.getModelInfo().getField(relationName);
@@ -426,16 +426,16 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 			notes = "Find the related resource for the given relation name and identifier",
 			hidden = true)
 	public JsonApiDocument jsonApiGetRelated(
-			@ApiParam(name = PARAM_PK, required = true, value = "string") @PathVariable PK id,
-			@ApiParam(name = PARAM_RELATION_NAME, required = true, value = "string") @PathVariable String relationName,
-			@ApiParam(name = PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
-			@RequestParam(value = PARAM_FILTER, required = false) String filter,
-			@ApiParam(name = PARAM_JSONAPI_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
-			@RequestParam(value = PARAM_JSONAPI_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
-			@ApiParam(name = PARAM_JSONAPI_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]", defaultValue = "10")
-			@RequestParam(value = PARAM_JSONAPI_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
-			@ApiParam(name = PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
-			@RequestParam(value = PARAM_SORT, required = false, defaultValue = "id") String sort) {
+			@ApiParam(name = SpecificationsBuilder.PARAM_PK, required = true, value = "string") @PathVariable PK id,
+			@ApiParam(name = SpecificationsBuilder.PARAM_RELATION_NAME, required = true, value = "string") @PathVariable String relationName,
+			@ApiParam(name = SpecificationsBuilder.PARAM_FILTER, value = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
+			@RequestParam(value = SpecificationsBuilder.PARAM_FILTER, required = false) String filter,
+			@ApiParam(name = SpecificationsBuilder.PARAM_JSONAPI_PAGE_NUMBER, value = "The page number", allowableValues = "range[0, infinity]", defaultValue = "0")
+			@RequestParam(value = SpecificationsBuilder.PARAM_JSONAPI_PAGE_NUMBER, required = false, defaultValue = "0") Integer page,
+			@ApiParam(name = SpecificationsBuilder.PARAM_JSONAPI_PAGE_SIZE, value = "The page size", allowableValues = "range[1, infinity]", defaultValue = "10")
+			@RequestParam(value = SpecificationsBuilder.PARAM_JSONAPI_PAGE_SIZE, required = false, defaultValue = "10") Integer size,
+			@ApiParam(name = SpecificationsBuilder.PARAM_SORT, value = "Comma separated list of attribute names, descending for each one prefixed with a dash, ascending otherwise")
+			@RequestParam(value = SpecificationsBuilder.PARAM_SORT, required = false, defaultValue = "id") String sort) {
 
 		// get the field info for the relation, if any
 		FieldInfo fieldInfo = this.getModelInfo().getField(relationName);
@@ -554,7 +554,7 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 
 			ModelInfo relatedModelInfo = fieldInfo.getRelatedModelInfo();
 			// optionally create a query specification
-			Specification<M> spec = RsqlUtils.buildSpecification(relatedModelInfo, this.service.getConversionService(), params, implicitCriteria, PARAMS_IGNORE_FOR_CRITERIA);
+			Specification<M> spec = RsqlUtils.buildSpecification(relatedModelInfo, this.service.getConversionService(), params, implicitCriteria, SpecificationsBuilder.PARAMS_IGNORE_FOR_CRITERIA);
 			// get the page of related children
 			Page<M> tmp = this.service.findRelatedPaginated(relatedModelInfo.getModelType(), spec, pageable);
 			page = new ParamsAwarePageImpl<M>(params, tmp.getContent(), pageable, tmp.getTotalElements());
@@ -580,7 +580,7 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 			spec = RsqlUtils.buildSpecification(
 					this.getModelInfo(),
 					this.service.getConversionService(),
-					params, implicitCriteria, PARAMS_IGNORE_FOR_CRITERIA);
+					params, implicitCriteria, SpecificationsBuilder.PARAMS_IGNORE_FOR_CRITERIA);
 		}
 		Page<T> page = this.service.findPaginated(spec, pageable);
 		// Return a page with the appropriate meta

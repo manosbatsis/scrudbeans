@@ -22,6 +22,7 @@ package com.github.manosbatsis.scrudbeans.jpa.specification.factory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -32,19 +33,26 @@ import javax.persistence.criteria.Root;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 
 import org.springframework.core.convert.ConversionService;
 
 @Slf4j
 public abstract class AbstractPredicateFactory<T extends Serializable> implements IPredicateFactory<T> {
 
-
 	public AbstractPredicateFactory() {
 	}
 
 	@Override
-	public Predicate buildPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<T> fieldType, ConversionService conversionService, PredicateOperator operator, List<String> propertyValues) {
-		List<T> converted = this.convertValues(propertyValues, conversionService, fieldType);
+	public Predicate buildPredicate(
+			Root<?> root, CriteriaBuilder cb, String propertyName, Class<T> fieldType,
+			ConversionService conversionService, PredicateOperator operator,
+			List<String> propertyValues) {
+		log.info("buildPredicate, operator: {}", operator);
+		List<T> converted = !PredicateOperator.IS_NULL.equals(operator)
+				&& !PredicateOperator.IS_NOT_NULL.equals(operator)
+				? this.convertValues(propertyValues, conversionService, fieldType)
+				: new ArrayList<>(1);
 		Path<T> path = this.getPath(root, propertyName, fieldType);
 		return this.buildPredicate(root, cb, path, operator, converted);
 	}
@@ -53,7 +61,7 @@ public abstract class AbstractPredicateFactory<T extends Serializable> implement
 		Predicate predicate = null;
 
 
-		AV argument = propertyValues.get(0);
+		AV argument = CollectionUtils.isNotEmpty(propertyValues) ? propertyValues.get(0) : null;
 		switch (operator) {
 			case NOT_EQUAL: {
 				if (argument == null) {
@@ -97,6 +105,14 @@ public abstract class AbstractPredicateFactory<T extends Serializable> implement
 				predicate = cb.not(path.in(propertyValues));
 				break;
 			}
+			case IS_NULL: {
+				predicate = cb.isNull(path);
+				break;
+			}
+			case IS_NOT_NULL: {
+				predicate = cb.isNotNull(path);
+				break;
+			}
 			default: {
 				throw new IllegalArgumentException("Unknown predicate operator: " + operator);
 			}
@@ -107,11 +123,12 @@ public abstract class AbstractPredicateFactory<T extends Serializable> implement
 	}
 
 	public <AV extends Serializable> List<AV> convertValues(List<String> propertyValues, ConversionService conversionService, Class<AV> valueType) {
+		List<String> ignoredValues = Arrays.asList(null, "IS_NULL", "IS_NOT_NULL");
 		List<AV> converted = null;
 		if (propertyValues != null) {
 			converted = new ArrayList<>(propertyValues.size());
 			for (String value : propertyValues) {
-				converted.add(value != null ? conversionService.convert(value, valueType) : null);
+				converted.add(!ignoredValues.contains(value) ? conversionService.convert(value, valueType) : null);
 			}
 		}
 		return converted;

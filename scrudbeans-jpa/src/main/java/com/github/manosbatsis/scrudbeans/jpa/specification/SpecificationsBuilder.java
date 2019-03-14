@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,6 +48,24 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
 public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Serializable> {
 
+	public static final String PARAM_RELATION_NAME = "relationName";
+
+	public static final String PARAM_FILTER = "filter";
+
+	public static final String PARAM_JSONAPI_PAGE_NUMBER = "page[number]";
+
+	public static final String PARAM_JSONAPI_PAGE_SIZE = "page[size]";
+
+	public static final String PARAM_SORT = "sort";
+
+	public static final String PARAM_PK = "id";
+
+	public static final String PARAM_PAGE_NUMBER = "_pn";
+
+	public static final String PARAM_PAGE_SIZE = "_ps";
+
+	public static final String[] PARAMS_IGNORE_FOR_CRITERIA = {PARAM_RELATION_NAME, PARAM_FILTER, PARAM_JSONAPI_PAGE_NUMBER, PARAM_JSONAPI_PAGE_SIZE, PARAM_SORT, PARAM_PK, PARAM_PAGE_NUMBER, PARAM_PAGE_SIZE};
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpecificationsBuilder.class);
 
 	private final Class<T> domainClass;
@@ -68,8 +87,10 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 	 */
 	public Specification<T> build(final Map<String, String[]> searchTerms) {
 
-		LOGGER.debug("build, entity: {}, searchTerms: {}", domainClass.getSimpleName(), searchTerms);
-
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("build, entity: {}, searchTerms: ", domainClass.getSimpleName());
+			printMap(searchTerms);
+		}
 		return new Specification<T>() {
 
 			/**
@@ -103,7 +124,10 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 	private Predicate buildRootPredicate(final Map<String, String[]> searchTerms,
 			Root<T> root, CriteriaBuilder cb) {
 
-		LOGGER.debug("buildRootPredicate0, clazz: {}, searchTerms: {}", domainClass, searchTerms);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("buildRootPredicate0, clazz: {}, searchTerms: {}", domainClass, searchTerms);
+			printMap(searchTerms);
+		}
 		Map<String, String[]> normalizedSearchTerms = new HashMap<>();
 		Iterator<String> keyIterator = searchTerms.keySet().iterator();
 
@@ -118,7 +142,8 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 			normalizedSearchTerms.put(newPropertyName, searchTerms.get(propertyName));
 		}
 
-		LOGGER.debug("buildRootPredicate1, normalizedSearchTerms: {}", normalizedSearchTerms);
+		LOGGER.debug("buildRootPredicate1, normalizedSearchTerms: ");
+		this.printMap(normalizedSearchTerms);
 
 		// build a list of criteria/predicates
 		LinkedList<Predicate> predicates = buildSearchPredicates(normalizedSearchTerms, root, cb);
@@ -139,6 +164,15 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 		return predicate;
 	}
 
+	private void printMap(Map<String, String[]> searchTerms) {
+		if (MapUtils.isNotEmpty(searchTerms)) {
+			for (String key : searchTerms.keySet()) {
+				String[] values = searchTerms.get(key);
+				LOGGER.debug("{}: {}", key, Arrays.toString(values));
+			}
+		}
+	}
+
 	/**
 	 * Build the list of predicates corresponding to the given search terms
 	 * @param searchTerms the search terms to match
@@ -150,13 +184,17 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 
 		LOGGER.debug("buildSearchPredicates, domainClass: {}, searchTerms: {}", domainClass, searchTerms);
 		LinkedList<Predicate> predicates = new LinkedList<Predicate>();
-
+		List<String> ignoredTerms = Arrays.asList(PARAMS_IGNORE_FOR_CRITERIA);
 		if (!MapUtils.isEmpty(searchTerms)) {
 			Set<String> propertyNames = searchTerms.keySet();
 			for (String propertyName : propertyNames) {
-				String[] values = searchTerms.get(propertyName);
-				LOGGER.debug("buildSearchPredicates i, propertyName: {}, values: {}", propertyName, values);
-				addPredicate(root, cb, predicates, values, propertyName);
+				if (!ignoredTerms.contains(propertyName)) {
+					String[] values = searchTerms.get(propertyName);
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("buildSearchPredicates i, propertyName: {}, values: {}", propertyName, Arrays.toString(values));
+					}
+					addPredicate(root, cb, predicates, values, propertyName);
+				}
 			}
 		}
 		// return the list of predicates
@@ -184,7 +222,8 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 			predicateFactory = SpecificationUtils.getPredicateFactoryForClass(fieldType);
 			if (predicateFactory != null) {
 				LOGGER.debug("addPredicate3, found predicate factory: {}", predicateFactory);
-				PredicateOperator operator = ArrayUtils.isNotEmpty(propertyValues) && propertyValues.length > 1 ? PredicateOperator.IN : PredicateOperator.EQUAL;
+				PredicateOperator operator = getPredicateOperator(propertyValues);
+
 				predicates.add(predicateFactory.buildPredicate(root, cb, propertyName, fieldType, conversionService, operator, Arrays.asList(propertyValues)));
 			}
 			else {
@@ -196,6 +235,27 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 			LOGGER.debug("addPredicate1, field type not found for domainClass: {}, propertyName: {}, fieldType: {}", domainClass, propertyName, fieldType);
 		}
 
+	}
+
+	private PredicateOperator getPredicateOperator(String[] propertyValues) {
+		PredicateOperator operator = null;
+		// special cases
+		if (propertyValues != null) {
+			if ("IS_NULL".equals(propertyValues[0]) || "null".equals(propertyValues[0])) {
+				operator = PredicateOperator.IS_NULL;
+			}
+			else if ("IS_NOT_NULL".equals(propertyValues[0])) {
+				operator = PredicateOperator.IS_NOT_NULL;
+			}
+		}
+		// regular cases
+		if (operator == null) {
+			operator = ArrayUtils.isNotEmpty(propertyValues) && propertyValues.length > 1
+					? PredicateOperator.IN
+					: PredicateOperator.EQUAL;
+		}
+		LOGGER.debug("getPredicateOperator: {}, values: {}", operator, propertyValues);
+		return operator;
 	}
 
 }

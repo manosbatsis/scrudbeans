@@ -74,6 +74,14 @@ public class PredicateFactorySpecification<T extends IdModel> implements Specifi
 	protected PredicateOperator getDefaultOperator(List<String> propertyValues) {
 		PredicateOperator op = PredicateOperator.EQUAL;
 		if (propertyValues != null) {
+			if (propertyValues.size() == 1) {
+				if ("IS_NULL".equals(propertyValues.get(0))) {
+					op = PredicateOperator.IS_NULL;
+				}
+				else if ("IS_NOT_NULL".equals(propertyValues.get(0))) {
+					op = PredicateOperator.IS_NOT_NULL;
+				}
+			}
 			if (propertyValues.size() > 1) {
 				op = PredicateOperator.IN;
 			}
