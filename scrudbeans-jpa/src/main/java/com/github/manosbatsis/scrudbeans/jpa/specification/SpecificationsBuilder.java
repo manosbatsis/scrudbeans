@@ -227,7 +227,7 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 				predicates.add(predicateFactory.buildPredicate(root, cb, propertyName, fieldType, conversionService, operator, Arrays.asList(propertyValues)));
 			}
 			else {
-				LOGGER.debug("addPredicate3, could not find predicate factory");
+				LOGGER.debug("addPredicate3, could not find predicate factory for field type: {}", fieldType);
 			}
 
 		}

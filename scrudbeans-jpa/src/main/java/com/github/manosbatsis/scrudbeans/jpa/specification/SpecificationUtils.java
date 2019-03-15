@@ -90,7 +90,7 @@ public class SpecificationUtils<T extends SettableIdModel<PK>, PK extends Serial
 
 	protected static final NumberPredicateFactory<BigDecimal> bigDecimalPredicateFactory = new NumberPredicateFactory<BigDecimal>(BigDecimal.class);
 
-	protected static final HashMap<Class, IPredicateFactory> factoryForClassMap = new HashMap<Class, IPredicateFactory>();
+	protected static final HashMap<String, IPredicateFactory> factoryForClassMap = new HashMap<String, IPredicateFactory>();
 
 	protected static final String OR = "OR";
 
@@ -99,20 +99,20 @@ public class SpecificationUtils<T extends SettableIdModel<PK>, PK extends Serial
 	protected static List<String> IGNORED_FIELD_NAMES;
 
 	static {
-		factoryForClassMap.put(String.class, stringPredicateFactory);
-		factoryForClassMap.put(Boolean.class, booleanPredicateFactory);
-		factoryForClassMap.put(Date.class, datePredicateFactory);
-		factoryForClassMap.put(LocalDate.class, localDatePredicateFactory);
-		factoryForClassMap.put(LocalDateTime.class, localDateTimePredicateFactory);
+		factoryForClassMap.put(String.class.getCanonicalName(), stringPredicateFactory);
+		factoryForClassMap.put(Boolean.class.getCanonicalName(), booleanPredicateFactory);
+		factoryForClassMap.put(Date.class.getCanonicalName(), datePredicateFactory);
+		factoryForClassMap.put(LocalDate.class.getCanonicalName(), localDatePredicateFactory);
+		factoryForClassMap.put(LocalDateTime.class.getCanonicalName(), localDateTimePredicateFactory);
 
-		factoryForClassMap.put(Byte.class, bytePredicateFactory);
-		factoryForClassMap.put(Short.class, shortPredicateFactory);
-		factoryForClassMap.put(Integer.class, integerPredicateFactory);
-		factoryForClassMap.put(Long.class, longPredicateFactory);
-		factoryForClassMap.put(BigInteger.class, bigIntegerPredicateFactory);
-		factoryForClassMap.put(Float.class, floatPredicateFactory);
-		factoryForClassMap.put(Double.class, doublePredicateFactory);
-		factoryForClassMap.put(BigDecimal.class, bigDecimalPredicateFactory);
+		factoryForClassMap.put(Byte.class.getCanonicalName(), bytePredicateFactory);
+		factoryForClassMap.put(Short.class.getCanonicalName(), shortPredicateFactory);
+		factoryForClassMap.put(Integer.class.getCanonicalName(), integerPredicateFactory);
+		factoryForClassMap.put(Long.class.getCanonicalName(), longPredicateFactory);
+		factoryForClassMap.put(BigInteger.class.getCanonicalName(), bigIntegerPredicateFactory);
+		factoryForClassMap.put(Float.class.getCanonicalName(), floatPredicateFactory);
+		factoryForClassMap.put(Double.class.getCanonicalName(), doublePredicateFactory);
+		factoryForClassMap.put(BigDecimal.class.getCanonicalName(), bigDecimalPredicateFactory);
 
 		// init ignore list
 		// TODO: pick model-specific excludes from annotation
@@ -133,7 +133,7 @@ public class SpecificationUtils<T extends SettableIdModel<PK>, PK extends Serial
 		Assert.notNull(clazz, "clazz cannot be null");
 		Assert.notNull(factory, "factory cannot be null");
 		log.debug("Registering entity predicate factory {} for entity type {}", factory, clazz);
-		factoryForClassMap.put(clazz, factory);
+		factoryForClassMap.put(clazz.getCanonicalName(), factory);
 	}
 
 	/**
@@ -143,7 +143,7 @@ public class SpecificationUtils<T extends SettableIdModel<PK>, PK extends Serial
 	 */
 
 	public static IPredicateFactory<?> getPredicateFactoryForClass(Class clazz) {
-		IPredicateFactory factory = factoryForClassMap.get(clazz);
+		IPredicateFactory factory = factoryForClassMap.get(clazz.getCanonicalName());
 
 		// lazily add enum factory to cache as needed
 		if (factory == null && clazz.isEnum()) {
@@ -151,7 +151,9 @@ public class SpecificationUtils<T extends SettableIdModel<PK>, PK extends Serial
 			addFactoryForClass(clazz, factory);
 		}
 		log.debug("getPredicateFactoryForClass, clazz: {}, factory: {}", clazz, factory);
-
+		factoryForClassMap.forEach((k, v) -> {
+			log.debug("predicate factory for class {}: {}", k, v);
+		});
 		return factory;
 
 	}
