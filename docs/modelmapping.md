@@ -154,9 +154,9 @@ public class Country extends AbstractAssignedIdPersistableModel<String> {/* ...*
 
 ### Composite IDs
 
-Some times you need to use composite IDs in your models. This introduces some complexity in a number of 
-areas where the ID must be handled in a regular RESTful way, including request 
-mapping bindings of path or query parameters.
+Some times you need to use composite IDs in your models, e.g. when working with a legacy database design. 
+This introduces some complexity in a number of areas where the ID must be handled in a regular RESTful way, 
+including request mapping bindings of path or query parameters.
 
 To help making this work transparently out of the box, ScrudBeans provides a number of embeddable ID 
 implementations you can extend from depending on the number of columns/fields needed for your composite ID, 
