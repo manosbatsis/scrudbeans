@@ -61,7 +61,7 @@
 		<commons-io.version>2.4</commons-io.version>
 		<commons-collections4.version>4.1</commons-collections4.version>
 		<evo-inflector.version>1.2.2</evo-inflector.version>
-		<hibernate-core.version>5.2.17.Final</hibernate-core.version>
+		<hibernate-core.version>5.3.9.Final</hibernate-core.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
 		<java.version>1.8</java.version>
 		<h2.version>1.4.197</h2.version>
