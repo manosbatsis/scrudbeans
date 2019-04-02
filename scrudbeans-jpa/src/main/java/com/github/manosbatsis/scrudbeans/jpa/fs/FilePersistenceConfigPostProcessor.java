@@ -20,6 +20,9 @@
  */
 package com.github.manosbatsis.scrudbeans.jpa.fs;
 
+import java.io.IOException;
+import java.util.Properties;
+
 import com.github.manosbatsis.scrudbeans.api.mdd.service.FilePersistenceService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,9 +46,9 @@ public class FilePersistenceConfigPostProcessor
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry)
 			throws BeansException {
 		if (this.repositoryClass == null) {
-
+			Properties props = this.loadProperties();
 			// get class canonical name from configuration
-			String repositoryClassName = "";//TODO: ConfigurationFactory.getConfiguration().getString(ConfigurationFactory.FS_IMPL_CLASS);
+			String repositoryClassName = props.getProperty("scrudbeans.fs.filePersistenceService");
 			if (StringUtils.isNotBlank(repositoryClassName)) {
 				// get a class instance
 				try {
@@ -82,5 +85,18 @@ public class FilePersistenceConfigPostProcessor
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		// TODO Auto-generated method stub
 
+	}
+
+
+	private Properties loadProperties() {
+		Properties props = null;
+		try {
+			props = new Properties();
+			props.load(this.getClass().getResourceAsStream("/application.properties"));
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		return props;
 	}
 }
