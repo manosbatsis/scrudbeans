@@ -170,6 +170,7 @@ public class SpecificationUtils<T extends SettableIdModel<PK>, PK extends Serial
 		if (!IGNORED_FIELD_NAMES.contains(memberPath)) {
 
 			String key = clazz.getCanonicalName() + "#" + memberPath;
+			log.debug("getMemberType, key: {}", key);
 			memberType = FIELD_TYPE_CACHE.get(key);
 
 			// find it if not cached

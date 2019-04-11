@@ -86,11 +86,6 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 	 * @return the result specification
 	 */
 	public Specification<T> build(final Map<String, String[]> searchTerms) {
-
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("build, entity: {}, searchTerms: ", domainClass.getSimpleName());
-			printMap(searchTerms);
-		}
 		return new Specification<T>() {
 
 			/**
@@ -103,11 +98,11 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 			public Predicate toPredicate(@SuppressWarnings("rawtypes") Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
 				// Cache for {@link SimpleJpaRepository#getCountQuery(org.springframework.data.jpa.domain.Specification)}
 				if (this.rootPredicate == null) {
-					LOGGER.debug("toPredicate, adding to cache, root: {}, query: {}", root, query);
+					LOGGER.debug("toPredicate, adding to cache, root: {}", root.getModel().getName());
 					this.rootPredicate = buildRootPredicate(searchTerms, root, cb);
 				}
 				else {
-					LOGGER.debug("toPredicate, getting from cache, root: {}, query: {}", root, query);
+					LOGGER.debug("toPredicate, getting from cache, root: {}", root);
 				}
 				return this.rootPredicate;
 			}
@@ -125,8 +120,7 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 			Root<T> root, CriteriaBuilder cb) {
 
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("buildRootPredicate0, clazz: {}, searchTerms: {}", domainClass, searchTerms);
-			printMap(searchTerms);
+			LOGGER.debug("buildRootPredicate0, clazz: {}, searchTerms: {}", domainClass, Arrays.toString(searchTerms.entrySet().toArray()));
 		}
 		Map<String, String[]> normalizedSearchTerms = new HashMap<>();
 		Iterator<String> keyIterator = searchTerms.keySet().iterator();
@@ -141,14 +135,8 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 			}
 			normalizedSearchTerms.put(newPropertyName, searchTerms.get(propertyName));
 		}
-
-		LOGGER.debug("buildRootPredicate1, normalizedSearchTerms: ");
-		this.printMap(normalizedSearchTerms);
-
 		// build a list of criteria/predicates
 		LinkedList<Predicate> predicates = buildSearchPredicates(normalizedSearchTerms, root, cb);
-		LOGGER.debug("buildRootPredicate2, predicates: {}", predicates);
-
 		// wrap list in AND/OR junction
 		Predicate predicate;
 		if (searchTerms.containsKey(SpecificationUtils.SEARCH_MODE) && searchTerms.get(SpecificationUtils.SEARCH_MODE)[0].equalsIgnoreCase(SpecificationUtils.OR)
@@ -191,7 +179,7 @@ public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Ser
 				if (!ignoredTerms.contains(propertyName)) {
 					String[] values = searchTerms.get(propertyName);
 					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("buildSearchPredicates i, propertyName: {}, values: {}", propertyName, Arrays.toString(values));
+						LOGGER.debug("buildSearchPredicates, propertyName: {}, values: {}", propertyName, Arrays.toString(values));
 					}
 					addPredicate(root, cb, predicates, values, propertyName);
 				}

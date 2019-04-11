@@ -20,7 +20,12 @@
  */
 package com.github.manosbatsis.scrudbeans.jpa.repository;
 
+import static org.springframework.data.jpa.repository.query.QueryUtils.DELETE_ALL_QUERY_STRING;
+import static org.springframework.data.jpa.repository.query.QueryUtils.applyAndBind;
+import static org.springframework.data.jpa.repository.query.QueryUtils.getQueryString;
+
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,14 +36,19 @@ import java.util.Set;
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.Subgraph;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.JoinType;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.criteria.Selection;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
 
+import com.github.manosbatsis.scrudbeans.api.domain.DisableableModel;
 import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.exception.BeanValidationException;
@@ -51,9 +61,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.lang.Nullable;
 import org.springframework.security.access.method.P;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -69,10 +83,13 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 
 	private EntityManager entityManager;
 
+	private JpaEntityInformation<T, ?> entityInformation;
+
 	private Class<T> domainClass;
 
 	protected Validator validator;
 
+	protected final boolean disableableDomainClass;
 
 	/**
 	 * Creates a new {@link SimpleJpaRepository} to manage objects of the given {@link JpaEntityInformation}.
@@ -87,7 +104,9 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 		Assert.notNull(entityInformation, "BaseRepositoryImpl requires a non-null entityInformation constructor parameter");
 		Assert.notNull(entityManager, "BaseRepositoryImpl requires a non-null entityManager constructor parameter");
 		this.entityManager = entityManager;
+		this.entityInformation = entityInformation;
 		this.domainClass = entityInformation.getJavaType();
+		this.disableableDomainClass = DisableableModel.class.isAssignableFrom(this.domainClass);
 		//Configuration config = ConfigurationFactory.getConfiguration();
 		String[] validatorExcludeClasses = {};//TODO config.getStringArray(ConfigurationFactory.VALIDATOR_EXCLUDES_CLASSESS);
 		// TODO this.skipValidation = Arrays.asList(validatorExcludeClasses).contains(domainClass.getCanonicalName());
@@ -248,5 +267,162 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 			parent.addAttributeNodes(pathComponents[pathComponents.length - 1]);
 		}
 	}
+
+	/**
+	 * Creates a {@link TypedQuery} for the given {@link Specification} and {@link Sort}.
+	 *
+	 * @param spec can be {@literal null}.
+	 * @param domainClass must not be {@literal null}.
+	 * @param sort must not be {@literal null}.
+	 * @return
+	 */
+	@Override
+	protected <S extends T> TypedQuery<S> getQuery(@Nullable Specification<S> spec, Class<S> domainClass, Sort sort) {
+		return super.getQuery(applyDisabledFilter(spec), domainClass, sort);
+	}
+
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.data.repository.CrudRepository#delete(java.io.Serializable)
+	 */
+	@Override
+	@Transactional
+	public void deleteById(PK id) {
+		if (this.disableableDomainClass) {
+			this.softDelete(id);
+		}
+		else super.deleteById(id);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Object)
+	 */
+	@Override
+	@Transactional
+	public void delete(T entity) {
+		if (this.disableableDomainClass) {
+			this.softDelete(entity.getId());
+		}
+		else super.delete(entity);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Iterable)
+	 */
+	@Override
+	@Transactional
+	public void deleteAll(@NotNull Iterable<? extends T> entities) {
+		if (this.disableableDomainClass) {
+			for (T entity : entities) {
+				this.softDelete(entity.getId());
+			}
+		}
+		else super.deleteAll(entities);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.data.jpa.repository.JpaRepository#deleteInBatch(java.lang.Iterable)
+	 */
+	@Override
+	@Transactional
+	public void deleteInBatch(Iterable<T> entities) {
+		if (this.disableableDomainClass) {
+			if (!entities.iterator().hasNext()) {
+				return;
+			}
+			applyAndBind(
+					getQueryString(SOFT_DELETE_ALL_QUERY_STRING, entityInformation.getEntityName()),
+					entities, entityManager
+			).executeUpdate();
+		}
+		else super.deleteInBatch(entities);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.data.repository.Repository#deleteAll()
+	 */
+	@Override
+	@Transactional
+	public void deleteAll() {
+		for (T element : findAll()) {
+			delete(element);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.springframework.data.jpa.repository.JpaRepository#deleteAllInBatch()
+	 */
+	@Override
+	@Transactional
+	public void deleteAllInBatch() {
+		entityManager.createQuery(
+				getQueryString(DELETE_ALL_QUERY_STRING, entityInformation.getEntityName()))
+				.executeUpdate();
+	}
+
+	/**
+	 * Creates a new count query for the given {@link Specification}.
+	 *
+	 * @param spec can be {@literal null}.
+	 * @param domainClass must not be {@literal null}.
+	 * @return
+	 */
+	@Override
+	protected <S extends T> TypedQuery<Long> getCountQuery(@Nullable Specification<S> spec, Class<S> domainClass) {
+		return super.getCountQuery(applyDisabledFilter(spec), domainClass);
+	}
+
+
+	/** Applies a soft-delete filter */
+	private <S extends T> Specification<S> applyDisabledFilter(@Nullable Specification<S> spec) {
+		if (this.disableableDomainClass) {
+			if (spec == null) spec = notDisabled();
+			else spec = spec.and(notDisabled());
+		}
+		return spec;
+	}
+
+	/** Performs a soft-delete  */
+	protected void softDelete(PK id) {
+		CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+		// create update
+		CriteriaUpdate<T> update = cb.createCriteriaUpdate(this.domainClass);
+		// set the root class
+		Root e = update.from(this.domainClass);
+		// set update and where clause
+		update.set("disabled", LocalDateTime.now());
+		update.where(cb.equal(e.get("id"), id));
+		// perform update
+		this.entityManager.createQuery(update).executeUpdate();
+	}
+
+	private static final String FIELD_DISABLED = "disabled";
+
+	public static final String SOFT_DELETE_ALL_QUERY_STRING = "update %s x set disabled = NOW()";
+
+	private static final class DisabledIsNull<T> implements Specification<T> {
+		@Override
+		public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+			return cb.isNull(root.<LocalDateTime>get(FIELD_DISABLED));
+		}
+	}
+
+	private static final class ScheduledToBeDisabled<T> implements Specification<T> {
+		@Override
+		public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+			return cb.greaterThan(root.get(FIELD_DISABLED), LocalDateTime.now());
+		}
+	}
+
+	private static final <T> Specification<T> notDisabled() {
+		return Specification.where(new DisabledIsNull<T>()).or(new ScheduledToBeDisabled<T>());
+	}
+
 
 }

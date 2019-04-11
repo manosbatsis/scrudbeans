@@ -22,7 +22,6 @@ package com.github.manosbatsis.scrudbeans.jpa.service;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,7 +31,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 
-import com.github.manosbatsis.scrudbeans.api.domain.DisableableModel;
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
 import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
@@ -206,17 +204,7 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 	@Transactional(readOnly = false)
 	public void delete(T resource) {
 		Assert.notNull(resource, "Resource can't be null");
-		// soft delete if disableable
-		if (DisableableModel.class.isAssignableFrom(this.getDomainClass())) {
-			((DisableableModel) resource).setDisabled(LocalDateTime.now());
-			this.patch(resource);
-			LOGGER.debug("delete: soft-deleted resource");
-		}
-		// else delete physically
-		else {
-			repository.delete(resource);
-			LOGGER.debug("delete: deleted resource");
-		}
+		repository.delete(resource);
 	}
 
 	/**
@@ -226,17 +214,7 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 	@Transactional(readOnly = false)
 	public void delete(PK id) {
 		Assert.notNull(id, "Resource PK can't be null");
-		// soft delete if disableable
-		if (DisableableModel.class.isAssignableFrom(this.getDomainClass())) {
-			T resource = this.repository.getOne(id);
-			((DisableableModel) resource).setDisabled(LocalDateTime.now());
-			LOGGER.debug("delete: soft-deleted by ID");
-		}
-		// else delete physically
-		else {
-			repository.deleteById(id);
-			LOGGER.debug("delete: deleted by id");
-		}
+		repository.deleteById(id);
 	}
 
 	/**

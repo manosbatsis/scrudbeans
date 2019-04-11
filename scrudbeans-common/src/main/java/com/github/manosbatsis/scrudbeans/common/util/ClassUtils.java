@@ -100,15 +100,14 @@ public class ClassUtils {
 			PropertyDescriptor[] propertyDescriptors = null;
 			for (int i = 0; stepNames.hasNext() && tmpClass != null; i++) {
 				tmpFieldName = stepNames.next();
-				LOGGER.debug("getBeanPropertyType for {} tmpFieldName: {}", i, tmpFieldName);
+				LOGGER.debug("getBeanPropertyType for path {}, tmpClass: {} tmpFieldName: {}", i, tmpClass.getName(), tmpFieldName);
 				propertyDescriptors = Introspector.getBeanInfo(tmpClass).getPropertyDescriptors();
 				for (PropertyDescriptor pd : propertyDescriptors) {
-					LOGGER.debug("getBeanPropertyType for {} pd.getName(): {}", i, pd.getName());
 					if (tmpFieldName.equals(pd.getName())) {
 						Method getter = pd.getReadMethod();
 						if (getter != null) {
-							LOGGER.debug("getBeanPropertyType for {} found getter for tmpFieldName: {}", i, tmpFieldName);
 							tmpClass = GenericTypeResolver.resolveReturnType(getter, tmpClass);
+							LOGGER.debug("getBeanPropertyType for {} found getter for tmpFieldName: {}, return type: {}", i, tmpFieldName, tmpClass);
 						}
 						else {
 							LOGGER.warn("getBeanPropertyType for {} no getter exists for tmpFieldName: {}", i, tmpFieldName);
