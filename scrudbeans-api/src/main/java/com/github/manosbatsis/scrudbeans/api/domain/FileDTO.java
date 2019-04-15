@@ -21,7 +21,6 @@
 package com.github.manosbatsis.scrudbeans.api.domain;
 
 import java.io.File;
-import java.io.InputStream;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
@@ -31,7 +30,7 @@ public class FileDTO {
 
 	private String contentType;
 
-	private InputStream in;
+	private File in;
 
 	private String path;
 
@@ -66,11 +65,11 @@ public class FileDTO {
 		this.contentType = contentType;
 	}
 
-	public InputStream getIn() {
+	public File getIn() {
 		return in;
 	}
 
-	public void setIn(InputStream in) {
+	public void setIn(File in) {
 		this.in = in;
 	}
 
@@ -95,7 +94,7 @@ public class FileDTO {
 
 		private String contentType;
 
-		private InputStream in;
+		private File in;
 
 		private String path;
 
@@ -111,7 +110,7 @@ public class FileDTO {
 			return this;
 		}
 
-		public Builder in(InputStream in) {
+		public Builder in(File in) {
 			this.in = in;
 			return this;
 		}

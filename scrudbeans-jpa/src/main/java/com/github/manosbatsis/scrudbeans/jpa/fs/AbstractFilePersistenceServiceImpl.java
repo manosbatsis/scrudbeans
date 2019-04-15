@@ -21,10 +21,12 @@
 package com.github.manosbatsis.scrudbeans.jpa.fs;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -38,6 +40,7 @@ import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistenc
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistencePreview;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistencePreviews;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.FilePersistenceService;
+import com.github.manosbatsis.scrudbeans.jpa.fs.converter.ToImageConverter;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.imgscalr.Scalr;
@@ -53,15 +56,17 @@ public abstract class AbstractFilePersistenceServiceImpl implements FilePersiste
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFilePersistenceServiceImpl.class);
 
-
 	public String saveFile(Field fileField, MultipartFile multipartFile, String filename) {
 		String result = null;
 		FileDTO file = null;
 		try {
+			// Convert to file
+			File tmpFile = streamToTmpFile(multipartFile.getInputStream(), true);
+			// Build DTO
 			file = new FileDTO.Builder()
 					.contentLength(multipartFile.getSize())
 					.contentType(multipartFile.getContentType())
-					.in(multipartFile.getInputStream())
+					.in(tmpFile)
 					.path(filename).build();
 
 			file = convertToPngIfGif(file);
@@ -78,17 +83,27 @@ public abstract class AbstractFilePersistenceServiceImpl implements FilePersiste
 		return result;
 	}
 
+	private static File streamToTmpFile(InputStream in, boolean closeStream) throws IOException {
+		final File tempFile = File.createTempFile("scrudbeansUpload", ".tmp");
+		tempFile.deleteOnExit();
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(tempFile);
+			IOUtils.copy(in, out);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			if (out != null && closeStream) {
+				IOUtils.closeQuietly(in);
+			}
+		}
+		return tempFile;
+	}
 	@Override
 	public void closeFileDto(FileDTO file) {
 		if (file != null) {
-			try {
-				if (file.getIn() != null) {
-					file.getIn().close();
-				}
-			}
-			catch (Exception e) {
-				LOGGER.error("Faild closing file stream", e);
-			}
 			if (file.getTmpFile() != null) {
 				file.getTmpFile().delete();
 			}
@@ -116,28 +131,51 @@ public abstract class AbstractFilePersistenceServiceImpl implements FilePersiste
 	 */
 	public String saveFile(Field fileField, FileDTO file) {
 		String url = null;
+		FileInputStream in = null;
 		try {
 
 			FilePersistence config = fileField.getAnnotation(FilePersistence.class);
-			// ensure accepted content type
+			// Ensure accepted content type
 			FilePersistenceService.validateContentType(file.getContentType(), config);
-
-
-			BufferedImage img = ImageIO.read(file.getIn());
-			// if image that needs scaling
-			if (FilePersistenceService.isImage(file.getContentType()) && (config.maxHeight() > 0 || config.maxWidth() > 0)) {
-				url = saveScaled(img, file.getContentType(), config.maxWidth(), config.maxHeight(), file.getPath());
-			}
-			else {
-				url = saveFile(img, file.getContentLength(), file.getContentType(), file.getPath());
-			}
-
-			// generate previews?
+			// Get intented previews
 			Map<String, FilePersistencePreview> previews = getPreviews(fileField);
-			if (FilePersistenceService.isImage(file.getContentType()) && MapUtils.isNotEmpty(previews)) {
+			// Base for previews
+			BufferedImage img = null;
+			// Is it an image?
+			if (FilePersistenceService.isImage(file.getContentType())) {
+				in = new FileInputStream(file.getIn());
+				img = ImageIO.read(in);
+				IOUtils.closeQuietly(in);
+				// iNeeds scaling?
+				if (FilePersistenceService.isImage(file.getContentType()) && (config.maxHeight() > 0 || config.maxWidth() > 0)) {
+					url = saveScaledImage(img, file.getContentType(), config.maxWidth(), config.maxHeight(), file.getPath());
+				}
+				else {
+					url = saveImageFile(img, file.getContentLength(), file.getContentType(), file.getPath());
+				}
+			}
+			// Other file types
+			else {
+				// Converter?
+				ToImageConverter converter = ToImageConverter.converters.get(file.getContentType());
+				if (converter != null) {
+					try {
+						img = converter.toImageFile(file);
+					}
+					catch (Exception e) {
+						LOGGER.error("Failed converting file to image", e);
+					}
+				}
+				// Save actual file
+				url = saveFile(file.getIn(), file.getContentLength(), file.getContentType(), file.getPath());
+
+			}
+
+			// Generate previews?
+			if (img != null && MapUtils.isNotEmpty(previews)) {
 				for (String key : previews.keySet()) {
 					FilePersistencePreview previewConfig = previews.get(key);
-					saveScaled(img, file.getContentType(), previewConfig.maxWidth(), previewConfig.maxHeight(), file.getPath() + "_" + key);
+					saveScaledImage(img, "image/png", previewConfig.maxWidth(), previewConfig.maxHeight(), file.getPath() + "_" + key);
 				}
 			}
 
@@ -146,6 +184,7 @@ public abstract class AbstractFilePersistenceServiceImpl implements FilePersiste
 			throw new RuntimeException("Failed persisting file", e);
 		}
 		finally {
+			IOUtils.closeQuietly(in);
 			this.closeFileDto(file);
 		}
 
@@ -157,19 +196,20 @@ public abstract class AbstractFilePersistenceServiceImpl implements FilePersiste
 		if (IMAGE_GIF.equals(fileDto.getContentType())) {
 			FileDTO gifDto = fileDto;
 
-			InputStream in = fileDto.getIn();
-			ByteArrayOutputStream os = null;
-			try {
 
+			InputStream in = new FileInputStream(fileDto.getIn());
+			FileOutputStream os = null;
+			File newFile = File.createTempFile("scrudBeansUpload", "tmp");
+			try {
+				os = new FileOutputStream(newFile);
 				// convert
 				BufferedImage tmpImg = ImageIO.read(in);
-				os = new ByteArrayOutputStream();
 				ImageIO.write(tmpImg, "PNG", os);
-
 				// update FileDTO
-				fileDto = new FileDTO.Builder().contentLength(os.size())
+				fileDto = new FileDTO.Builder()
+						.contentLength(newFile.length())
 						.contentType(IMAGE_PNG)
-						.in(new ByteArrayInputStream(os.toByteArray()))
+						.in(newFile)
 						.path(fileDto.getPath()).build();
 
 			}
@@ -213,7 +253,7 @@ public abstract class AbstractFilePersistenceServiceImpl implements FilePersiste
 	}
 
 
-	public String saveScaled(BufferedImage img, String contentType, int maxWidth, int maxHeight, String path) throws IOException {
+	public String saveScaledImage(BufferedImage img, String contentType, int maxWidth, int maxHeight, String path) throws IOException {
 		String url;
 		FileDTO tmp = null;
 		try {
@@ -252,22 +292,21 @@ public abstract class AbstractFilePersistenceServiceImpl implements FilePersiste
 
 	public FileDTO scaleFile(BufferedImage img, String contentType, int maxWidth, int maxHeight) throws IOException {
 		FileDTO scaledFile = null;
-		ByteArrayOutputStream os = null;
-		ByteArrayInputStream in = null;
+		FileOutputStream os = null;
+		File newFile = File.createTempFile("scrudBeansUpload", "tmp");
 		try {
 			BufferedImage scaled = Scalr.resize(img,
-					Scalr.Method.SPEED,
+					Scalr.Method.QUALITY,
 					Scalr.Mode.FIT_TO_WIDTH,
 					maxWidth,
 					maxHeight,
 					Scalr.OP_ANTIALIAS);
-			os = new ByteArrayOutputStream();
+			os = new FileOutputStream(newFile);
 			ImageIO.write(scaled, FilePersistenceService.getImageIoFormat(contentType), os);
-			in = new ByteArrayInputStream(os.toByteArray());
 			scaledFile = new FileDTO.Builder()
-					.contentLength(os.size())
+					.contentLength(newFile.length())
 					.contentType(contentType)
-					.in(in)
+					.in(newFile)
 					.build();
 		}
 		catch (Exception e) {
@@ -275,31 +314,27 @@ public abstract class AbstractFilePersistenceServiceImpl implements FilePersiste
 		}
 		finally {
 			IOUtils.closeQuietly(os);
-			IOUtils.closeQuietly(in);
 		}
 		return scaledFile;
 	}
 
 
-	public String saveFile(BufferedImage img, long contentLength, String contentType, String path) throws IOException {
+	public String saveImageFile(BufferedImage img, long contentLength, String contentType, String path) throws IOException {
 		String result = null;
-		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		ByteArrayInputStream in = null;
+		OutputStream os = null;
 		try {
+			File tmpFile = File.createTempFile("scrudBeansImage", "tmp");
+			os = new FileOutputStream(tmpFile);
 			ImageIO.write(img, FilePersistenceService.getImageIoFormat(contentType), os);
-			in = new ByteArrayInputStream(os.toByteArray());
-			result = saveFile(in, os.size(), contentType, path);
+			result = saveFile(tmpFile, tmpFile.length(), contentType, path);
 		}
 		catch (Exception e) {
 			throw e;
 		}
 		finally {
 			IOUtils.closeQuietly(os);
-			IOUtils.closeQuietly(in);
 		}
-
 		return result;
-
 	}
 
 }

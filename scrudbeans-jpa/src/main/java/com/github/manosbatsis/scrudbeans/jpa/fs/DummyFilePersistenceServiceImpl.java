@@ -20,7 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.jpa.fs;
 
-import java.io.InputStream;
+import java.io.File;
 
 import com.github.manosbatsis.scrudbeans.api.mdd.service.FilePersistenceService;
 import org.slf4j.Logger;
@@ -53,10 +53,10 @@ public class DummyFilePersistenceServiceImpl extends AbstractFilePersistenceServ
 
 	/**
 	 * Non-action implementation, does not persist files
-	 * @see FilePersistenceService#saveFile(InputStream, long, String, String)
+	 * @see FilePersistenceService#saveFile(File, long, String, String)
 	 */
 	@Override
-	public String saveFile(InputStream in, long contentLength, String contentType, String path) {
+	public String saveFile(File in, long contentLength, String contentType, String path) {
 		LOGGER.warn("File not saved, please configure another bean for id FilePersistenceService to save: " + path + ", size: " + contentLength + ", contentType: " + contentType);
 		return path;
 	}

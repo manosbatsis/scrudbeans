@@ -20,7 +20,10 @@
  */
 package com.github.manosbatsis.scrudbeans.jpa.fs;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Objects;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -30,6 +33,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.FilePersistenceService;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,24 +87,34 @@ public class S3FilePersistenceServiceImpl extends AbstractFilePersistenceService
 
 	/**
 	 * Save file in S3
-	 * @see FilePersistenceService#saveFile(InputStream, long, String, String)
+	 * @see FilePersistenceService#saveFile(File, long, String, String)
 	 */
 	@Override
-	public String saveFile(InputStream in, long contentLength, String contentType, String path) {
+	public String saveFile(File file, long contentLength, String contentType, String path) {
 		String url;
 		// create metadata
 		ObjectMetadata meta = new ObjectMetadata();
 		meta.setContentLength(contentLength);
 		meta.setContentType(contentType);
-
-		// save to bucket
-		PutObjectResult putObjectResult = s3Client.putObject(new PutObjectRequest(nameCardBucket, path, in, meta)
-				.withCannedAcl(CannedAccessControlList.PublicRead));
-
+		InputStream in = null;
+		try {
+			in = new FileInputStream(file);
+			// save to bucket
+			PutObjectResult putObjectResult = s3Client.putObject(new PutObjectRequest(nameCardBucket, path, in, meta)
+					.withCannedAcl(CannedAccessControlList.PublicRead));
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			if (Objects.nonNull(in)) {
+				IOUtils.closeQuietly(in);
+			}
+		}
 		// set the URL to return
 		url = s3Client.getUrl(nameCardBucket, path).toString();
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("File saved, url: {}, size: {}, contentType: {}, expires: {}, exp. rule: {}", url, contentLength, contentType, putObjectResult.getExpirationTime(), putObjectResult.getExpirationTimeRuleId());
+			LOGGER.debug("File saved, url: {}, size: {}, contentType: {}", url, contentLength, contentType);
 		}//
 		return url;
 	}

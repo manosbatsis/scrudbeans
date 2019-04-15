@@ -58,6 +58,18 @@
 			<artifactId>imgscalr-lib</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox-tools</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.jodconverter</groupId>
+			<artifactId>jodconverter-local</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>net.jodah</groupId>
 			<artifactId>typetools</artifactId>
 		</dependency>

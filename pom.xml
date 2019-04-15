@@ -63,6 +63,8 @@
 		<evo-inflector.version>1.2.2</evo-inflector.version>
 		<hibernate-core.version>5.3.9.Final</hibernate-core.version>
 		<imgscalr-lib.version>4.2</imgscalr-lib.version>
+		<pdfbox.version>2.0.15</pdfbox.version>
+		<jodconverter-local.version>4.2.2</jodconverter-local.version>
 		<java.version>1.8</java.version>
 		<h2.version>1.4.197</h2.version>
 		<jaxb.api.version>2.3.0</jaxb.api.version>
@@ -183,6 +185,21 @@
 				<groupId>org.imgscalr</groupId>
 				<artifactId>imgscalr-lib</artifactId>
 				<version>${imgscalr-lib.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.pdfbox</groupId>
+				<artifactId>pdfbox</artifactId>
+				<version>${pdfbox.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.pdfbox</groupId>
+				<artifactId>pdfbox-tools</artifactId>
+				<version>${pdfbox.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.jodconverter</groupId>
+				<artifactId>jodconverter-local</artifactId>
+				<version>${jodconverter-local.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.amazonaws</groupId>

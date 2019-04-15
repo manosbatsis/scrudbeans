@@ -21,8 +21,8 @@
 package com.github.manosbatsis.scrudbeans.api.mdd.service;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,7 +62,12 @@ public interface FilePersistenceService {
 			MIME_FORMATS.put(IMAGE_PNG, "png");
 			MIME_FORMATS.put(IMAGE_GIF, "gif");
 		}
-		return MIME_FORMATS.get(contentType);
+		String format = MIME_FORMATS.get(contentType);
+		// If other type, then use PNG as preview type
+		if (format == null) {
+			format = "png";
+		}
+		return format;
 	}
 
 	public static boolean isImage(String contentType) {
@@ -98,15 +103,15 @@ public interface FilePersistenceService {
 	 */
 	void deleteFile(Field fileField, FileDTO file);
 
-	String saveScaled(BufferedImage img, String contentType, int maxWidth, int maxHeight, String path) throws IOException;
+	String saveScaledImage(BufferedImage img, String contentType, int maxWidth, int maxHeight, String path) throws IOException;
 
 	Map<String, FilePersistencePreview> getPreviews(Field fileField);
 
 	FileDTO scaleFile(BufferedImage img, String contentType, int maxWidth, int maxHeight) throws IOException;
 
-	String saveFile(BufferedImage img, long contentLength, String contentType, String path) throws IOException;
+	String saveImageFile(BufferedImage img, long contentLength, String contentType, String path) throws IOException;
 
-	String saveFile(InputStream in, long contentLength, String contentType, String path) throws IOException;
+	String saveFile(File file, long contentLength, String contentType, String path) throws IOException;
 
 	void deleteFiles(String... path);
 
