@@ -40,6 +40,7 @@ import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistenc
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistencePreview;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistencePreviews;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.FilePersistenceService;
+import com.github.manosbatsis.scrudbeans.jpa.fs.converter.ImageConverterRegistry;
 import com.github.manosbatsis.scrudbeans.jpa.fs.converter.ToImageConverter;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -157,7 +158,7 @@ public abstract class AbstractFilePersistenceServiceImpl implements FilePersiste
 			// Other file types
 			else {
 				// Converter?
-				ToImageConverter converter = ToImageConverter.converters.get(file.getContentType());
+				ToImageConverter converter = ImageConverterRegistry.converters.get(file.getContentType());
 				if (converter != null) {
 					try {
 						img = converter.toImageFile(file);

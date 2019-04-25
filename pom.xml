@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.manosbatsis.scrudbeans</groupId>
 	<artifactId>scrudbeans</artifactId>
-	<version>0.13-SNAPSHOT</version>
+	<version>0.13</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2016</inceptionYear>
 	<name>scrudbeans</name>
@@ -204,7 +204,7 @@
 			<dependency>
 				<groupId>com.amazonaws</groupId>
 				<artifactId>aws-java-sdk-s3</artifactId>
-				<version>1.11.453</version>
+				<version>1.11.537</version>
 				<optional>true</optional>
 			</dependency>
 			<dependency>

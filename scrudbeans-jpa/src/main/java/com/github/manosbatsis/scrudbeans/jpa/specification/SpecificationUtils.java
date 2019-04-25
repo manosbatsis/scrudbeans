@@ -151,9 +151,6 @@ public class SpecificationUtils<T extends SettableIdModel<PK>, PK extends Serial
 			addFactoryForClass(clazz, factory);
 		}
 		log.debug("getPredicateFactoryForClass, clazz: {}, factory: {}", clazz, factory);
-		factoryForClassMap.forEach((k, v) -> {
-			log.debug("predicate factory for class {}: {}", k, v);
-		});
 		return factory;
 
 	}
@@ -170,7 +167,6 @@ public class SpecificationUtils<T extends SettableIdModel<PK>, PK extends Serial
 		if (!IGNORED_FIELD_NAMES.contains(memberPath)) {
 
 			String key = clazz.getCanonicalName() + "#" + memberPath;
-			log.debug("getMemberType, key: {}", key);
 			memberType = FIELD_TYPE_CACHE.get(key);
 
 			// find it if not cached

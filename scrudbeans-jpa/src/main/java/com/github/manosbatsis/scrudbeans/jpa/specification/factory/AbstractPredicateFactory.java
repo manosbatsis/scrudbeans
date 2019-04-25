@@ -48,7 +48,7 @@ public abstract class AbstractPredicateFactory<T extends Serializable> implement
 			Root<?> root, CriteriaBuilder cb, String propertyName, Class<T> fieldType,
 			ConversionService conversionService, PredicateOperator operator,
 			List<String> propertyValues) {
-		log.info("buildPredicate, operator: {}", operator);
+		log.debug("buildPredicate, operator: {}", operator);
 		List<T> converted = !PredicateOperator.IS_NULL.equals(operator)
 				&& !PredicateOperator.IS_NOT_NULL.equals(operator)
 				? this.convertValues(propertyValues, conversionService, fieldType)
