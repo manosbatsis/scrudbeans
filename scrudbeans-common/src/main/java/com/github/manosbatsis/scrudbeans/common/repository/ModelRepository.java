@@ -68,6 +68,41 @@ public interface ModelRepository<T extends IdModel<PK>, PK extends Serializable>
 	 */
 	T patch(T delta);
 
+	/**
+	 * Check if the given state is transient.
+	 * Only applies to entities with non-assigned identifiers
+	 */
+	default boolean isTransient(T resource) {
+		return resource.getId() == null;
+	}
+
+	/**
+	 * Check if the given state is managed,
+	 * i.e. contained within the current {@link EntityManager}.
+	 */
+	default boolean isManaged(T resource) {
+		return this.getEntityManager().contains(resource);
+	}
+
+	/**
+	 * Check if the given state exists,
+	 * i.e. is persisted.
+	 */
+	default boolean exists(T resource) {
+		return !isTransient(resource)
+				&& this.getEntityManager().find(this.getDomainClass(), resource.getId()) != null;
+	}
+
+	/**
+	 * Check if the given state is detached,
+	 * i.e. not managed but already persisted.
+	 */
+	default boolean isDetached(T resource) {
+		return !isTransient(resource)
+				&& !isManaged(resource)
+				&& exists(resource);
+	}
+
 //	MetadatumModel addMetadatum(PK subjectId, String predicate, String object);
 //
 //	List<MetadatumModel> addMetadata(PK subjectId, Map<String, String> metadata);
