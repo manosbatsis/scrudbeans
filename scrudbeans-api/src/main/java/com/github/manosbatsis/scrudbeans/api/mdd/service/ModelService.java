@@ -60,6 +60,20 @@ public interface ModelService<T extends IdModel<PK>, PK extends Serializable> ex
 	void postCreate(T resource);
 
 	/**
+	 * Override to handle post-update
+	 *
+	 * @param resource The updated resource
+	 */
+	void postUpdate(T resource);
+
+	/**
+	 * Override to handle post-delete
+	 *
+	 * @param resource The created resource
+	 */
+	void postDelete(T resource);
+
+	/**
 	 * Update an existing resource.
 	 *
 	 * @param resource Resource to update

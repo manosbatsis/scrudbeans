@@ -34,6 +34,9 @@ import javax.validation.ConstraintViolation;
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
 import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
+import com.github.manosbatsis.scrudbeans.api.domain.event.EntityCreatedEvent;
+import com.github.manosbatsis.scrudbeans.api.domain.event.EntityDeletedEvent;
+import com.github.manosbatsis.scrudbeans.api.domain.event.EntityUpdatedEvent;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistence;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
@@ -58,12 +61,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-//TODO
-//import com.github.manosbatsis.scrudbeans.api.domain.UserDetails;
-//import com.github.manosbatsis.scrudbeans.api.domain.event.EntityCreatedEvent;
-//import com.github.manosbatsis.scrudbeans.api.domain.event.EntityUpdatedEvent;
-//import com.github.manosbatsis.scrudbeans.api.domain.users.model.User;
-
 /**
  * SCRUD service handling a specific type of {@link SettableIdModel} using a {@link ModelRepository}
  *
@@ -81,6 +78,7 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 	protected R repository;
 
 	@SuppressWarnings("SpringJavaAutowiringInspection")
+
 	@Autowired
 	public void setRepository(R repository) {
 		this.repository = repository;
@@ -149,6 +147,21 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 //        }
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public void postCreate(T resource) {
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void postUpdate(T resource) {
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	public void postDelete(T resource) {
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -156,20 +169,14 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 	@Transactional(readOnly = false)
 	public T create(@P("resource") T resource) {
 		Assert.notNull(resource, "Resource can't be null");
+		// Persist
 		resource = repository.save(resource);
+		// Do any post-processing
 		this.postCreate(resource);
-
-		// TODO
-		//EntityCreatedEvent<T> event = new EntityCreatedEvent<T>(resource);
-		//this.applicationEventPublisher.publishEvent(event);
-
+		// Fire "created" event
+		this.applicationEventPublisher.publishEvent(new EntityCreatedEvent<>(resource));
+		// Return persisted
 		return resource;
-	}
-
-
-	@Override
-	public void postCreate(T resource) {
-
 	}
 
 	/**
@@ -179,9 +186,13 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 	@Transactional(readOnly = false)
 	public T update(@P("resource") T resource) {
 		Assert.notNull(resource, "Resource can't be null");
-		log.debug("update resource: {}", resource);
+		// Persist
 		resource = repository.save(resource);
-		// TODO applicationEventPublisher.publishEvent(new EntityUpdatedEvent<T>(resource));
+		// Do any post-processing
+		this.postUpdate(resource);
+		// Fire "updated" event
+		this.applicationEventPublisher.publishEvent(new EntityUpdatedEvent<>(resource));
+		// Return persisted
 		return resource;
 	}
 
@@ -191,9 +202,14 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 	@Override
 	@Transactional(readOnly = false)
 	public T patch(@P("resource") T resource) {
-		log.debug("patch resource: {}", resource);
+		Assert.notNull(resource, "Resource can't be null");
+		// Persist
 		resource = repository.patch(resource);
-		// TODOv applicationEventPublisher.publishEvent(new EntityUpdatedEvent<T>(resource));
+		// Do any post-processing
+		this.postUpdate(resource);
+		// Fire "updated" event
+		this.applicationEventPublisher.publishEvent(new EntityUpdatedEvent<>(resource));
+		// Return persisted
 		return resource;
 	}
 
@@ -204,7 +220,12 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 	@Transactional(readOnly = false)
 	public void delete(T resource) {
 		Assert.notNull(resource, "Resource can't be null");
+		// Persist
 		repository.delete(resource);
+		// Do any post-processing
+		this.postDelete(resource);
+		// Fire "deleted" event
+		this.applicationEventPublisher.publishEvent(new EntityDeletedEvent<>(resource));
 	}
 
 	/**

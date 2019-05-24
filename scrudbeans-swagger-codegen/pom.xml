@@ -4,12 +4,11 @@
 
 	<groupId>com.github.manosbatsis.scrudbeans</groupId>
 	<artifactId>scrudbeans-swagger-codegen</artifactId>
-	<version>0.13</version>
 
 	<parent>
 		<artifactId>scrudbeans</artifactId>
 		<groupId>com.github.manosbatsis.scrudbeans</groupId>
-		<version>0.13</version>
+		<version>0.14-SNAPSHOT</version>
 	</parent>
 
 	<build>
