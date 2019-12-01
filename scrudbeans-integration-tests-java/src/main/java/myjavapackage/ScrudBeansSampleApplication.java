@@ -41,7 +41,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 )
 public class ScrudBeansSampleApplication {
 
-	public static final String PACKAGE_NAME = "mypackage";
+	public static final String PACKAGE_NAME = "myjavapackage";
 
 	public static void main(String[] args) {
 		SpringApplication.run(ScrudBeansSampleApplication.class, args);
