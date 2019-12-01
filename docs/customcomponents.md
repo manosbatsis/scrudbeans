@@ -11,13 +11,13 @@ take a note of any optional, pre-existing custom components:
 ```
 └── mypackage
     ├── controller
-    │   └── OrderLineController.java
+    │   └── OrderLineController
     └── dto
-    │   └── OrderEmailUpdateDTO.java
+    │   └── OrderEmailUpdateDTO
     └── model
-        ├── OrderLine.java
-        ├── Order.java
-        └── Product.java
+        ├── OrderLine
+        ├── Order
+        └── Product
 ```
 
 To use your custom components, all you have to do is create them yourself - like the `OrderLineController` 
@@ -26,32 +26,32 @@ above. ScrudBeans will preserve any existing components and complete the structu
 ```
 └── mypackage
     ├── controller
-    │   ├── OrderLineController.java
-    │   ├── OrderController.java
-    │   └── ProductController.java
+    │   ├── OrderLineController
+    │   ├── OrderController
+    │   └── ProductController
     └── dto
-    │   └── OrderEmailUpdateDTO.java
+    │   └── OrderEmailUpdateDTO
     └── mapper
-    │   └── OrderToOrderEmailUpdateDTOMapper.java
+    │   └── OrderToOrderEmailUpdateDTOMapper
     ├── model
-    │   ├── OrderLine.java
-    │   ├── Order.java
-    │   └── Product.java
+    │   ├── OrderLine
+    │   ├── Order
+    │   └── Product
     ├── repository
-    │   ├── OrderLineRepository.java
-    │   ├── OrderRepository.java
-    │   └── ProductRepository.java
+    │   ├── OrderLineRepository
+    │   ├── OrderRepository
+    │   └── ProductRepository
     ├── service
-    │   ├── OrderLineServiceImpl.java
-    │   ├── OrderLineService.java
-    │   ├── OrderServiceImpl.java
-    │   ├── OrderService.java
-    │   ├── ProductServiceImpl.java
-    │   └── ProductService.java
+    │   ├── OrderLineServiceImpl
+    │   ├── OrderLineService
+    │   ├── OrderServiceImpl
+    │   ├── OrderService
+    │   ├── ProductServiceImpl
+    │   └── ProductService
     └── specification
-        ├── AnyToOneOrderLinePredicateFactory.java
-        ├── AnyToOneOrderPredicateFactory.java
-        └── AnyToOneProductPredicateFactory.java
+        ├── AnyToOneOrderLinePredicateFactory
+        ├── AnyToOneOrderPredicateFactory
+        └── AnyToOneProductPredicateFactory
 ```
 
 When using Maven, you can browse the generated component sources in `target/generated-sources/annotations`.
@@ -83,9 +83,9 @@ To use your custom repository, all you have to do is create them e.g. like the `
 ```
 └── mypackage
     ├── repository
-    │   └── OrderLineRepository.java
+    │   └── OrderLineRepository
     └── model
-        └── OrderLine.java
+        └── OrderLine
 ```
 
 The implementation is actually a common Spring Data repository interface that extends 
@@ -109,9 +109,9 @@ bellow.
 ```
 └── mypackage
     ├── service
-    │   └── OrderLineService.java
+    │   └── OrderLineService
     └── model
-        └── OrderLine.java
+        └── OrderLine
 ```
 
 The service can either be a concrete class like: 
@@ -158,9 +158,9 @@ bellow.
 ```
 └── mypackage
     ├── controller
-    │   └── OrderLineController.java
+    │   └── OrderLineController
     └── model
-        └── OrderLine.java
+        └── OrderLine
 ```
 
 The implementation can extend  
@@ -200,11 +200,11 @@ like `OrderToOrderUpdateCommentDTOMapper` bellow:
 ```
 └── mypackage
     ├── dto
-    │   └── OrderUpdateCommentDTO.java
+    │   └── OrderUpdateCommentDTO
     ├── model
-    │   └── Order.java
+    │   └── Order
     └── mapper
-        └── OrderToOrderUpdateCommentDTOMapper.java
+        └── OrderToOrderUpdateCommentDTOMapper
 ```
 
 The `OrderToOrderUpdateCommentDTOMapper` implementation can be a MapStruct-based interface that simply extends 
@@ -226,5 +226,6 @@ public interface OrderToOrderUpdateCommentDTOMapper extends DtoMapper<Order, Ord
 ```
 
 MapStruct will pick up the interface and generate the actual implementation as usual - the MapStruct annotation 
-processor is a transitive dependency of scrudbeans-annotation-processor.
+processor is a transitive dependency of `scrudbeans-annotation-processor-java` 
+and `scrudbeans-annotation-processor-kotlin` modules.
 

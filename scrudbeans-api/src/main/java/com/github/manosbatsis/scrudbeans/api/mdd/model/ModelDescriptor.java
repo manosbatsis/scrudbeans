@@ -129,12 +129,11 @@ public abstract class ModelDescriptor {
 			memberType = asTypeElement(types, typeMirror).toString();
 		}
 
-		log.debug("getType for {}: {}", scrudModelMember.getSimpleName(), memberType);
 		return memberType;
 	}
 
 	public String getStack() {
-		return this.getJpaEntity() ? STACK_JPA : "";
+		return this.jpaEntity ? STACK_JPA : "";
 	}
 
 }

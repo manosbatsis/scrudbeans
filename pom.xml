@@ -54,6 +54,7 @@
 		<spring-boot.exclude-devtools>false</spring-boot.exclude-devtools>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<kotlin.version>1.3.61</kotlin.version>
 		<!-- versions -->
 		<commons-lang3.version>3.5</commons-lang3.version>
 		<commons-beanutils.version>1.9.3</commons-beanutils.version>
@@ -72,6 +73,7 @@
 		<junit-platform.version>1.3.2</junit-platform.version>
 		<!-- javers auditing -->
 		<javapoet.version>1.11.1</javapoet.version>
+        <kotlinpoet.version>1.4.1</kotlinpoet.version>
 		<javers-spring-boot-starter-sql.version>5.0.0</javers-spring-boot-starter-sql.version>
 		<kotlin.version>1.2.71</kotlin.version>
 		<lombok.version>1.18.4</lombok.version>
@@ -94,12 +96,13 @@
 	</properties>
 
 	<modules>
-		<module>scrudbeans-annotation-processor</module>
+		<module>scrudbeans-annotation-processor-java</module>
+		<module>scrudbeans-annotation-processor-kotlin</module>
 		<module>scrudbeans-api</module>
 		<module>scrudbeans-common</module>
 		<module>scrudbeans-error</module>
 		<module>scrudbeans-hypermedia</module>
-		<module>scrudbeans-integration-tests</module>
+		<module>scrudbeans-integration-tests-java</module>
 		<module>scrudbeans-jpa</module>
 		<module>scrudbeans-spring-boot-autoconfigure</module>
 		<module>scrudbeans-spring-boot-starter</module>
