@@ -29,13 +29,6 @@ import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-/**
- * TODO:
- * @param <T>
- * @param <PK>
- * @param <R>
- */
 public abstract class AbstractModelServiceImpl<T extends IdModel<PK>, PK extends Serializable>
 		extends AbstractBaseServiceImpl
 		implements ModelService<T, PK> {
@@ -76,22 +69,24 @@ public abstract class AbstractModelServiceImpl<T extends IdModel<PK>, PK extends
 	/**
 	 * Update an existing resource.
 	 *
-	 * @param resource Resource to update
+	 * @param id Resource identifier
+	 * @param resource Resource body to use for the update
 	 * @return resource updated
 	 */
 	@Override
-	public T update(T resource) {
+	public T update(PK id, T resource) {
 		return null;
 	}
 
 	/**
 	 * Partially update an existing resource.
 	 *
-	 * @param resource Resource to update
+	 * @param id Resource identifier
+	 * @param resource Resource body to use for as patch
 	 * @return resource updated
 	 */
 	@Override
-	public T patch(T resource) {
+	public T patch(PK id, T resource) {
 		return null;
 	}
 
@@ -101,7 +96,7 @@ public abstract class AbstractModelServiceImpl<T extends IdModel<PK>, PK extends
 	 * @param resource Resource to delete
 	 */
 	@Override
-	public void delete(T resource) {
+	public void delete(PK id, T resource) {
 
 	}
 

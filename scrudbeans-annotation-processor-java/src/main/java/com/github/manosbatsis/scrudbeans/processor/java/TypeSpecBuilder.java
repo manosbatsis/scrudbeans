@@ -1,4 +1,4 @@
-package com.github.manosbatsis.scrudbeans.processor;
+package com.github.manosbatsis.scrudbeans.processor.java;
 
 import static com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATIOM_JSON_VALUE;
 import static com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATION_VND_API_PLUS_JSON_VALUE;
@@ -14,9 +14,6 @@ import javax.persistence.Entity;
 import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
-import com.github.manosbatsis.scrudbeans.api.mdd.model.EntityModelDescriptor;
-import com.github.manosbatsis.scrudbeans.api.mdd.model.ModelDescriptor;
-import com.github.manosbatsis.scrudbeans.api.mdd.model.ScrudModelDescriptor;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
@@ -27,6 +24,9 @@ import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractPersistableModel
 import com.github.manosbatsis.scrudbeans.jpa.service.AbstractModelServiceImpl;
 import com.github.manosbatsis.scrudbeans.jpa.service.AbstractPersistableModelServiceImpl;
 import com.github.manosbatsis.scrudbeans.jpa.specification.factory.AnyToOnePredicateFactory;
+import com.github.manosbatsis.scrudbeans.processor.java.descriptor.EntityModelDescriptor;
+import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ModelDescriptor;
+import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ScrudModelDescriptor;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;

@@ -3,14 +3,15 @@ package com.github.manosbatsis.scrudbeans.processor.kotlin
 import com.github.manosbatsis.scrudbeans.api.DtoMapper
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.api.mdd.model.EntityModelDescriptor
-import com.github.manosbatsis.scrudbeans.api.mdd.model.ModelDescriptor
-import com.github.manosbatsis.scrudbeans.api.mdd.model.ScrudModelDescriptor
-import com.github.manosbatsis.kotlinpoet.utils.BaseProcessor
+import com.github.manosbatsis.kotlinpoet.utils.ProcessingEnvironmentAware
+import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.EntityModelDescriptor
+import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
+import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.WildcardTypeName
 import com.squareup.kotlinpoet.asTypeName
+import org.slf4j.LoggerFactory
 import java.io.File
 
 import javax.annotation.processing.*
@@ -30,9 +31,10 @@ import java.util.*
  */
 @SupportedAnnotationTypes("com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-class ScrudModelAnnotationProcessor : BaseProcessor() {
+class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironmentAware {
 
     companion object {
+        private val log = LoggerFactory.getLogger(ScrudModelAnnotationProcessor.javaClass)
         const val BLOCK_FUN_NAME = "block"
         const val KAPT_KOTLIN_SCRUDBEANS_GENERATED_OPTION_NAME = "kapt.kotlin.vaultaire.generated"
         const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
@@ -41,10 +43,17 @@ class ScrudModelAnnotationProcessor : BaseProcessor() {
     }
 
     private var complete = false
-    private var filer: Filer? = null
+    private val typeSpecBuilder by lazy { TypeSpecBuilder(processingEnv)}
+    private lateinit var filer: Filer
 
     // Config properties, i.e. "application.properties" from the classpath
-    private var configProps: Properties? = null
+    private lateinit var configProps: Properties
+
+    /** Implement [ProcessingEnvironmentAware.processingEnvironment] for access to a [ProcessingEnvironment] */
+    override val processingEnvironment by lazy {
+        processingEnv
+    }
+
 
     val generatedSourcesRoot: String by lazy {
         processingEnv.options[KAPT_KOTLIN_SCRUDBEANS_GENERATED_OPTION_NAME]
@@ -122,17 +131,18 @@ class ScrudModelAnnotationProcessor : BaseProcessor() {
             try {
                 if (element.getAnnotation(Entity::class.java) != null) {
                     if (element is TypeElement) {
-                        processingEnv.noteMessage { "generateEntityPredicateFactories, processing element: ${element.getSimpleName()}" }
+                        processingEnv.noteMessage { "generateEntityPredicateFactories, processing element: ${element.simpleName}" }
                         val descriptor = EntityModelDescriptor(processingEnv, element)
                         createPredicateFactory(descriptor)
                     } else {
-                            processingEnv.noteMessage { "Not an instance of TypeElement but annotated with ScrudBean: ${element.simpleName}" }
+                        processingEnv.noteMessage { "Not an instance of TypeElement but annotated with ScrudBean: ${element.simpleName}" }
                     }
                 }
             } catch (e: RuntimeException) {
                 processingEnv.errorMessage { "Error generating components for element.simpleName ${e.message}: " }
                 throw e
             } catch (e: ScrudModelProcessorException) {
+                e.printStackTrace()
                 processingEnv.errorMessage { "Error generating components for ${element.simpleName}: " + e.message }
                 throw e
             }
@@ -146,8 +156,8 @@ class ScrudModelAnnotationProcessor : BaseProcessor() {
      * @return the written file
      */
     private fun createController(descriptor: ScrudModelDescriptor): FileSpec? {
-        val typeSpec = TypeSpecBuilder.createController(descriptor)
-        return writeKotlinFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".controller")
+        val typeSpec = typeSpecBuilder.createController(descriptor)
+        return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".controller")
     }
 
     /**
@@ -157,12 +167,13 @@ class ScrudModelAnnotationProcessor : BaseProcessor() {
      */
     private fun generateDtoMappers(descriptor: ScrudModelDescriptor): List<FileSpec?> {
         val files = LinkedList<FileSpec?>()
-        descriptor.getDtoTypes().forEach { dtoClass ->
-            val typeSpec = TypeSpecBuilder.createDtoMapper(descriptor, dtoClass)
+        log.debug("generateDtoMappers, dtoTypes (${descriptor.dtoTypes.size}): ${descriptor.dtoTypes}")
+        descriptor.dtoTypes.forEach { dtoClass ->
+            val typeSpec = typeSpecBuilder.createDtoMapper(descriptor, dtoClass)
             files.add(writeKotlinFile(
                     descriptor,
                     typeSpec,
-                    descriptor.getParentPackageName() + ".mapper"))
+                    descriptor.parentPackageName + ".mapper"))
         }
         return files
     }
@@ -175,8 +186,8 @@ class ScrudModelAnnotationProcessor : BaseProcessor() {
     private fun createService(descriptor: ScrudModelDescriptor): List<FileSpec?> {
         val files = LinkedList<FileSpec?>()
         // Ensure a service has not already been created
-        val serviceQualifiedName = descriptor.getParentPackageName() +
-                ".service." + descriptor.getSimpleName() + "Service"
+        val serviceQualifiedName = descriptor.parentPackageName +
+                ".service." + descriptor.simpleName + "Service"
         val existing = processingEnv.elementUtils.getTypeElement(serviceQualifiedName)
         if (Objects.isNull(existing)) {
             files.add(createServiceInterface(descriptor))
@@ -193,8 +204,8 @@ class ScrudModelAnnotationProcessor : BaseProcessor() {
      * @return the written file
      */
     private fun createServiceInterface(descriptor: ScrudModelDescriptor): FileSpec? {
-        val typeSpec = TypeSpecBuilder.createServiceInterface(descriptor)
-        return writeKotlinFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".service")
+        val typeSpec = typeSpecBuilder.createServiceInterface(descriptor)
+        return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".service")
 
     }
 
@@ -204,8 +215,8 @@ class ScrudModelAnnotationProcessor : BaseProcessor() {
      * @return the written file
      */
     private fun createServiceImpl(descriptor: ScrudModelDescriptor): FileSpec? {
-        val typeSpec = TypeSpecBuilder.createServiceImpl(descriptor)
-        return writeKotlinFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".service")
+        val typeSpec = typeSpecBuilder.createServiceImpl(descriptor)
+        return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".service")
     }
 
     /**
@@ -214,8 +225,8 @@ class ScrudModelAnnotationProcessor : BaseProcessor() {
      * @return the written file
      */
     private fun createRepository(descriptor: ScrudModelDescriptor): FileSpec? {
-        val typeSpec = TypeSpecBuilder.createRepository(descriptor)
-        return writeKotlinFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".repository")
+        val typeSpec = typeSpecBuilder.createRepository(descriptor)
+        return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".repository")
     }
 
     /**
@@ -224,8 +235,8 @@ class ScrudModelAnnotationProcessor : BaseProcessor() {
      * @return the written file
      */
     private fun createPredicateFactory(descriptor: EntityModelDescriptor): FileSpec? {
-        val typeSpec = TypeSpecBuilder.createPredicateFactory(descriptor)
-        return writeKotlinFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".specification")
+        val typeSpec = typeSpecBuilder.createPredicateFactory(descriptor)
+        return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".specification")
     }
 
     /**
@@ -263,18 +274,16 @@ class ScrudModelAnnotationProcessor : BaseProcessor() {
         return file
     }
 
-    private fun loadProperties(): Properties? {
-        var props: Properties? = null
+    private fun loadProperties(): Properties {
+        var props = Properties()
         try {
             val fileObject = this.filer!!
                     .getResource(StandardLocation.CLASS_OUTPUT, "", "application.properties")
-            props = Properties()
             props.load(fileObject.openInputStream())
             processingEnv.noteMessage { "loadProperties, props: $props" }
         } catch (e: IOException) {
             e.printStackTrace()
         }
-
         return props
     }
 

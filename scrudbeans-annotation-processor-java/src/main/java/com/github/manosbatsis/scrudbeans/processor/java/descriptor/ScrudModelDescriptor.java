@@ -1,13 +1,10 @@
-package com.github.manosbatsis.scrudbeans.api.mdd.model;
+package com.github.manosbatsis.scrudbeans.processor.java.descriptor;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -15,33 +12,19 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypesException;
 import javax.lang.model.util.Types;
-
-import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A metadata and utility context helper focusing on a single model annotated with
  * {@link ScrudBean}. Used during javapoet-driven sourcecode generation.
  */
-@EqualsAndHashCode(callSuper = true)
-@Slf4j
-@Data
 public class ScrudModelDescriptor extends ModelDescriptor {
 
+	private static final Logger log = LoggerFactory.getLogger(ScrudModelDescriptor.class);
 
 	private final ScrudBean scrudBean;
-
-	private Map<String, String> oneToMany = new HashMap<>();
-
-	private Map<String, String> oneToOne = new HashMap<>();
-
-	private Map<String, String> manyToOne = new HashMap<>();
-
-	private Map<String, String> manyToMany = new HashMap<>();
 
 	private Set<String> dtoTypes;
 
@@ -102,4 +85,30 @@ public class ScrudModelDescriptor extends ModelDescriptor {
 		checkIfMemberIsId(types, memberElement);
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		ScrudModelDescriptor that = (ScrudModelDescriptor) o;
+		return Objects.equals(scrudBean, that.scrudBean) &&
+				Objects.equals(dtoTypes, that.dtoTypes) &&
+				Objects.equals(configProperties, that.configProperties);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(scrudBean, dtoTypes, configProperties);
+	}
+
+	public ScrudBean getScrudBean() {
+		return scrudBean;
+	}
+
+	public Set<String> getDtoTypes() {
+		return dtoTypes;
+	}
+
+	public Properties getConfigProperties() {
+		return configProperties;
+	}
 }

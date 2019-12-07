@@ -26,7 +26,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.Validator;
 
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +42,7 @@ import org.springframework.data.repository.core.support.RepositoryFactorySupport
 import org.springframework.data.repository.core.support.TransactionalRepositoryFactoryBeanSupport;
 
 //@Component
-public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extends SettableIdModel<PK>, PK extends Serializable>
+public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extends IdModel<PK>, PK extends Serializable>
 		extends TransactionalRepositoryFactoryBeanSupport<R, T, PK> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModelRepositoryFactoryBean.class);
@@ -99,7 +99,7 @@ public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extend
 	}
 
 
-	private static class RepositoryFactory<T extends SettableIdModel<PK>, PK extends Serializable> extends JpaRepositoryFactory {
+	private static class RepositoryFactory<T extends IdModel<PK>, PK extends Serializable> extends JpaRepositoryFactory {
 
 		private EntityManager entityManager;
 

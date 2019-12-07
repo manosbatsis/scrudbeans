@@ -27,7 +27,6 @@ import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
 
 import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 
 import org.springframework.data.domain.Page;
@@ -58,22 +57,49 @@ public interface ModelRepository<T extends IdModel<PK>, PK extends Serializable>
 	 */
 	Class<T> getDomainClass();
 
+	/**
+	 * Create a resource.
+	 *
+	 * @param resource the state to apply
+	 * @return resource updated
+	 */
+	T create(T resource);
 
+	/**
+	 * Update an existing resource.
+	 *
+	 * @param id the resource identifier
+	 * @param resource the state to apply
+	 * @return resource updated
+	 */
+	T update(PK id, T resource);
 
 	/**
 	 * Partially update an existing resource.
 	 *
+	 * @param id the resource identifier
 	 * @param delta the patch to apply
 	 * @return resource updated
 	 */
-	T patch(T delta);
+	T patch(PK id, T delta);
+
+	/**
+	 * Delete an existing resource.
+	 *
+	 * @param resource the resource to delete
+	 * @return resource updated
+	 * @deprecated use {@link #deleteById(Object)}
+	 */
+	@Override
+	@Deprecated
+	void delete(T resource);
 
 	/**
 	 * Check if the given state is transient.
 	 * Only applies to entities with non-assigned identifiers
 	 */
 	default boolean isTransient(T resource) {
-		return resource.getId() == null;
+		return resource.getScrudBeanId() == null;
 	}
 
 	/**
@@ -90,7 +116,7 @@ public interface ModelRepository<T extends IdModel<PK>, PK extends Serializable>
 	 */
 	default boolean exists(T resource) {
 		return !isTransient(resource)
-				&& this.getEntityManager().find(this.getDomainClass(), resource.getId()) != null;
+				&& this.getEntityManager().find(this.getDomainClass(), resource.getScrudBeanId()) != null;
 	}
 
 	/**
@@ -136,6 +162,6 @@ public interface ModelRepository<T extends IdModel<PK>, PK extends Serializable>
 	 * @param fieldInfo the attribute name of the relationship
 	 * @return the single entity in the other side of the relation if any, null otherwise
 	 */
-	<RT extends SettableIdModel> RT findRelatedEntityByOwnId(PK id, FieldInfo fieldInfo);
+	<RT extends IdModel> RT findRelatedEntityByOwnId(PK id, FieldInfo fieldInfo);
 
 }

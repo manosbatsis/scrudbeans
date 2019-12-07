@@ -25,11 +25,12 @@ import java.io.Serializable;
 import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.jpa.validation.Unique;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * Abstract entity class with basic auditing and unique constraints validation
@@ -38,21 +39,16 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @XmlRootElement
 @MappedSuperclass
 @Unique
-public abstract class AbstractPersistableModel<PK extends Serializable> implements SettableIdModel<PK> {
+@EqualsAndHashCode
+@ToString
+public abstract class AbstractPersistableModel<PK extends Serializable> implements IdModel<PK> {
 	private static final long serialVersionUID = -6009587976502456848L;
 
 	public AbstractPersistableModel() {
 		super();
 	}
 
-	public AbstractPersistableModel(PK id) {
-		this.setId(id);
-	}
 
-	@Override
-	public String toString() {
-		return new ToStringBuilder(this).append(PK_FIELD_NAME, this.getId()).toString();
-	}
 
 	/**
 	 * @see Object#equals(Object)
@@ -71,7 +67,7 @@ public abstract class AbstractPersistableModel<PK extends Serializable> implemen
 		}
 		AbstractPersistableModel other = (AbstractPersistableModel) obj;
 		return new EqualsBuilder()
-				.append(this.getId(), this.getId())
+				.append(this.getScrudBeanId(), this.getScrudBeanId())
 				.isEquals();
 	}
 
@@ -81,7 +77,7 @@ public abstract class AbstractPersistableModel<PK extends Serializable> implemen
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
-				.append(this.getId())
+				.append(this.getScrudBeanId())
 				.toHashCode();
 	}
 

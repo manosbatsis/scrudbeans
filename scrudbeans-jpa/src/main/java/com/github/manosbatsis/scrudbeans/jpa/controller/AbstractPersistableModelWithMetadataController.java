@@ -23,7 +23,7 @@ package com.github.manosbatsis.scrudbeans.jpa.controller;
 
 import java.io.Serializable;
 
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import com.github.manosbatsis.scrudbeans.jpa.metadata.MetadatumDTO;
 import io.swagger.annotations.ApiOperation;
@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-public abstract class AbstractPersistableModelWithMetadataController<T extends SettableIdModel<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
+public abstract class AbstractPersistableModelWithMetadataController<T extends IdModel<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
 		extends AbstractPersistableModelController<T, PK, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelWithMetadataController.class);

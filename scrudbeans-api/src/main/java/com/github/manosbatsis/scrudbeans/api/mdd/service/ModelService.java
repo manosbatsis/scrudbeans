@@ -79,7 +79,7 @@ public interface ModelService<T extends IdModel<PK>, PK extends Serializable> ex
 	 * @param resource Resource to update
 	 * @return resource updated
 	 */
-	T update(T resource);
+	T update(PK id, T resource);
 
 
 	/**
@@ -88,14 +88,14 @@ public interface ModelService<T extends IdModel<PK>, PK extends Serializable> ex
 	 * @param resource Resource to update
 	 * @return resource updated
 	 */
-	T patch(T resource);
+	T patch(PK id, T resource);
 
 	/**
 	 * Delete an existing resource.
 	 *
 	 * @param resource Resource to delete
 	 */
-	void delete(T resource);
+	void delete(PK id, T resource);
 
 	/**
 	 * Delete an existing resource.

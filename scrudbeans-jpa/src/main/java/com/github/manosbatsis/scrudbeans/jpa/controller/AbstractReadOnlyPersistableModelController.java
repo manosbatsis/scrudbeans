@@ -22,7 +22,7 @@ package com.github.manosbatsis.scrudbeans.jpa.controller;
 
 import java.io.Serializable;
 
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.exception.NotImplementedException;
 import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class for read-only model controllers, i.e. with no support for HTTP PUT, PATCH or DELETE.
  */
-public abstract class AbstractReadOnlyPersistableModelController<T extends SettableIdModel<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
+public abstract class AbstractReadOnlyPersistableModelController<T extends IdModel<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
 		extends AbstractNoDeletePersistableModelController<T, PK, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractReadOnlyPersistableModelController.class);

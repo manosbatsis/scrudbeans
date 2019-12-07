@@ -34,7 +34,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
 import org.apache.commons.collections4.MapUtils;
@@ -46,7 +46,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
-public class SpecificationsBuilder<T extends SettableIdModel<PK>, PK extends Serializable> {
+public class SpecificationsBuilder<T extends IdModel<PK>, PK extends Serializable> {
 
 	public static final String PARAM_RELATION_NAME = "relationName";
 

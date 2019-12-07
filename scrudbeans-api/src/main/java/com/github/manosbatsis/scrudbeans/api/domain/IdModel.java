@@ -20,6 +20,8 @@
  */
 package com.github.manosbatsis.scrudbeans.api.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.io.Serializable;
 
 /**
@@ -31,12 +33,16 @@ public interface IdModel<PK extends Serializable> extends Serializable {
 	/**
 	 * The primary key, field name.
 	 */
-	String PK_FIELD_NAME = "id";
+	@JsonIgnore
+	default String getScrudBeanIdFieldName() {
+		return "id";
+	}
 
 	/**
 	 * Get the entity's primary key.
 	 */
-	PK getId();
+	@JsonIgnore
+	PK getScrudBeanId();
 
 
 }

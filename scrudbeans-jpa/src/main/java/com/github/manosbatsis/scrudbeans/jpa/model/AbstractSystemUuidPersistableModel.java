@@ -43,6 +43,13 @@ public abstract class AbstractSystemUuidPersistableModel extends AbstractPersist
 	 * {@inheritDoc}
 	 */
 	@Override
+	public String getScrudBeanId() {
+		return getId();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	public String getId() {
 		return id;
 	}

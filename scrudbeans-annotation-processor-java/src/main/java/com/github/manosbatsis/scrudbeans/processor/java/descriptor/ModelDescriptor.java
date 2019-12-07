@@ -1,14 +1,11 @@
-package com.github.manosbatsis.scrudbeans.api.mdd.model;
+package com.github.manosbatsis.scrudbeans.processor.java.descriptor;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
+import lombok.NonNull;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
+import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -17,18 +14,15 @@ import javax.lang.model.util.Types;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-
-import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Base implementation for classes describing (entity) models
  */
-@Slf4j
-@Data
 public abstract class ModelDescriptor {
+
+	private static final org.slf4j.Logger log = LoggerFactory.getLogger(ModelDescriptor.class);
 
 	public static final String STACK_JPA = "jpa";
 
@@ -129,11 +123,47 @@ public abstract class ModelDescriptor {
 			memberType = asTypeElement(types, typeMirror).toString();
 		}
 
+		log.debug("getType for {}: {}", scrudModelMember.getSimpleName(), memberType);
 		return memberType;
 	}
 
 	public String getStack() {
-		return this.jpaEntity ? STACK_JPA : "";
+		return this.getJpaEntity() ? STACK_JPA : "";
 	}
 
+	public Boolean getJpaEntity() {
+		return jpaEntity;
+	}
+
+	public String getIdType() {
+		return idType;
+	}
+
+	public void setIdType(String idType) {
+		this.idType = idType;
+	}
+
+	public String getQualifiedName() {
+		return qualifiedName;
+	}
+
+	public String getSimpleName() {
+		return simpleName;
+	}
+
+	public String getPackageName() {
+		return packageName;
+	}
+
+	public String getParentPackageName() {
+		return parentPackageName;
+	}
+
+	public Map<String, String> getGenericParamTypes() {
+		return genericParamTypes;
+	}
+
+	public void setGenericParamTypes(Map<String, String> genericParamTypes) {
+		this.genericParamTypes = genericParamTypes;
+	}
 }

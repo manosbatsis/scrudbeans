@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * Generates static swagger docs in {@value SwaggerStaticExporterIT#GENERATED_ASCIIDOCS_PATH}
  */
 @Slf4j
-public class SwaggerStaticExporterIT extends AbstractRestAssueredIT {
+public class SwaggerStaticExporterIT extends AbstractRestAssuredIT {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SwaggerStaticExporterIT.class);
 

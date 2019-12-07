@@ -26,12 +26,7 @@ import static org.springframework.data.jpa.repository.query.QueryUtils.getQueryS
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
@@ -50,7 +45,6 @@ import javax.validation.constraints.NotNull;
 
 import com.github.manosbatsis.scrudbeans.api.domain.DisableableModel;
 import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.exception.BeanValidationException;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
@@ -132,12 +126,55 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 
 	/***
 	 * {@inheritDoc}
+	 * @deprecated use {@link #create(IdModel)}
+	 */
+	@Deprecated
+	@Override
+	public <S extends T> S save(@NonNull S entity) {
+		this.validate(entity);
+		return super.save(entity);
+	}
+
+	/***
+	 * {@inheritDoc}
 	 */
 	@Override
-	public <S extends T> S save(S entity) {
+	public T create(@NonNull T entity) {
 		this.validate(entity);
-		entity = super.save(entity);
-		return entity;
+		return super.save(entity);
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public T update(@NonNull PK id, @NonNull T resource) {
+		String[] ignored = {"id"};
+		return patch(id, resource, ignored);
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public T patch(@NonNull @P("id") PK id, @NonNull @P("resource") T delta) {
+		// update it by copying all non-null properties from the given transient instance
+		List<String> ignoredList = Arrays.asList(EntityUtil.getNullPropertyNames(delta));
+		ignoredList.add("id");
+		return patch(id, delta, ignoredList.toArray(new String[ignoredList.size()]));
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	private T patch(@NonNull @P("id") PK id, @NonNull @P("resource") T delta, @NonNull String[] ignoredPropertyNames) {
+		// load existing
+		T persisted = this.getOne(id);
+		BeanUtils.copyProperties(delta, persisted, ignoredPropertyNames);
+		// validate
+		this.validate(persisted);
+		// persist changes
+		return this.entityManager.merge(persisted);
 	}
 
 	/***
@@ -150,22 +187,6 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 		return entity;
 	}
 
-
-	/***
-	 * {@inheritDoc}
-	 */
-	@Override
-	public T patch(@P("resource") T delta) {
-		// load existing
-		T persisted = this.getOne(delta.getId());
-		// update it by copying all non-null properties from the given transient instance
-		String[] nullPropertyNames = EntityUtil.getNullPropertyNames(delta);
-		BeanUtils.copyProperties(delta, persisted, nullPropertyNames);
-		// validate
-		this.validate(persisted);
-		// persist changes
-		return this.entityManager.merge(persisted);
-	}
 
 	/***
 	 * {@inheritDoc}
@@ -210,7 +231,7 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 	 * @return
 	 */
 	@Override
-	public <RT extends SettableIdModel> RT findRelatedEntityByOwnId(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
+	public <RT extends IdModel> RT findRelatedEntityByOwnId(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
 		if (!fieldInfo.getFieldMappingType().isToOne()) {
 			throw new IllegalArgumentException("Field " + fieldInfo.getFieldName() + " is not a relation to a single entity");
 		}
@@ -295,17 +316,16 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 		else super.deleteById(id);
 	}
 
-	/*
+	/**
 	 * (non-Javadoc)
 	 * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Object)
+	 * @deprecated use #delete(java.io.Serializable, com.github.manosbatsis.scrudbeans.api.domain.IdModel)
 	 */
+	@Deprecated
 	@Override
-	@Transactional
 	public void delete(T entity) {
-		if (this.disableableDomainClass) {
-			this.softDelete(entity.getId());
-		}
-		else super.delete(entity);
+		super.delete(entity);
+		throw new UnsupportedOperationException("Signature without explicit ID is not supported");
 	}
 
 	/*
@@ -317,7 +337,7 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 	public void deleteAll(@NotNull Iterable<? extends T> entities) {
 		if (this.disableableDomainClass) {
 			for (T entity : entities) {
-				this.softDelete(entity.getId());
+				this.softDelete(entity.getScrudBeanId());
 			}
 		}
 		else super.deleteAll(entities);

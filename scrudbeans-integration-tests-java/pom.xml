@@ -107,6 +107,7 @@
 		</plugins>
 	</reporting>
 	<build>
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -130,7 +131,7 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 			</plugin>
-			<!-- Make generated Java sources available to IntelliJ or other IDE -->
+			<!-- Add generated sources -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>

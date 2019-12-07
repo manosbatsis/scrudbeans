@@ -37,7 +37,7 @@ import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelR
 public interface JsonApiResource<A extends Serializable, ID extends Serializable> extends JsonApiLinksContainer {
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	@JsonIgnoreProperties(value = {"id", "links"})
+	@JsonIgnoreProperties(value = {"links"})
 	A getAttributes();
 
 	@JsonProperty

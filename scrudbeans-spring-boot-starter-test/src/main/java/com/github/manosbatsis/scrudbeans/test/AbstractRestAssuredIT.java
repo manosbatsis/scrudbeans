@@ -46,7 +46,7 @@ import org.springframework.boot.web.server.LocalServerPort;
  */
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AbstractRestAssueredIT {
+public abstract class AbstractRestAssuredIT {
 
 	public static final String MIME_APPLICATION_JSON_UTF8 = "application/json; charset=UTF-8";
 
@@ -56,6 +56,10 @@ public abstract class AbstractRestAssueredIT {
 			.setContentType(MIME_APPLICATION_JSON_UTF8)
 			.setAccept(MIME_APPLICATION_JSON_UTF8)
 			.build();
+	private static final RequestSpecification SPEC_JSON_API = new RequestSpecBuilder()
+			.setContentType(MIME_APPLICATION_VND_API_JSON_UTF8)
+			.setAccept(MIME_APPLICATION_VND_API_JSON_UTF8)
+			.build();
 
 	@LocalServerPort
 	public int port;
@@ -63,6 +67,18 @@ public abstract class AbstractRestAssueredIT {
 	protected RequestSpecification defaultSpec() {
 		// Update to use our port
 		RequestSpecBuilder requestSpecBuilder = new RequestSpecBuilder().addRequestSpecification(SPEC_JSON).setPort(port);
+		// add logging filters if debug is enabled
+		if (log.isDebugEnabled()) {
+			requestSpecBuilder
+					.addFilter(new RequestLoggingFilter())
+					.addFilter(new ResponseLoggingFilter());
+		}
+		return requestSpecBuilder.build();
+	}
+
+	protected RequestSpecification jsonApiSpec() {
+		// Update to use our port
+		RequestSpecBuilder requestSpecBuilder = new RequestSpecBuilder().addRequestSpecification(SPEC_JSON_API).setPort(port);
 		// add logging filters if debug is enabled
 		if (log.isDebugEnabled()) {
 			requestSpecBuilder

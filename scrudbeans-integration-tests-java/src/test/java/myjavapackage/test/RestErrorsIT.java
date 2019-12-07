@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.Set;
 
 import com.github.manosbatsis.scrudbeans.api.error.ConstraintViolationEntry;
-import com.github.manosbatsis.scrudbeans.test.AbstractRestAssueredIT;
+import com.github.manosbatsis.scrudbeans.test.AbstractRestAssuredIT;
 import lombok.extern.slf4j.Slf4j;
 import myjavapackage.ScrudBeansSampleApplication;
 import myjavapackage.model.DiscountCode;
@@ -19,7 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ScrudBeansSampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RestErrorsIT extends AbstractRestAssueredIT {
+public class RestErrorsIT extends AbstractRestAssuredIT {
 
 	@Test
 	public void testNotFound() {

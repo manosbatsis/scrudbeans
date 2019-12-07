@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @ScrudBean
 @ApiModel(value = "Product Relationships", description = "A model representing a relationship between products")
-public class ProductRelationship implements SettableIdModel<ProductRelationshipIdentifier> {
+public class ProductRelationship implements IdModel<ProductRelationshipIdentifier> {
 
 	@NotNull
 	@ApiModelProperty(required = true)
@@ -37,5 +37,11 @@ public class ProductRelationship implements SettableIdModel<ProductRelationshipI
 	@Column(nullable = false, length = 512)
 	@ApiModelProperty(value = "The relationship short description (max 512 chars)", required = true)
 	private String description;
+
+	@Override
+	public ProductRelationshipIdentifier getScrudBeanId() {
+		return id;
+	}
+
 
 }

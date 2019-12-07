@@ -174,10 +174,10 @@ public class EntityUtil {
 	}
 
 	public static <PK extends Serializable> PK idOrNull(IdModel<PK> user) {
-		return user != null ? user.getId() : null;
+		return user != null ? user.getScrudBeanId() : null;
 	}
 
 	public static String idOrNEmpty(IdModel entity) {
-		return entity != null ? entity.getId().toString() : StringUtils.EMPTY;
+		return entity != null ? entity.getScrudBeanId().toString() : StringUtils.EMPTY;
 	}
 }

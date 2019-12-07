@@ -46,9 +46,16 @@ public abstract class AbstractAssignedIdPersistableModel<PK extends Serializable
 	}
 
 	/**
-	 *{@inheritDoc}
+	 * {@inheritDoc}
 	 */
 	@Override
+	public PK getScrudBeanId() {
+		return getId();
+	}
+
+	/**
+	 *{@inheritDoc}
+	 */
 	public PK getId() {
 		return id;
 	}
@@ -56,7 +63,6 @@ public abstract class AbstractAssignedIdPersistableModel<PK extends Serializable
 	/**
 	 *{@inheritDoc}
 	 */
-	@Override
 	public void setId(PK id) {
 		this.id = id;
 	}

@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
@@ -91,7 +91,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @param <PK> Resource id type, usually Long or String
  * @param <S>  The service class
  */
-public class AbstractModelServiceBackedController<T extends SettableIdModel<PK>, PK extends Serializable, S extends ModelService<T, PK>> implements InitializingBean {
+public class AbstractModelServiceBackedController<T extends IdModel<PK>, PK extends Serializable, S extends ModelService<T, PK>> implements InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceBackedController.class);
 
@@ -179,7 +179,7 @@ public class AbstractModelServiceBackedController<T extends SettableIdModel<PK>,
 	 *
 	 * @param page
 	 */
-	protected <RT extends SettableIdModel> PagedModelResources<RT> toHateoasPagedResources(@NonNull ParamsAwarePage<RT> page, @NonNull Class<RT> modelType, @NonNull String pageNumberParamName) {
+	protected <RT extends IdModel> PagedModelResources<RT> toHateoasPagedResources(@NonNull ParamsAwarePage<RT> page, @NonNull Class<RT> modelType, @NonNull String pageNumberParamName) {
 		ModelInfo rootModelInfo = this.mmdelInfoRegistry.getEntryFor(modelType);
 
 		// long size, long number, long totalElements, long totalPages
@@ -236,7 +236,7 @@ public class AbstractModelServiceBackedController<T extends SettableIdModel<PK>,
 	 * @param <RT>
 	 * @param <RPK>
 	 */
-	protected <RT extends SettableIdModel<RPK>, RPK extends Serializable> JsonApiModelResourceCollectionDocument<RT, RPK> toPageDocument(@NonNull ParamsAwarePage<RT> page, @NonNull ModelInfo<RT, RPK> modelInfo, @NonNull String pageNumberParamName) {
+	protected <RT extends IdModel<RPK>, RPK extends Serializable> JsonApiModelResourceCollectionDocument<RT, RPK> toPageDocument(@NonNull ParamsAwarePage<RT> page, @NonNull ModelInfo<RT, RPK> modelInfo, @NonNull String pageNumberParamName) {
 		JsonApiModelResourceCollectionDocument<RT, RPK> doc = new JsonApiModelBasedDocumentBuilder<RT, RPK>(this.getModelInfo().getUriComponent())
 				.withData(page)
 				.buildModelCollectionDocument();
@@ -258,7 +258,6 @@ public class AbstractModelServiceBackedController<T extends SettableIdModel<PK>,
 		JsonApiModelResource<T, PK> resource = document.getData();
 		if (resource != null) {
 			entity = resource.getAttributes();
-			entity.setId(resource.getIdentifier());
 		}
 		return entity;
 	}
@@ -272,17 +271,15 @@ public class AbstractModelServiceBackedController<T extends SettableIdModel<PK>,
 
 	protected T update(PK id, T resource) {
 		Assert.notNull(id, "id cannot be null");
-		resource.setId(id);
 		applyCurrentPrincipal(resource);
-		resource = this.service.update(resource);
+		resource = this.service.update(id, resource);
 		return resource;
 	}
 
 
 	protected T patch(PK id, T resource) {
 		applyCurrentPrincipal(resource);
-		resource.setId(id);
-		resource = this.service.patch(resource);
+		resource = this.service.patch(id, resource);
 		return resource;
 	}
 
@@ -305,8 +302,7 @@ public class AbstractModelServiceBackedController<T extends SettableIdModel<PK>,
 
 
 	protected void delete(@NonNull PK id) {
-		T resource = this.findById(id);
-		this.service.delete(resource);
+		this.service.delete(id, this.findById(id));
 	}
 
 

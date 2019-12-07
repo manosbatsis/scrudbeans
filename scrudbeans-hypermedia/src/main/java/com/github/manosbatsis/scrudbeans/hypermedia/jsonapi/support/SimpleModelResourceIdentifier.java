@@ -59,7 +59,7 @@ public class SimpleModelResourceIdentifier<T extends IdModel<PK>, PK extends Ser
 	}
 
 	public SimpleModelResourceIdentifier(@NonNull T attributesModel, @NonNull String type) {
-		this.identifier = attributesModel.getId();
+		this.identifier = attributesModel.getScrudBeanId();
 		this.type = type;
 	}
 

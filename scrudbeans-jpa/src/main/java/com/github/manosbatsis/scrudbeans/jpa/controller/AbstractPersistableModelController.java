@@ -33,7 +33,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
 import com.github.manosbatsis.scrudbeans.api.exception.NotFoundException;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
@@ -99,7 +99,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @param <PK> Resource id type, usually Long or String
  * @param <S>  The service class
  */
-public class AbstractPersistableModelController<T extends SettableIdModel<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
+public class AbstractPersistableModelController<T extends IdModel<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
 		extends AbstractModelServiceBackedController<T, PK, S> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelController.class);
@@ -401,7 +401,7 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 
 		// if ToOne
 		if (fieldInfo.isToOne()) {
-			SettableIdModel related = this.findRelatedSingle(id, fieldInfo);
+			IdModel related = this.findRelatedSingle(id, fieldInfo);
 			// if found
 			Resource res = HypermediaUtils.toHateoasResource(related, fieldInfo.getRelatedModelInfo());
 			responseEntity = new ResponseEntity(res, HttpStatus.OK);
@@ -450,7 +450,7 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 
 		// if ToOne
 		if (fieldInfo.isToOne()) {
-			SettableIdModel related = this.findRelatedSingle(id, fieldInfo);
+			IdModel related = this.findRelatedSingle(id, fieldInfo);
 			// if found
 			if (related != null) {
 				document = HypermediaUtils.toDocument(related, fieldInfo.getRelatedModelInfo());
@@ -530,8 +530,8 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 	 * @return the single related entity, if any
 	 * @see PersistableModelService#findRelatedSingle(Serializable, FieldInfo)
 	 */
-	protected SettableIdModel findRelatedSingle(PK id, FieldInfo fieldInfo) {
-		SettableIdModel resource = this.service.findRelatedSingle(id, fieldInfo);
+	protected IdModel findRelatedSingle(PK id, FieldInfo fieldInfo) {
+		IdModel resource = this.service.findRelatedSingle(id, fieldInfo);
 		return resource;
 	}
 
@@ -544,7 +544,7 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 	 * @return the page of results, may be <code>null</code>
 	 * @see PersistableModelService#findRelatedPaginated(java.lang.Class, org.springframework.data.jpa.domain.Specification, org.springframework.data.domain.Pageable)
 	 */
-	protected <M extends SettableIdModel> ParamsAwarePageImpl<M> findRelatedPaginated(PK id, Pageable pageable, FieldInfo fieldInfo) {
+	protected <M extends IdModel> ParamsAwarePageImpl<M> findRelatedPaginated(PK id, Pageable pageable, FieldInfo fieldInfo) {
 		ParamsAwarePageImpl<M> page = null;
 		Optional<String> reverseFieldName = fieldInfo.getReverseFieldName();
 		if (reverseFieldName.isPresent()) {

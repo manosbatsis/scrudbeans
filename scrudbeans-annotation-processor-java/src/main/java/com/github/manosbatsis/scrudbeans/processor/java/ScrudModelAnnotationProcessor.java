@@ -1,4 +1,4 @@
-package com.github.manosbatsis.scrudbeans.processor;
+package com.github.manosbatsis.scrudbeans.processor.java;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,9 +25,9 @@ import javax.tools.StandardLocation;
 import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
-import com.github.manosbatsis.scrudbeans.api.mdd.model.EntityModelDescriptor;
-import com.github.manosbatsis.scrudbeans.api.mdd.model.ModelDescriptor;
-import com.github.manosbatsis.scrudbeans.api.mdd.model.ScrudModelDescriptor;
+import com.github.manosbatsis.scrudbeans.processor.java.descriptor.EntityModelDescriptor;
+import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ModelDescriptor;
+import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ScrudModelDescriptor;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 import org.slf4j.Logger;

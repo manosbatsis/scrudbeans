@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.manosbatsis.scrudbeans.test.AbstractRestAssueredIT;
+import com.github.manosbatsis.scrudbeans.test.AbstractRestAssuredIT;
 import com.github.manosbatsis.scrudbeans.test.TestableParamsAwarePage;
 import lombok.extern.slf4j.Slf4j;
 import myjavapackage.ScrudBeansSampleApplication;
@@ -31,7 +31,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Slf4j
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = ScrudBeansSampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RestServicesIT extends AbstractRestAssueredIT {
+public class RestServicesIT extends AbstractRestAssuredIT {
 
 
 	@Test
@@ -76,6 +76,7 @@ public class RestServicesIT extends AbstractRestAssueredIT {
 				.post("/api/rest/orders")
 				.then()
 				.statusCode(201).extract().as(Order.class);
+		log.debug("Created order " + order.getId() + ": " + order);
 		// Test Update
 		//============================
 		order.setEmail(order.getEmail() + "_updated");
