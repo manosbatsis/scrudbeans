@@ -8,7 +8,6 @@ import mykotlinpackage.service.OrderLineService
 import mykotlinpackage.service.OrderService
 import mykotlinpackage.service.ProductService
 import org.springframework.boot.CommandLineRunner
-import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
@@ -75,9 +74,7 @@ class ScrudBeansSampleApplication {
             val order: Order = orderService.create(Order(email = "foo@bar.baz"))
             for (p in productService.findAll()) {
                 var orderLine = OrderLine(
-                        name = p.name,
                         order = order,
-                        description = "Description text",
                         product = p,
                         quantity = 2)
                 orderLine = orderLineService.create(orderLine)

@@ -7,6 +7,7 @@ import mykotlinpackage.ScrudBeansSampleApplication
 import mykotlinpackage.model.DiscountCode
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.SpringBootTest
@@ -37,7 +38,8 @@ class RestErrorsIT : AbstractRestAssuredIT() {
                 .statusCode(400).extract().`as`(SimpleErrorResponse::class.java)
         assertEquals("Validation failed", error.title)
         assertEquals(400, error.httpStatusCode)
-        val violations: Set<ConstraintViolationEntry> = error.validationErrors
+        assertNotNull(error.validationErrors)
+        val violations: Set<ConstraintViolationEntry> = error.validationErrors!!
         Assertions.assertEquals(1, violations.size)
         val violation = violations.iterator().next()
         Assertions.assertEquals("must not be null", violation.message)
@@ -65,7 +67,8 @@ class RestErrorsIT : AbstractRestAssuredIT() {
                 .statusCode(400).extract().`as`(SimpleErrorResponse::class.java)
         assertEquals("Validation failed", error.title)
         assertEquals(400, error.httpStatusCode)
-        val violations: Set<ConstraintViolationEntry> = error.validationErrors
+        assertNotNull(error.validationErrors)
+        val violations: Set<ConstraintViolationEntry> = error.validationErrors!!
         Assertions.assertEquals(1, violations.size)
         val violation = violations.iterator().next()
         Assertions.assertEquals("Unique value not available for property: code", violation.message)

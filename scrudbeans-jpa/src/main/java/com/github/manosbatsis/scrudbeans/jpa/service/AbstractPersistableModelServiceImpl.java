@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.domain.event.EntityCreatedEvent;
 import com.github.manosbatsis.scrudbeans.api.domain.event.EntityDeletedEvent;
@@ -62,24 +62,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 /**
- * SCRUD service handling a specific type of {@link IdModel} using a {@link ModelRepository}
+ * SCRUD service handling a specific type of {@link Persistable} using a {@link ModelRepository}
  *
  * @param <T>  Your resource class to manage, usually an entity class
  * @param <PK> Resource id type, usually Long or String
  * @param <R>  The repository class to automatically inject
  */
 @Slf4j
-public class AbstractPersistableModelServiceImpl<T extends IdModel<PK>, PK extends Serializable, R extends ModelRepository<T, PK>>
-		extends AbstractBaseServiceImpl
-		implements PersistableModelService<T, PK> {
+public class AbstractPersistableModelServiceImpl<T extends Persistable<PK>, PK extends Serializable, R extends ModelRepository<T, PK>>
+        extends AbstractBaseServiceImpl
+        implements PersistableModelService<T, PK> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelServiceImpl.class);
 
-	protected R repository;
+    protected R repository;
 
-	@SuppressWarnings("SpringJavaAutowiringInspection")
+    @SuppressWarnings("SpringJavaAutowiringInspection")
 
-	@Autowired
+    @Autowired
 	public void setRepository(R repository) {
 		this.repository = repository;
 	}
@@ -168,16 +168,16 @@ public class AbstractPersistableModelServiceImpl<T extends IdModel<PK>, PK exten
 	@Override
 	@Transactional(readOnly = false)
 	public T create(@P("resource") T resource) {
-		Assert.notNull(resource, "Resource can't be null");
-		// Persist
-		resource = repository.save(resource);
-		// Do any post-processing
-		this.postCreate(resource);
-		// Fire "created" event
-		this.applicationEventPublisher.publishEvent(new EntityCreatedEvent<>(resource));
-		// Return persisted
-		return resource;
-	}
+        Assert.notNull(resource, "Resource can't be null");
+        // Persist
+        resource = repository.create(resource);
+        // Do any post-processing
+        this.postCreate(resource);
+        // Fire "created" event
+        this.applicationEventPublisher.publishEvent(new EntityCreatedEvent<>(resource));
+        // Return persisted
+        return resource;
+    }
 
 	/**
 	 * {@inheritDoc}
@@ -276,33 +276,32 @@ public class AbstractPersistableModelServiceImpl<T extends IdModel<PK>, PK exten
 		return repository.findAllById(ids);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public IdModel findRelatedSingle(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
-		// throw error if not valid or linkable relationship
-		if (!fieldInfo.isLinkableResource() || !fieldInfo.isToOne()) {
-			throw new IllegalArgumentException("Related must be linkable and *ToOne");
-		}
-		return repository.findRelatedEntityByOwnId(id, fieldInfo);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Persistable findRelatedSingle(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
+        // throw error if not valid or linkable relationship
+        if (!fieldInfo.isLinkableResource() || !fieldInfo.isToOne()) {
+            throw new IllegalArgumentException("Related must be linkable and *ToOne");
+        }
+        return repository.findRelatedEntityByOwnId(id, fieldInfo);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public <M extends IdModel<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable) {
-		ModelRepository<M, MID> repo = (ModelRepository) this.repositoryRegistryService.getRepositoryFor(entityType);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <M extends Persistable<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable) {
+        ModelRepository<M, MID> repo = (ModelRepository) this.repositoryRegistryService.getRepositoryFor(entityType);
 
-		if (repo == null) {
-			throw new IllegalArgumentException("Could not find a repository for model type: " + entityType);
-		}
+        if (repo == null) {
+            throw new IllegalArgumentException("Could not find a repository for model type: " + entityType);
+        }
 
-		if (spec != null) {
-			return repo.findAll(spec, pageable);
-		}
-		else {
+        if (spec != null) {
+            return repo.findAll(spec, pageable);
+        } else {
 			return repo.findAll(pageable);
 		}
 	}

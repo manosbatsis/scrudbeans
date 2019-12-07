@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.Entity;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
@@ -46,17 +46,22 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * Contains metadata for a specific Model class.
  */
 @Slf4j
-public class ModelInfoImpl<T extends IdModel<PK>, PK extends Serializable> implements ModelInfo<T, PK> {
+public class ModelInfoImpl<T extends Persistable<PK>, PK extends Serializable> implements ModelInfo<T, PK> {
 
-	@Getter private final Class<T> modelType;
+    @Getter
+    private final Class<T> modelType;
 
-	@Getter private final ScrudBean scrudBean;
+    @Getter
+    private final ScrudBean scrudBean;
 
-	@Getter private final String packageName;
+    @Getter
+    private final String packageName;
 
-	@Getter private final String beansBasePackage;
+    @Getter
+    private final String beansBasePackage;
 
-	@Getter private final String uriComponent;
+    @Getter
+    private final String uriComponent;
 
 	@Getter private final String parentApplicationPath;
 

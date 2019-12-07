@@ -22,6 +22,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.util.HashMap
 import org.slf4j.LoggerFactory
+import java.math.BigDecimal
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [ScrudBeansSampleApplication::class], webEnvironment = RANDOM_PORT)
@@ -102,8 +103,11 @@ class RestServicesIT : AbstractRestAssuredIT() {
                 .statusCode(200).extract().`as`(Order::class.java)
         assertEquals(email + "_updated_patched", order.email)
         // Add order items (lines)
+        val quantity = 2
         for (p in products) {
-            val orderLine: OrderLine = OrderLine(name = p.name, description = "Description text", order = order, product = p, quantity = 2)
+
+            val orderLine: OrderLine = OrderLine(order = order, product = p, quantity = quantity)
+            log.debug("Saving order line: $orderLine")
             RestAssured.given()
                     .spec(defaultSpec())
                     .body(orderLine)

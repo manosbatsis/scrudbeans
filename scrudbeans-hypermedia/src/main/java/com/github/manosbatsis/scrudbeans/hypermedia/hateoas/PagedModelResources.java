@@ -24,7 +24,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import lombok.Getter;
 
 import org.springframework.hateoas.Link;
@@ -34,17 +34,18 @@ import org.springframework.hateoas.PagedResources;
  * Created by manos on 21/2/2017.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PagedModelResources<M extends IdModel> extends PagedResources<ModelResource<M>> {
+public class PagedModelResources<M extends Persistable> extends PagedResources<ModelResource<M>> {
 
 
-	@Getter private Map<String, String[]> urlParameters;
+    @Getter
+    private Map<String, String[]> urlParameters;
 
-	public PagedModelResources() {
-	}
+    public PagedModelResources() {
+    }
 
-	/**
-	 * Creates a new {@link PagedResources} from the given content, {@link PageMetadata}, URL parameters and {@link Link}s (optional).
-	 *
+    /**
+     * Creates a new {@link PagedResources} from the given content, {@link PageMetadata}, URL parameters and {@link Link}s (optional).
+     *
 	 * @param content must not be {@literal null}.
 	 * @param paginationMetadata the pagination information
 	 * @param urlParameters the original URL parameters used to construct the page

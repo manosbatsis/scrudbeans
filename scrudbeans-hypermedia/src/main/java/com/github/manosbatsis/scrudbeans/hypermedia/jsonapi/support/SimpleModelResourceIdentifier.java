@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiLink;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiResourceIdentifier;
 import lombok.Getter;
@@ -37,23 +37,23 @@ import lombok.Setter;
 /**
  * A model wrapper that allows serializing as a Resource according to JSON API  1.1
  *
- * @see <a href="http://jsonapi.org/format/#document-resource-objects">JSON API Resources</a>
- *
  * @param <PK> the JSON API Resource model key type
+ * @see <a href="http://jsonapi.org/format/#document-resource-objects">JSON API Resources</a>
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonPropertyOrder({"id", "type", "meta"})
-public class SimpleModelResourceIdentifier<T extends IdModel<PK>, PK extends Serializable> implements JsonApiResourceIdentifier<PK> {
+public class SimpleModelResourceIdentifier<T extends Persistable<PK>, PK extends Serializable> implements JsonApiResourceIdentifier<PK> {
 
-	@JsonProperty("id")
-	private PK identifier;
+    @JsonProperty("id")
+    private PK identifier;
 
-	private String type;
+    private String type;
 
-	@Getter @Setter
-	private Map<String, JsonApiLink> links;
+    @Getter
+    @Setter
+    private Map<String, JsonApiLink> links;
 
-	private Map<String, Serializable> meta;
+    private Map<String, Serializable> meta;
 
 	protected SimpleModelResourceIdentifier() {
 	}

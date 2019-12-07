@@ -24,7 +24,7 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.jonpeterson.jackson.module.interceptor.JsonInterceptors;
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.JsonApiModelResourceDocumentJacksonInterceptor;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelResourceDocument;
 
@@ -39,7 +39,7 @@ import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelR
 @JsonInterceptors(
         beforeDeserialization = JsonApiModelResourceDocumentJacksonInterceptor.class)
 @JsonDeserialize(as = SimpleModelResourceDocument.class)
-public interface JsonApiModelResourceDocument<T extends IdModel<PK>, PK extends Serializable>
+public interface JsonApiModelResourceDocument<T extends Persistable<PK>, PK extends Serializable>
         extends JsonApiResourceDocument<JsonApiModelResource<T, PK>, T, PK> {
 
 }

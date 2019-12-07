@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
@@ -91,17 +91,17 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @param <PK> Resource id type, usually Long or String
  * @param <S>  The service class
  */
-public class AbstractModelServiceBackedController<T extends IdModel<PK>, PK extends Serializable, S extends ModelService<T, PK>> implements InitializingBean {
+public class AbstractModelServiceBackedController<T extends Persistable<PK>, PK extends Serializable, S extends ModelService<T, PK>> implements InitializingBean {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceBackedController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceBackedController.class);
 
-	private ModelInfo modelInfo;
+    private ModelInfo modelInfo;
 
-	@Autowired
-	private ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
-	@Autowired
-	protected HttpServletRequest request;
+    @Autowired
+    protected HttpServletRequest request;
 
 	@Autowired
 	protected ModelInfoRegistry mmdelInfoRegistry;
@@ -174,20 +174,20 @@ public class AbstractModelServiceBackedController<T extends IdModel<PK>, PK exte
 		return toHateoasPagedResources(page, modelType, pageNumberParamName);
 	}
 
-	/**
-	 * Convert the given {@link Page} to a {@link PagedResources} object and add {@link Link}s
-	 *
-	 * @param page
-	 */
-	protected <RT extends IdModel> PagedModelResources<RT> toHateoasPagedResources(@NonNull ParamsAwarePage<RT> page, @NonNull Class<RT> modelType, @NonNull String pageNumberParamName) {
-		ModelInfo rootModelInfo = this.mmdelInfoRegistry.getEntryFor(modelType);
+    /**
+     * Convert the given {@link Page} to a {@link PagedResources} object and add {@link Link}s
+     *
+     * @param page
+     */
+    protected <RT extends Persistable> PagedModelResources<RT> toHateoasPagedResources(@NonNull ParamsAwarePage<RT> page, @NonNull Class<RT> modelType, @NonNull String pageNumberParamName) {
+        ModelInfo rootModelInfo = this.mmdelInfoRegistry.getEntryFor(modelType);
 
-		// long size, long number, long totalElements, long totalPages
-		PagedModelResources<RT> pagedResources = HypermediaUtils.toHateoasPagedResources(page, request, pageNumberParamName, this.mmdelInfoRegistry);
+        // long size, long number, long totalElements, long totalPages
+        PagedModelResources<RT> pagedResources = HypermediaUtils.toHateoasPagedResources(page, request, pageNumberParamName, this.mmdelInfoRegistry);
 
 
-		return pagedResources;
-	}
+        return pagedResources;
+    }
 
 	/**
 	 * Wrap the given model in a JSON API Document
@@ -226,25 +226,25 @@ public class AbstractModelServiceBackedController<T extends IdModel<PK>, PK exte
 
 		Class<T> modelType = this.modelType;
 		return toPageDocument(page, this.getModelInfo(), "page[number]");
-	}
+    }
 
-	/*
-	 * Wrap the given {@link Page} of models in a JSON API Document
-	 * @param page the page to wrap
-	 * @param modelInfo
-	 * @param pageNumberParamName
-	 * @param <RT>
-	 * @param <RPK>
-	 */
-	protected <RT extends IdModel<RPK>, RPK extends Serializable> JsonApiModelResourceCollectionDocument<RT, RPK> toPageDocument(@NonNull ParamsAwarePage<RT> page, @NonNull ModelInfo<RT, RPK> modelInfo, @NonNull String pageNumberParamName) {
-		JsonApiModelResourceCollectionDocument<RT, RPK> doc = new JsonApiModelBasedDocumentBuilder<RT, RPK>(this.getModelInfo().getUriComponent())
-				.withData(page)
-				.buildModelCollectionDocument();
-		List<Link> tmp = HypermediaUtils.buileHateoasLinks(page, request, pageNumberParamName);
-		LOGGER.debug("toPageDocument, pageLinks: {}", tmp);
-		if (CollectionUtils.isNotEmpty(tmp)) {
-			for (Link l : tmp) {
-				doc.add(l.getRel(), l.getHref());
+    /*
+     * Wrap the given {@link Page} of models in a JSON API Document
+     * @param page the page to wrap
+     * @param modelInfo
+     * @param pageNumberParamName
+     * @param <RT>
+     * @param <RPK>
+     */
+    protected <RT extends Persistable<RPK>, RPK extends Serializable> JsonApiModelResourceCollectionDocument<RT, RPK> toPageDocument(@NonNull ParamsAwarePage<RT> page, @NonNull ModelInfo<RT, RPK> modelInfo, @NonNull String pageNumberParamName) {
+        JsonApiModelResourceCollectionDocument<RT, RPK> doc = new JsonApiModelBasedDocumentBuilder<RT, RPK>(this.getModelInfo().getUriComponent())
+                .withData(page)
+                .buildModelCollectionDocument();
+        List<Link> tmp = HypermediaUtils.buileHateoasLinks(page, request, pageNumberParamName);
+        LOGGER.debug("toPageDocument, pageLinks: {}", tmp);
+        if (CollectionUtils.isNotEmpty(tmp)) {
+            for (Link l : tmp) {
+                doc.add(l.getRel(), l.getHref());
 			}
 		}
 		return doc;

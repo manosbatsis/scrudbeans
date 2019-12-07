@@ -24,27 +24,25 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 
 /**
  * CRUD Service interface.
  *
- * @param <T>
- *            Your resource POJO to manage, maybe an entity or DTO class
- * @param <PK>
- *            Resource id type, usually Long or String
+ * @param <T>  Your resource POJO to manage, maybe an entity or DTO class
+ * @param <PK> Resource id type, usually Long or String
  */
-public interface ModelService<T extends IdModel<PK>, PK extends Serializable> extends BaseService {
+public interface ModelService<T extends Persistable<PK>, PK extends Serializable> extends BaseService {
 
 
-	/**
-	 * Get the entity Class corresponding to the generic T
-	 *
-	 * @return the corresponding entity Class
-	 */
-	Class<T> getDomainClass();
+    /**
+     * Get the entity Class corresponding to the generic T
+     *
+     * @return the corresponding entity Class
+     */
+    Class<T> getDomainClass();
 
-	/**
+    /**
 	 * Create a new resource.
 	 *
 	 * @param resource Resource to create

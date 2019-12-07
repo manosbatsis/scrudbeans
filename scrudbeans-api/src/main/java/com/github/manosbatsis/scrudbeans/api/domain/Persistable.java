@@ -26,23 +26,28 @@ import java.io.Serializable;
 
 /**
  * Base interface for model objects
+ *
  * @param <PK> The primary key type, if any
  */
-public interface IdModel<PK extends Serializable> extends Serializable {
+public interface Persistable<PK extends Serializable> extends Serializable {
 
-	/**
-	 * The primary key, field name.
-	 */
-	@JsonIgnore
-	default String getScrudBeanIdFieldName() {
-		return "id";
-	}
+    /**
+     * The primary key, field name.
+     */
+    @JsonIgnore
+    default String getScrudBeanIdFieldName() {
+        return "id";
+    }
 
-	/**
-	 * Get the entity's primary key.
-	 */
-	@JsonIgnore
-	PK getScrudBeanId();
+    /**
+     * Get the entity's primary key.
+     */
+    @JsonIgnore
+    PK getScrudBeanId();
 
-
+    /**
+     * Whether the instance is transient
+     */
+    @JsonIgnore
+    boolean isNew();
 }

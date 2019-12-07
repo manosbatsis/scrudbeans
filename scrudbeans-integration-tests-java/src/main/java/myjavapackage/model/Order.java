@@ -63,9 +63,4 @@ public class Order extends AbstractSystemUuidPersistableModel {
 	@Column(name = "date_last_modified", nullable = false)
 	private LocalDateTime lastModifiedDate;
 
-	@Formula(" (select sum(ol.quantity * ol.price) from order_lines ol where ol.order_id = id) ")
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	@ApiModelProperty(dataType = "float", value = "Total order cost", readOnly = true, example = "45.99")
-	private BigDecimal total;
-
 }

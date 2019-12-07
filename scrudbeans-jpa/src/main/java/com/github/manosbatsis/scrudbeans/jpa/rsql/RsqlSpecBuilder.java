@@ -23,7 +23,7 @@ package com.github.manosbatsis.scrudbeans.jpa.rsql;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.jpa.specification.PredicateFactorySpecification;
 import cz.jirutka.rsql.parser.ast.ComparisonNode;
@@ -41,16 +41,16 @@ import org.springframework.data.jpa.domain.Specifications;
  * Used by {@link RsqlSpecVisitor} to generate {@link Specification}-based predicates from individual RSQL {@link Node}s
  */
 @Slf4j
-public class RsqlSpecBuilder<T extends IdModel> {
+public class RsqlSpecBuilder<T extends Persistable> {
 
-	private final ModelInfo modelInfo;
+    private final ModelInfo modelInfo;
 
-	private final ConversionService conversionService;
+    private final ConversionService conversionService;
 
-	public RsqlSpecBuilder(@NonNull ModelInfo modelInfo, @NonNull ConversionService conversionService) {
-		this.modelInfo = modelInfo;
-		this.conversionService = conversionService;
-	}
+    public RsqlSpecBuilder(@NonNull ModelInfo modelInfo, @NonNull ConversionService conversionService) {
+        this.modelInfo = modelInfo;
+        this.conversionService = conversionService;
+    }
 
 	public Specifications<T> createSpecification(Node node) {
 		if (node instanceof LogicalNode) {

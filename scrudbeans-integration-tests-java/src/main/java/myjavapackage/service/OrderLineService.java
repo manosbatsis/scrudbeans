@@ -22,13 +22,6 @@ public class OrderLineService extends AbstractPersistableModelServiceImpl<OrderL
 	 */
 	@Override
 	public OrderLine create(OrderLine resource) {
-		// Load the target product
-		Product lineProduct = productRepository.getOne(resource.getProduct().getId());
-		resource.setProduct(lineProduct);
-		// Init product-related properties
-		resource.setName(lineProduct.getName());
-		resource.setDescription(lineProduct.getDescription());
-		resource.setPrice(lineProduct.getPrice());
 		return super.create(resource);
 	}
 

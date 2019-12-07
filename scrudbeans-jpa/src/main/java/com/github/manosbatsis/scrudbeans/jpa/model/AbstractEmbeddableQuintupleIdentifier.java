@@ -31,7 +31,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableCompositeIdentifier;
 import com.github.manosbatsis.scrudbeans.jpa.binding.EmbeddableCompositeIdDeserializer;
 import com.github.manosbatsis.scrudbeans.jpa.binding.EmbeddableCompositeIdSerializer;
@@ -107,11 +107,11 @@ import org.slf4j.LoggerFactory;
 @JsonSerialize(using = EmbeddableCompositeIdSerializer.class)
 @JsonDeserialize(using = EmbeddableCompositeIdDeserializer.class)
 public abstract class AbstractEmbeddableQuintupleIdentifier<
-		L extends IdModel<LPK>, LPK extends Serializable,
-		IL extends IdModel<ILPK>, ILPK extends Serializable,
-		M extends IdModel<MPK>, MPK extends Serializable,
-		IR extends IdModel<IRPK>, IRPK extends Serializable,
-		R extends IdModel<RPK>, RPK extends Serializable>
+        L extends Persistable<LPK>, LPK extends Serializable,
+        IL extends Persistable<ILPK>, ILPK extends Serializable,
+        M extends Persistable<MPK>, MPK extends Serializable,
+        IR extends Persistable<IRPK>, IRPK extends Serializable,
+        R extends Persistable<RPK>, RPK extends Serializable>
 		implements Serializable, EmbeddableCompositeIdentifier {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEmbeddableQuintupleIdentifier.class);

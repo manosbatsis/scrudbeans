@@ -25,7 +25,7 @@ import java.io.Serializable;
 import javax.persistence.MappedSuperclass;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.jpa.validation.Unique;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -34,6 +34,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
  * Abstract entity class with basic auditing and unique constraints validation
+ *
  * @param <PK> The id Serializable
  */
 @XmlRootElement
@@ -41,17 +42,16 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 @Unique
 @EqualsAndHashCode
 @ToString
-public abstract class AbstractPersistableModel<PK extends Serializable> implements IdModel<PK> {
-	private static final long serialVersionUID = -6009587976502456848L;
+public abstract class AbstractPersistableModel<PK extends Serializable> implements Persistable<PK> {
+    private static final long serialVersionUID = -6009587976502456848L;
 
-	public AbstractPersistableModel() {
-		super();
-	}
+    public AbstractPersistableModel() {
+        super();
+    }
 
 
-
-	/**
-	 * @see Object#equals(Object)
+    /**
+     * @see Object#equals(Object)
 	 */
 	@Override
 	public boolean equals(Object obj) {

@@ -21,7 +21,7 @@
 package com.github.manosbatsis.scrudbeans.jpa.uischema.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.jpa.uischema.serializer.UiSchemaSerializer;
 
 /**
@@ -34,26 +34,26 @@ public class UiSchema {
 
 	private Class domainClass = null;
 
-	private String json = null;
+    private String json = null;
 
-	public UiSchema(Class domainClass) {
-		this.domainClass = domainClass;
-	}
+    public UiSchema(Class domainClass) {
+        this.domainClass = domainClass;
+    }
 
-	public UiSchema() {
-	}
+    public UiSchema() {
+    }
 
-	public Class<? extends IdModel> getDomainClass() {
-		return domainClass;
-	}
+    public Class<? extends Persistable> getDomainClass() {
+        return domainClass;
+    }
 
-	public void setDomainClass(Class domainClass) {
-		this.domainClass = domainClass;
-	}
+    public void setDomainClass(Class domainClass) {
+        this.domainClass = domainClass;
+    }
 
 
-	public String getJson() {
-		return json;
+    public String getJson() {
+        return json;
 	}
 
 	public void setJson(String json) {

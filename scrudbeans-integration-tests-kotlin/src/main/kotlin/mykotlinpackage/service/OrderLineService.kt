@@ -19,9 +19,6 @@ class OrderLineService : AbstractPersistableModelServiceImpl<OrderLine, String, 
      * @param resource
      */
     override fun create(resource: OrderLine): OrderLine {
-        // Load the target product
-        val lineProduct = productRepository.getOne(resource.product!!.id!!)
-        resource.copy(product = lineProduct, name = lineProduct.name, description = lineProduct.description, price = lineProduct.price)
         return super.create(resource)!!
     }
 

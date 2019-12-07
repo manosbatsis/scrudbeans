@@ -32,28 +32,10 @@ public class OrderLine extends AbstractSystemUuidPersistableModel {
 
 	@NotNull
 	@Column(nullable = false)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	@ApiModelProperty(value = "The product name", readOnly = true)
-	private String name;
-
-	@NotNull
-	@Column(nullable = false, length = 512)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	@ApiModelProperty(value = "The product short description (max 512 chars)", readOnly = true)
-	private String description;
-
-	@NotNull
-	@Column(nullable = false)
-	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
-	@ApiModelProperty(value = "The product price", readOnly = true)
-	private BigDecimal price;
-
-	@NotNull
-	@Column(nullable = false)
 	@ApiModelProperty(dataType = "int", value = "The desired quantity, default is 1", example = "2")
 	private Integer quantity = 1;
 
-	@Formula("price * quantity")
+	@Formula(" (select p.price * quantity from products p where p.id = product_id) ")
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	@ApiModelProperty(dataType = "float", value = "The subtotal cost for this order line", readOnly = true, example = "3.05")
 	private BigDecimal lineTotal;

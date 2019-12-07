@@ -24,22 +24,22 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractModelServiceImpl<T extends IdModel<PK>, PK extends Serializable>
-		extends AbstractBaseServiceImpl
-		implements ModelService<T, PK> {
+public abstract class AbstractModelServiceImpl<T extends Persistable<PK>, PK extends Serializable>
+        extends AbstractBaseServiceImpl
+        implements ModelService<T, PK> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceImpl.class);
 
-	/**
-	 * Get the entity Class corresponding to the generic T
-	 *
-	 * @return the corresponding entity Class
-	 */
+    /**
+     * Get the entity Class corresponding to the generic T
+     *
+     * @return the corresponding entity Class
+     */
 	@Override
 	public Class<T> getDomainClass() {
 		return null;

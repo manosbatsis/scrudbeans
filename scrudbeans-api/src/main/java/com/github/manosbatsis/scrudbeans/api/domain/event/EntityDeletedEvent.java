@@ -21,15 +21,15 @@
 package com.github.manosbatsis.scrudbeans.api.domain.event;
 
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 
 /**
- * Fired when a new {@link IdModel} instance has been deleted
+ * Fired when a new {@link Persistable} instance has been deleted
  */
-public class EntityDeletedEvent<T extends IdModel> extends EntityEvent<T> {
+public class EntityDeletedEvent<T extends Persistable> extends EntityEvent<T> {
 
-	public EntityDeletedEvent(T source) {
-		super(source);
-	}
+    public EntityDeletedEvent(T source) {
+        super(source);
+    }
 
 }

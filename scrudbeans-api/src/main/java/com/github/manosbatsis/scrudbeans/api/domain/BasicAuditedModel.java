@@ -26,17 +26,17 @@ import java.time.LocalDateTime;
 /**
  * Includes basic audit details, i.e. date and user for creation and latest update
  */
-public interface BasicAuditedModel<PK extends Serializable, U extends Serializable> extends IdModel<PK> {
+public interface BasicAuditedModel<PK extends Serializable, U extends Serializable> extends Persistable<PK> {
 
-	U getCreatedBy();
+    U getCreatedBy();
 
-	void setCreatedBy(U author);
+    void setCreatedBy(U author);
 
-	LocalDateTime getCreatedDate();
+    LocalDateTime getCreatedDate();
 
-	void setCreatedDate(LocalDateTime createdDate);
+    void setCreatedDate(LocalDateTime createdDate);
 
-	U getLastModifiedBy();
+    U getLastModifiedBy();
 
 	void setLastModifiedBy(U author);
 

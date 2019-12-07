@@ -20,7 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.api.domain.event;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import lombok.Getter;
 
 import org.springframework.context.ApplicationEvent;
@@ -30,17 +30,17 @@ import org.springframework.core.ResolvableTypeProvider;
 /**
  *
  */
-public abstract class EntityEvent<T extends IdModel> extends ApplicationEvent implements ResolvableTypeProvider {
+public abstract class EntityEvent<T extends Persistable> extends ApplicationEvent implements ResolvableTypeProvider {
 
-	@Getter
-	private T model;
+    @Getter
+    private T model;
 
-	public EntityEvent(T source) {
-		super(source);
-		this.model = source;
-	}
+    public EntityEvent(T source) {
+        super(source);
+        this.model = source;
+    }
 
-	@Override
+    @Override
 	public ResolvableType getResolvableType() {
 		return ResolvableType.forClassWithGenerics(getClass(),
 				ResolvableType.forInstance(model));

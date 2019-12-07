@@ -26,7 +26,7 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 
 import org.springframework.data.domain.Page;
@@ -46,16 +46,17 @@ import org.springframework.data.repository.NoRepositoryBean;
  * @see Page
  */
 @NoRepositoryBean
-public interface ModelRepository<T extends IdModel<PK>, PK extends Serializable>
-		extends JpaRepository<T, PK>, JpaSpecificationExecutor<T> {
+public interface ModelRepository<T extends Persistable<PK>, PK extends Serializable>
+        extends JpaRepository<T, PK>, JpaSpecificationExecutor<T> {
 
-	EntityManager getEntityManager();
+    EntityManager getEntityManager();
 
-	/**
-	 * Get the domain type class
-	 * @return the domain type class
-	 */
-	Class<T> getDomainClass();
+    /**
+     * Get the domain type class
+     *
+     * @return the domain type class
+     */
+    Class<T> getDomainClass();
 
 	/**
 	 * Create a resource.
@@ -156,12 +157,13 @@ public interface ModelRepository<T extends IdModel<PK>, PK extends Serializable>
 	Set<ConstraintViolation<T>> validateConstraints(T resource);
 
 
-	/**
-	 * Get the other end of a ToOne relationship
-	 * @param id the id of the root model
-	 * @param fieldInfo the attribute name of the relationship
-	 * @return the single entity in the other side of the relation if any, null otherwise
-	 */
-	<RT extends IdModel> RT findRelatedEntityByOwnId(PK id, FieldInfo fieldInfo);
+    /**
+     * Get the other end of a ToOne relationship
+     *
+     * @param id        the id of the root model
+     * @param fieldInfo the attribute name of the relationship
+     * @return the single entity in the other side of the relation if any, null otherwise
+     */
+    <RT extends Persistable> RT findRelatedEntityByOwnId(PK id, FieldInfo fieldInfo);
 
 }

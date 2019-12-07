@@ -29,7 +29,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
@@ -78,25 +78,25 @@ public class HypermediaUtils {
 			links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder).withRel("next"));
 		}
 
-		// add last
-		if (!page.isLast()) {
-			uriComponentsBuilder.replaceQueryParam(pageNumberParamName, page.getTotalPages() - 1);
-			// create the link builder
-			links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder).withRel("last"));
-		}
-		return links;
-	}
+        // add last
+        if (!page.isLast()) {
+            uriComponentsBuilder.replaceQueryParam(pageNumberParamName, page.getTotalPages() - 1);
+            // create the link builder
+            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder).withRel("last"));
+        }
+        return links;
+    }
 
-	public static List<Link> buileHateoasLinks(@NonNull IdModel model, ModelInfo modelInfo) {
-		List<Link> links = null;
-		if (model.getScrudBeanId() != null && modelInfo != null) {
+    public static List<Link> buileHateoasLinks(@NonNull Persistable model, ModelInfo modelInfo) {
+        List<Link> links = null;
+        if (model.getScrudBeanId() != null && modelInfo != null) {
 
-			links = new LinkedList<>();
+            links = new LinkedList<>();
 
-			// add link to self
-			links.add(BasicLinkBuilder.linkToCurrentMapping()
-					.slash(modelInfo.getRequestMapping())
-					.slash(model.getScrudBeanId()).withSelfRel());
+            // add link to self
+            links.add(BasicLinkBuilder.linkToCurrentMapping()
+                    .slash(modelInfo.getRequestMapping())
+                    .slash(model.getScrudBeanId()).withSelfRel());
 
 			// add links to linkable relationships
 			Set<String> relationshipFields = new HashSet<>();
@@ -107,74 +107,75 @@ public class HypermediaUtils {
 
 				if (fieldInfo.isLinkableResource()) {
 					links.add(BasicLinkBuilder.linkToCurrentMapping()
-							.slash(modelInfo.getRequestMapping())
-							.slash(model.getScrudBeanId())
-							.slash("relationships")
-							.slash(fieldName).withRel(fieldName));
-				}
-			}
-		}
-		return links;
-	}
+                            .slash(modelInfo.getRequestMapping())
+                            .slash(model.getScrudBeanId())
+                            .slash("relationships")
+                            .slash(fieldName).withRel(fieldName));
+                }
+            }
+        }
+        return links;
+    }
 
-	public static <RT extends IdModel<RID>, RID extends Serializable> ModelResource<RT> toHateoasResource(RT model, ModelInfo<RT, RID> modelInfo) {
-		Class<RT> modelType = (modelInfo != null) ? modelInfo.getModelType() : (Class<RT>) model.getClass();
-		ModelResource<RT> resource = new ModelResource<>(modelInfo.getUriComponent(), model);
-		List<Link> links = HypermediaUtils.buileHateoasLinks(model, modelInfo);
-		log.debug("toHateoasResource, model: {}, modelType: {}, modelInfo: {}", model, modelType, modelInfo);
-		if (CollectionUtils.isNotEmpty(links)) {
-			resource.add(links);
-		}
-		return resource;
-	}
+    public static <RT extends Persistable<RID>, RID extends Serializable> ModelResource<RT> toHateoasResource(RT model, ModelInfo<RT, RID> modelInfo) {
+        Class<RT> modelType = (modelInfo != null) ? modelInfo.getModelType() : (Class<RT>) model.getClass();
+        ModelResource<RT> resource = new ModelResource<>(modelInfo.getUriComponent(), model);
+        List<Link> links = HypermediaUtils.buileHateoasLinks(model, modelInfo);
+        log.debug("toHateoasResource, model: {}, modelType: {}, modelInfo: {}", model, modelType, modelInfo);
+        if (CollectionUtils.isNotEmpty(links)) {
+            resource.add(links);
+        }
+        return resource;
+    }
 
-	/**
-	 * Wrap the given models in a {@link Resources} and add {@link org.springframework.hateoas.Link}s
-	 *
-	 * @param models
-	 */
-	public static <RT extends IdModel> ModelResources<RT> toHateoasResources(@NonNull Iterable<RT> models, Class<RT> modelType, ModelInfoRegistry modelInfoRegistry) {
-		log.debug("toHateoasResources");
-		LinkedList<ModelResource<RT>> wrapped = new LinkedList<>();
-		ModelInfo modelInfo;
-		modelInfo = modelInfoRegistry.getEntryFor(modelType);
-		for (RT model : models) {
-			wrapped.add(new ModelResource<RT>(modelInfo.getUriComponent(), model));
-		}
-		ModelResources<RT> resources = new ModelResources<>(wrapped);
-		return resources;
-	}
+    /**
+     * Wrap the given models in a {@link Resources} and add {@link org.springframework.hateoas.Link}s
+     *
+     * @param models
+     */
+    public static <RT extends Persistable> ModelResources<RT> toHateoasResources(@NonNull Iterable<RT> models, Class<RT> modelType, ModelInfoRegistry modelInfoRegistry) {
+        log.debug("toHateoasResources");
+        LinkedList<ModelResource<RT>> wrapped = new LinkedList<>();
+        ModelInfo modelInfo;
+        modelInfo = modelInfoRegistry.getEntryFor(modelType);
+        for (RT model : models) {
+            wrapped.add(new ModelResource<RT>(modelInfo.getUriComponent(), model));
+        }
+        ModelResources<RT> resources = new ModelResources<>(wrapped);
+        return resources;
+    }
 
-	/**
-	 * Wrap the given model in a JSON API Document
-	 * @param model the model to wrap
-	 * @return
-	 */
-	public static <RT extends IdModel<RID>, RID extends Serializable> JsonApiModelResourceDocument<RT, RID> toDocument(RT model, ModelInfo<RT, RID> modelInfo) {
-		log.debug("toDocument");
+    /**
+     * Wrap the given model in a JSON API Document
+     *
+     * @param model the model to wrap
+     * @return
+     */
+    public static <RT extends Persistable<RID>, RID extends Serializable> JsonApiModelResourceDocument<RT, RID> toDocument(RT model, ModelInfo<RT, RID> modelInfo) {
+        log.debug("toDocument");
 
-		JsonApiModelResourceDocument<RT, RID> doc = new JsonApiModelBasedDocumentBuilder<RT, RID>(modelInfo.getUriComponent())
-				.withData(model)
-				.buildModelDocument();
-		List<Link> tmp = HypermediaUtils.buileHateoasLinks(model, modelInfo);
-		if (CollectionUtils.isNotEmpty(tmp)) {
-			for (Link l : tmp) {
-				doc.add(l.getRel(), l.getHref());
-			}
-		}
-		return doc;
-	}
+        JsonApiModelResourceDocument<RT, RID> doc = new JsonApiModelBasedDocumentBuilder<RT, RID>(modelInfo.getUriComponent())
+                .withData(model)
+                .buildModelDocument();
+        List<Link> tmp = HypermediaUtils.buileHateoasLinks(model, modelInfo);
+        if (CollectionUtils.isNotEmpty(tmp)) {
+            for (Link l : tmp) {
+                doc.add(l.getRel(), l.getHref());
+            }
+        }
+        return doc;
+    }
 
-	public static <M extends IdModel> PagedModelResources<M> toHateoasPagedResources(@NonNull ParamsAwarePage<M> page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName, ModelInfoRegistry modelInfoRegistry) {
+    public static <M extends Persistable> PagedModelResources<M> toHateoasPagedResources(@NonNull ParamsAwarePage<M> page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName, ModelInfoRegistry modelInfoRegistry) {
 
-		PagedResources.PageMetadata paginationInfo = new PagedResources.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements(), page.getTotalPages());
-		List<Link> links = HypermediaUtils.buileHateoasLinks(page, request, pageNumberParamName);
+        PagedResources.PageMetadata paginationInfo = new PagedResources.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements(), page.getTotalPages());
+        List<Link> links = HypermediaUtils.buileHateoasLinks(page, request, pageNumberParamName);
 
-		ArrayList<ModelResource<M>> wrapped = new ArrayList<>();
-		ModelInfo modelInfo;
-		for (M model : page.getContent()) {
-			modelInfo = modelInfoRegistry.getEntryFor(model.getClass());
-			wrapped.add(new ModelResource<M>(modelInfo.getUriComponent(), model));
+        ArrayList<ModelResource<M>> wrapped = new ArrayList<>();
+        ModelInfo modelInfo;
+        for (M model : page.getContent()) {
+            modelInfo = modelInfoRegistry.getEntryFor(model.getClass());
+            wrapped.add(new ModelResource<M>(modelInfo.getUriComponent(), model));
 		}
 
 		return new PagedModelResources(wrapped, paginationInfo, page.getParameters(), links);

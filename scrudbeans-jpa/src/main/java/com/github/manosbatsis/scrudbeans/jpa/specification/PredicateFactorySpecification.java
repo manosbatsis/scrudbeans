@@ -27,7 +27,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
@@ -39,20 +39,21 @@ import org.springframework.data.jpa.domain.Specification;
 
 /**
  * A {@link Specification} implementation that will dynamically resolve and use an appropriate {@link IPredicateFactory} to delegate the creation of a predicate
+ *
  * @param <T> the {@link Root} entity model type
  */
 @Slf4j
-public class PredicateFactorySpecification<T extends IdModel> implements Specification<T> {
+public class PredicateFactorySpecification<T extends Persistable> implements Specification<T> {
 
-	private final ConversionService conversionService;
+    private final ConversionService conversionService;
 
-	private final ModelInfo modelInfo;
+    private final ModelInfo modelInfo;
 
-	private final String propertyPath;
+    private final String propertyPath;
 
-	private final PredicateOperator operator;
+    private final PredicateOperator operator;
 
-	private final List<String> propertyValues;
+    private final List<String> propertyValues;
 
 	public PredicateFactorySpecification(
 			@NonNull ConversionService conversionService, @NonNull ModelInfo modelInfo, @NonNull String propertyPath, @NonNull PredicateOperator operator, @NonNull List<String> propertyValues) {

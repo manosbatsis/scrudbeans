@@ -33,17 +33,17 @@ import org.springframework.security.core.GrantedAuthority;
 /**
  * Created by manos on 4/2/2017.
  */
-public interface UserModel extends IdModel<String> {
+public interface UserModel extends Persistable<String> {
 
-	Locale getLocaleObject();
+    Locale getLocaleObject();
 
-	boolean hasRole(String roleName);
+    boolean hasRole(String roleName);
 
-	Boolean getActive();
+    Boolean getActive();
 
-	void setActive(Boolean active);
+    void setActive(Boolean active);
 
-	// serialize user name to response
+    // serialize user name to response
 	@JsonProperty
 	String getUsername();
 
