@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.slf4j.LoggerFactory
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -21,14 +22,12 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.util.HashMap
-import org.slf4j.LoggerFactory
-import java.math.BigDecimal
 
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [ScrudBeansSampleApplication::class], webEnvironment = RANDOM_PORT)
 class RestServicesIT : AbstractRestAssuredIT() {
 
-    companion object{
+    companion object {
         val log = LoggerFactory.getLogger(RestServicesIT.javaClass)
     }
 
@@ -80,9 +79,10 @@ class RestServicesIT : AbstractRestAssuredIT() {
                 .then()
                 .statusCode(200).extract().`as`(Order::class.java)
         assertEquals(email + "_updated", order.email)
+
         // Test Patch
-//============================
-// Prepare the patch
+        //============================
+        // Prepare the patch
         val orderMap: MutableMap<String, Any> = HashMap()
         orderMap.put("id", order.getScrudBeanId())
         orderMap["email"] = order.email.toString() + "_patched"
@@ -95,8 +95,8 @@ class RestServicesIT : AbstractRestAssuredIT() {
                 .statusCode(200).extract().`as`(Order::class.java)
         assertEquals(email + "_updated_patched", order.email)
         // Test Read
-//============================
-// verify order was created and can be retrieved
+        //============================
+        // verify order was created and can be retrieved
         order = RestAssured.given()
                 .spec(defaultSpec())["/api/rest/orders/" + order.getScrudBeanId()]
                 .then()
@@ -120,7 +120,7 @@ class RestServicesIT : AbstractRestAssuredIT() {
         var startOfDay = localDate.atStartOfDay()
         var endOfDay = localDate.atTime(LocalTime.MAX)
         // Test RSQL Search
-//============================
+        //============================
         var ordersOfTheDay = RestAssured.given()
                 .spec(defaultSpec()) // >= day-start and <= day-end
                 .param("filter",
@@ -198,8 +198,8 @@ class RestServicesIT : AbstractRestAssuredIT() {
     @Test
     @Throws(Exception::class)
     fun testJsonSchema() { // --------------------------------
-// Gwt user schema
-// --------------------------------
+        // Gwt user schema
+        // --------------------------------
         val schema = RestAssured.given().spec(defaultSpec())
                 .log().all()["/api/rest/products/jsonschema"]
                 .then()

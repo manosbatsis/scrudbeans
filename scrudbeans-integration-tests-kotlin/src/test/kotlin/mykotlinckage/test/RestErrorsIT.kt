@@ -40,10 +40,10 @@ class RestErrorsIT : AbstractRestAssuredIT() {
         assertEquals(400, error.httpStatusCode)
         assertNotNull(error.validationErrors)
         val violations: Set<ConstraintViolationEntry> = error.validationErrors!!
-        Assertions.assertEquals(1, violations.size)
+        assertEquals(1, violations.size)
         val violation = violations.iterator().next()
-        Assertions.assertEquals("must not be null", violation.message)
-        Assertions.assertEquals("percentage", violation.propertyPath)
+        assertEquals("must not be null", violation.message)
+        assertEquals("percentage", violation.propertyPath)
     }
 
     /**
@@ -69,9 +69,9 @@ class RestErrorsIT : AbstractRestAssuredIT() {
         assertEquals(400, error.httpStatusCode)
         assertNotNull(error.validationErrors)
         val violations: Set<ConstraintViolationEntry> = error.validationErrors!!
-        Assertions.assertEquals(1, violations.size)
+        assertEquals(1, violations.size)
         val violation = violations.iterator().next()
-        Assertions.assertEquals("Unique value not available for property: code", violation.message)
-        Assertions.assertEquals("code", violation.propertyPath)
+        assertEquals("Unique value not available for property: code", violation.message)
+        assertEquals("code", violation.propertyPath)
     }
 }
