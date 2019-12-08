@@ -49,10 +49,11 @@
 		</dependency>
 		<!-- Provided/code generation Dependencies -->
 		<dependency>
-			<groupId>com.github.manosbatsis.scrudbeans</groupId>
-			<artifactId>scrudbeans-annotation-processor-java</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+            <groupId>com.github.manosbatsis.scrudbeans</groupId>
+            <artifactId>scrudbeans-annotation-processor-java</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -78,14 +79,6 @@
 			<artifactId>scrudbeans-spring-boot-starter-test</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-parameter-names</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jdk8</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -131,27 +124,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 			</plugin>
-			<!-- Add generated sources -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${basedir}/target/generated-sources/annotations</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
+
+            <plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
 				<version>1.5.7.1</version>

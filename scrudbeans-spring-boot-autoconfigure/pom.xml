@@ -11,10 +11,9 @@
 	</parent>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>com.github.manosbatsis.scrudbeans</groupId>
-			<artifactId>scrudbeans-annotation-processor-java</artifactId>
+			<artifactId>scrudbeans-jpa</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -39,13 +38,6 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<version>${spring-boot.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>com.github.manosbatsis.scrudbeans</groupId>
-			<artifactId>scrudbeans-annotation-processor-java</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
