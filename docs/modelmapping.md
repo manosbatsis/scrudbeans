@@ -13,18 +13,21 @@ Model driven services are enabled per entity provided two conditions are met:
  
  - It must be annotated with `@ScrudBean`.
  - It must have a non-primitive id.
- - It must implement `PersistableModel` or simply extend one of the abstract entities from the 
-`com.github.manosbatsis.scrudbeans.jpa.model` package.
+ - It must implement `com.github.manosbatsis.scrudbeans.api.domain.Persistable` or simply extend one of the abstract 
+ entities from the `com.github.manosbatsis.scrudbeans.jpa.model` package.
 
 > The last requirement will be removed in upcpming versions.
 
 To make this easier, ScrudBeans provides a set of mapped superclasses you can extend to create your
 entities, see [Base Models](#base-models) for more details.
 
-## Mapping Example
+## Mapping Examples
  
- As an example, consider an `Order` entity. The scrudbeans-template repo has the 
- [full source](https://github.com/manosbatsis/scrudbeans-template/blob/master/src/main/java/mypackage/model/Order.java).
+ As an example, consider an `Order` entity in 
+ [Java](https://github.com/manosbatsis/scrudbeans-template-java/blob/master/src/main/java/myjavapackage/model/Order.java) or 
+ [Kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin/blob/master/src/main/java/mykotlinpackage/model/Order.kt).
+ 
+ Java example:
  
  ```java
 @Entity
@@ -39,6 +42,32 @@ public class Order extends AbstractSystemUuidPersistableModel {
 	private String email;
 	
 	// other members...
+}
+``` 
+ Kotlin example:
+ 
+ ```kotlin
+@Entity
+@Table(name = "product_orders")
+@ScrudBean
+data class Order(
+
+        @field:Id
+        @field:GeneratedValue(generator = "system-uuid")
+        @field:GenericGenerator(name = "system-uuid", strategy = "uuid2")
+        var id: String? = null,
+
+        @field:NotNull
+        @field:Column(nullable = false)
+        @field:ApiModelProperty(value = "The client's email", required = true)
+        var email: String? = null,
+
+        // other constructor params...
+
+
+) : Persistable<String> {
+        override fun getScrudBeanId() = id!!
+        override fun isNew(): Boolean = id == null
 }
 ```
 

@@ -78,9 +78,10 @@ __Kotlin Processor__: If you use Kotlin, add this annotation processor:
 </dependency>
 ```
 
-> You'll have to setup Kotlin kapt appropriately, respectively, 
-> see [scrudbeans-template-kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin)
-> for an example.
+> You may have to setup apt or kapt for Java or Kotlin respectively, 
+> see [scrudbeans-template-java](https://github.com/manosbatsis/scrudbeans-template-java) 
+> and [scrudbeans-template-kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin)
+> for examples.
 
 ### Using Gradle
 
@@ -100,11 +101,11 @@ If you use Kotlin:
 dependencies {
     //...
 	implementation 'com.github.manosbatsis.scrudbeans:scrudbeans-spring-boot-starter:$scrudbeans_version'
-	implementation("com.github.manosbatsis.scrudbeans:scrudbeans-annotation-processor-kotlin:$scrudbeansVersion")
+	kapt("com.github.manosbatsis.scrudbeans:scrudbeans-annotation-processor-kotlin:$scrudbeansVersion")
 }
 ```
 
-> You'll have to setup apt or kapt appropriately for Java or Kotlin respectively, 
+> You may have to setup apt or kapt for Java or Kotlin respectively, 
 > see [scrudbeans-template-java](https://github.com/manosbatsis/scrudbeans-template-java) 
 > and [scrudbeans-template-kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin)
 > for examples.
