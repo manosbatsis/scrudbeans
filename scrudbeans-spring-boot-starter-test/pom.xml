@@ -5,10 +5,10 @@
 	<artifactId>scrudbeans-spring-boot-starter-test</artifactId>
 
 	<parent>
-		<artifactId>scrudbeans</artifactId>
-		<groupId>com.github.manosbatsis.scrudbeans</groupId>
-		<version>0.14-SNAPSHOT</version>
-	</parent>
+        <artifactId>scrudbeans</artifactId>
+        <groupId>com.github.manosbatsis.scrudbeans</groupId>
+        <version>0.14</version>
+    </parent>
 
 	<dependencies>
 		<dependency>

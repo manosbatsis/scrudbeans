@@ -5,10 +5,10 @@
 	<artifactId>scrudbeans-integration-tests-kotlin</artifactId>
 
 	<parent>
-		<groupId>com.github.manosbatsis.scrudbeans</groupId>
-		<artifactId>scrudbeans</artifactId>
-		<version>0.14-SNAPSHOT</version>
-	</parent>
+        <groupId>com.github.manosbatsis.scrudbeans</groupId>
+        <artifactId>scrudbeans</artifactId>
+        <version>0.14</version>
+    </parent>
 
 	<properties>
 		<scrudbeans_version>${project.version}</scrudbeans_version>
