@@ -25,7 +25,7 @@ entities, see [Base Models](#base-models) for more details.
  
  As an example, consider an `Order` entity in 
  [Java](https://github.com/manosbatsis/scrudbeans-template-java/blob/master/src/main/java/myjavapackage/model/Order.java) or 
- [Kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin/blob/master/src/main/java/mykotlinpackage/model/Order.kt).
+ [Kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin/blob/master/src/main/kotlin/mykotlinpackage/model/Order.kt).
  
  Java example:
  
