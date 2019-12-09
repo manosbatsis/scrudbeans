@@ -50,6 +50,7 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 	 * To disable, simply exclude "scrudbeans-error" as a transitive dependency of the starter.
 	 */
 	@Bean
+	@ConditionalOnMissingBean
 	@ConditionalOnClass(RestExceptionHandler.class)
 	public HandlerExceptionResolver restExceptionHandler() {
 		return new RestExceptionHandler();

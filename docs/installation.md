@@ -91,7 +91,7 @@ If you use Java:
 dependencies {
     //...
 	implementation 'com.github.manosbatsis.scrudbeans:scrudbeans-spring-boot-starter:$scrudbeans_version'
-	implementation("com.github.manosbatsis.scrudbeans:scrudbeans-annotation-processor-java:$scrudbeansVersion")
+	implementation("com.github.manosbatsis.scrudbeans:scrudbeans-annotation-processor-java:$scrudbeans_version")
 }
 ```
 
@@ -101,7 +101,7 @@ If you use Kotlin:
 dependencies {
     //...
 	implementation 'com.github.manosbatsis.scrudbeans:scrudbeans-spring-boot-starter:$scrudbeans_version'
-	kapt("com.github.manosbatsis.scrudbeans:scrudbeans-annotation-processor-kotlin:$scrudbeansVersion")
+	kapt("com.github.manosbatsis.scrudbeans:scrudbeans-annotation-processor-kotlin:$scrudbeans_version")
 }
 ```
 
