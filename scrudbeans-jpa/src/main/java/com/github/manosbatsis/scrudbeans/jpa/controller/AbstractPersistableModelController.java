@@ -33,7 +33,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.exception.NotFoundException;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
@@ -99,17 +99,17 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @param <PK> Resource id type, usually Long or String
  * @param <S>  The service class
  */
-public class AbstractPersistableModelController<T extends SettableIdModel<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
-		extends AbstractModelServiceBackedController<T, PK, S> {
+public class AbstractPersistableModelController<T extends Persistable<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
+        extends AbstractModelServiceBackedController<T, PK, S> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelController.class);
 
-	private SpecificationsBuilder<T, PK> specificationsBuilder;
+    private SpecificationsBuilder<T, PK> specificationsBuilder;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		this.specificationsBuilder = new SpecificationsBuilder<T, PK>(this.modelType, this.service.getConversionService());
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        super.afterPropertiesSet();
+        this.specificationsBuilder = new SpecificationsBuilder<T, PK>(this.modelType, this.service.getConversionService());
 	}
 
 	// Create
@@ -401,11 +401,11 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 
 		// if ToOne
 		if (fieldInfo.isToOne()) {
-			SettableIdModel related = this.findRelatedSingle(id, fieldInfo);
-			// if found
-			Resource res = HypermediaUtils.toHateoasResource(related, fieldInfo.getRelatedModelInfo());
-			responseEntity = new ResponseEntity(res, HttpStatus.OK);
-		}
+            Persistable related = this.findRelatedSingle(id, fieldInfo);
+            // if found
+            Resource res = HypermediaUtils.toHateoasResource(related, fieldInfo.getRelatedModelInfo());
+            responseEntity = new ResponseEntity(res, HttpStatus.OK);
+        }
 		else if (fieldInfo.isOneToMany()) {
 			Pageable pageable = PageableUtil.buildPageable(page, size, sort);
 			ParamsAwarePageImpl resultsPage = this.findRelatedPaginated(id, pageable, fieldInfo);
@@ -450,12 +450,12 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 
 		// if ToOne
 		if (fieldInfo.isToOne()) {
-			SettableIdModel related = this.findRelatedSingle(id, fieldInfo);
-			// if found
-			if (related != null) {
-				document = HypermediaUtils.toDocument(related, fieldInfo.getRelatedModelInfo());
-			}
-		}
+            Persistable related = this.findRelatedSingle(id, fieldInfo);
+            // if found
+            if (related != null) {
+                document = HypermediaUtils.toDocument(related, fieldInfo.getRelatedModelInfo());
+            }
+        }
 		else if (fieldInfo.isOneToMany()) {
 			Pageable pageable = PageableUtil.buildPageable(page, size, sort);
 			ParamsAwarePageImpl resultsPage = this.findRelatedPaginated(id, pageable, fieldInfo);
@@ -523,38 +523,40 @@ public class AbstractPersistableModelController<T extends SettableIdModel<PK>, P
 	}
 
 
-	/**
-	 * Find the other end of a ToOne relationship
-	 * @param id the root entity ID
-	 * @param fieldInfo the member/relation name
-	 * @return the single related entity, if any
-	 * @see PersistableModelService#findRelatedSingle(Serializable, FieldInfo)
-	 */
-	protected SettableIdModel findRelatedSingle(PK id, FieldInfo fieldInfo) {
-		SettableIdModel resource = this.service.findRelatedSingle(id, fieldInfo);
-		return resource;
-	}
+    /**
+     * Find the other end of a ToOne relationship
+     *
+     * @param id        the root entity ID
+     * @param fieldInfo the member/relation name
+     * @return the single related entity, if any
+     * @see PersistableModelService#findRelatedSingle(Serializable, FieldInfo)
+     */
+    protected Persistable findRelatedSingle(PK id, FieldInfo fieldInfo) {
+        Persistable resource = this.service.findRelatedSingle(id, fieldInfo);
+        return resource;
+    }
 
 
-	/**
-	 * Find a page of results matching the other end of a ToMany relationship
-	 * @param id the root entity ID
-	 * @param pageable the page config
-	 * @param fieldInfo the member/relation name
-	 * @return the page of results, may be <code>null</code>
-	 * @see PersistableModelService#findRelatedPaginated(java.lang.Class, org.springframework.data.jpa.domain.Specification, org.springframework.data.domain.Pageable)
-	 */
-	protected <M extends SettableIdModel> ParamsAwarePageImpl<M> findRelatedPaginated(PK id, Pageable pageable, FieldInfo fieldInfo) {
-		ParamsAwarePageImpl<M> page = null;
-		Optional<String> reverseFieldName = fieldInfo.getReverseFieldName();
-		if (reverseFieldName.isPresent()) {
-			Map<String, String[]> params = request.getParameterMap();
-			Map<String, String[]> implicitCriteria = new HashMap<>();
-			implicitCriteria.put(reverseFieldName.get(), new String[] {id.toString()});
+    /**
+     * Find a page of results matching the other end of a ToMany relationship
+     *
+     * @param id        the root entity ID
+     * @param pageable  the page config
+     * @param fieldInfo the member/relation name
+     * @return the page of results, may be <code>null</code>
+     * @see PersistableModelService#findRelatedPaginated(java.lang.Class, org.springframework.data.jpa.domain.Specification, org.springframework.data.domain.Pageable)
+     */
+    protected <M extends Persistable> ParamsAwarePageImpl<M> findRelatedPaginated(PK id, Pageable pageable, FieldInfo fieldInfo) {
+        ParamsAwarePageImpl<M> page = null;
+        Optional<String> reverseFieldName = fieldInfo.getReverseFieldName();
+        if (reverseFieldName.isPresent()) {
+            Map<String, String[]> params = request.getParameterMap();
+            Map<String, String[]> implicitCriteria = new HashMap<>();
+            implicitCriteria.put(reverseFieldName.get(), new String[]{id.toString()});
 
-			ModelInfo relatedModelInfo = fieldInfo.getRelatedModelInfo();
-			// optionally create a query specification
-			Specification<M> spec = RsqlUtils.buildSpecification(relatedModelInfo, this.service.getConversionService(), params, implicitCriteria, SpecificationsBuilder.PARAMS_IGNORE_FOR_CRITERIA);
+            ModelInfo relatedModelInfo = fieldInfo.getRelatedModelInfo();
+            // optionally create a query specification
+            Specification<M> spec = RsqlUtils.buildSpecification(relatedModelInfo, this.service.getConversionService(), params, implicitCriteria, SpecificationsBuilder.PARAMS_IGNORE_FOR_CRITERIA);
 			// get the page of related children
 			Page<M> tmp = this.service.findRelatedPaginated(relatedModelInfo.getModelType(), spec, pageable);
 			page = new ParamsAwarePageImpl<M>(params, tmp.getContent(), pageable, tmp.getTotalElements());

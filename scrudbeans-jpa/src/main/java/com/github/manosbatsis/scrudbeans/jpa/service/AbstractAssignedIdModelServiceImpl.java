@@ -26,7 +26,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceException;
 
 import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractAssignedIdPersistableModel;
+import com.github.manosbatsis.scrudbeans.jpa.model.AbstractAssignedPersistable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,17 +37,17 @@ import org.springframework.util.Assert;
 /**
  * Created by manos on 30/11/2016.
  */
-public class AbstractAssignedIdModelServiceImpl<T extends AbstractAssignedIdPersistableModel<PK>, PK extends Serializable, R extends ModelRepository<T, PK>>
-		extends AbstractPersistableModelServiceImpl<T, PK, R> implements AbstractAssignedIdModelService<T, PK> {
+public class AbstractAssignedIdModelServiceImpl<T extends AbstractAssignedPersistable<PK>, PK extends Serializable, R extends ModelRepository<T, PK>>
+        extends AbstractPersistableModelServiceImpl<T, PK, R> implements AbstractAssignedIdModelService<T, PK> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAssignedIdModelServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAssignedIdModelServiceImpl.class);
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@Transactional(readOnly = false)
-	public T findOrCreate(@P("resource") T resource) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = false)
+    public T findOrCreate(@P("resource") T resource) {
 		Assert.notNull(resource, "Resource can't be null");
 		Assert.notNull(resource.getId(), "Resource PK can't be null");
 

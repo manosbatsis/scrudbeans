@@ -29,8 +29,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
@@ -47,23 +47,23 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 /**
  * Provides SCRUD and utility operations for {@link T} model
- * @author manos
  *
- * @param <T> the entity type
+ * @param <T>  the entity type
  * @param <PK> the entity PK type
+ * @author manos
  */
 @Service
-public interface PersistableModelService<T extends SettableIdModel<PK>, PK extends Serializable>
-		extends ModelService<T, PK> {
+public interface PersistableModelService<T extends Persistable<PK>, PK extends Serializable>
+        extends ModelService<T, PK> {
 
-	String PRE_AUTHORIZATION_PREFIX = "SERVICE_";
+    String PRE_AUTHORIZATION_PREFIX = "SERVICE_";
 
-	/**
-	 * Override to initialize data related to your model type
-	 */
-	void initData();
+    /**
+     * Override to initialize data related to your model type
+     */
+    void initData();
 
-	/**
+    /**
 	 * Return the id of the entity.
 	 * A generated id is not guaranteed to be available until after
 	 * the database insert has occurred.
@@ -78,14 +78,15 @@ public interface PersistableModelService<T extends SettableIdModel<PK>, PK exten
 	 */
 	Object getIdentifier(Object entity);
 
-	/**
-	 * Find a page of results matching the given entity type and specification
-	 * @param entityType the root entity type
-	 * @param spec the query specification
-	 * @param pageable the page config
-	 * @return the page of results, may be <code>null</code>
-	 */
-	<M extends SettableIdModel<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable);
+    /**
+     * Find a page of results matching the given entity type and specification
+     *
+     * @param entityType the root entity type
+     * @param spec       the query specification
+     * @param pageable   the page config
+     * @return the page of results, may be <code>null</code>
+     */
+    <M extends Persistable<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable);
 
 	/**
 	 * Find resources page-by-page
@@ -96,16 +97,17 @@ public interface PersistableModelService<T extends SettableIdModel<PK>, PK exten
 	 */
 	Page<T> findPaginated(Specification<T> spec, Pageable pageRequest);
 
-	/**
-	 * Find the other end of a ToOne relationship
-	 * @param id the root entity ID
-	 * @param fieldInfo the member/relation name
-	 * @return the single related entity, if any
-	 */
-	SettableIdModel findRelatedSingle(PK id, FieldInfo fieldInfo);
+    /**
+     * Find the other end of a ToOne relationship
+     *
+     * @param id        the root entity ID
+     * @param fieldInfo the member/relation name
+     * @return the single related entity, if any
+     */
+    Persistable findRelatedSingle(PK id, FieldInfo fieldInfo);
 
-	/**
-	 * @see ModelRepository#validateConstraints(SettableIdModel)
+    /**
+	 * @see ModelRepository#validateConstraints(Persistable)
 	 */
 	Set<ConstraintViolation<T>> validateConstraints(T resource);
 

@@ -35,7 +35,7 @@ import javax.persistence.criteria.Root;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.jpa.util.EntityUtil;
 import com.github.manosbatsis.scrudbeans.jpa.util.ValidatorUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -47,58 +47,62 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Provides meaningful constraint validation messages
+ *
  * @see Unique
  */
 @Slf4j
-public class UniqueValidator implements ConstraintValidator<Unique, SettableIdModel> {
+public class UniqueValidator implements ConstraintValidator<Unique, Persistable> {
 
-	private EntityManager entityManager;
+    private EntityManager entityManager;
 
-	@Autowired
-	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
-	}
+    @Autowired
+    public void setEntityManager(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
-	public void initialize(Unique annotation) {
-	}
+    public void initialize(Unique annotation) {
+    }
 
-	@Override
-	@Transactional(readOnly = true)
-	public boolean isValid(SettableIdModel value, ConstraintValidatorContext constraintValidatorContext) {
-		log.debug("isValid pathFragment: {}", value);
-		boolean valid = true;
-		// skip validation if null
-		if (value != null) {
+    @Override
+    @Transactional(readOnly = true)
+    public boolean isValid(Persistable value, ConstraintValidatorContext constraintValidatorContext) {
+        log.debug("isValid pathFragment: {}", value);
+        boolean valid = true;
+        // skip validation if null
+        if (value != null) {
 
-			// get the entity class being proxied by <code>pathFragment</code> if any, or the actual <code>pathFragment</code> class otherwise
-			Class domainClass = HibernateProxyHelper.getClassWithoutInitializingProxy(value);
+            // get the entity class being proxied by <code>pathFragment</code> if any, or the actual <code>pathFragment</code> class otherwise
+            Class domainClass = HibernateProxyHelper.getClassWithoutInitializingProxy(value);
 
-			try {
-				// get unique field names
-				List<String> uniqueFieldNames = ValidatorUtil.getUniqueFieldNames(domainClass);
+            try {
+                // get unique field names
+                List<String> uniqueFieldNames = ValidatorUtil.getUniqueFieldNames(domainClass);
+                log.debug("isValid uniqueFieldNames: {}", uniqueFieldNames);
+                // get records matching the unique field values
+                List<Persistable> resultSet = getViolatingRecords(value, domainClass, uniqueFieldNames);
 
-				// get records matching the unique field values
-				List<SettableIdModel> resultSet = getViolatingRecords(value, domainClass, uniqueFieldNames);
+                log.debug("isValid violating records: {}", resultSet.size());
+                // process violating records
+                if (!resultSet.isEmpty()) {
 
-				// process violating records
-				if (!resultSet.isEmpty()) {
+                    // disable default constraint validation construction
+                    // as it will point to the object instead of the property
+                    constraintValidatorContext.disableDefaultConstraintViolation();
 
-					// disable default constraint validation construction
-					// as it will point to  the object instead of the property
-					constraintValidatorContext.disableDefaultConstraintViolation();
+                    for (Persistable match : resultSet) {
 
-					for (SettableIdModel match : resultSet) {
-						if (!match.getId().equals(value.getId())) {
-							for (String propertyName : uniqueFieldNames) {
-								Object newValue = PropertyUtils.getProperty(value, propertyName);
-								Object existingValue = PropertyUtils.getProperty(match, propertyName);
-								if (newValue != null) {
-									// ignore case for strings?
-									if (newValue instanceof String && !EntityUtil.isCaseSensitive(domainClass, propertyName)) {
-										newValue = ((String) newValue).toLowerCase();
-										existingValue = existingValue != null ? ((String) existingValue).toLowerCase() : null;
-									}
-									// match?
+                        // If value is new or otherwise different than the violating record
+                        if (value.isNew() || !value.getScrudBeanId().equals(match.getScrudBeanId())) {
+                            for (String propertyName : uniqueFieldNames) {
+                                Object newValue = PropertyUtils.getProperty(value, propertyName);
+                                Object existingValue = PropertyUtils.getProperty(match, propertyName);
+                                if (newValue != null) {
+                                    // ignore case for strings?
+                                    if (newValue instanceof String && !EntityUtil.isCaseSensitive(domainClass, propertyName)) {
+                                        newValue = ((String) newValue).toLowerCase();
+                                        existingValue = existingValue != null ? ((String) existingValue).toLowerCase() : null;
+                                    }
+                                    // match?
 									if (newValue.equals(existingValue)) {
 										log.debug("isValid, adding violation for property name: {}, value: {}", propertyName, newValue);
 										valid = false;
@@ -112,37 +116,36 @@ public class UniqueValidator implements ConstraintValidator<Unique, SettableIdMo
 						}
 					}
 				}
-			}
-			catch (Exception e) {
-				log.error("Error while validating constraints", e);
-			}
-		}
+            } catch (Exception e) {
+                log.error("Error while validating constraints", e);
+            }
+        }
 
-		log.debug("isValid returns: {}", valid);
-		return valid;
+        log.debug("isValid returns: {}", valid);
+        return valid;
 
-	}
+    }
 
-	private List<SettableIdModel> getViolatingRecords(SettableIdModel value, Class domainClass, List<String> uniqueFieldNames) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private List<Persistable> getViolatingRecords(Persistable value, Class domainClass, List<String> uniqueFieldNames) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
-		log.debug("getViolatingRecords, for pathFragment: {}, uniqueFieldNames: {}", value, uniqueFieldNames);
-		CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
-		CriteriaQuery criteriaQuery = criteriaBuilder.createQuery(domainClass);
-		Root<? extends SettableIdModel<Serializable>> root = criteriaQuery.from(domainClass);
-		List<Predicate> predicates = new ArrayList<Predicate>(uniqueFieldNames.size());
-		for (String propertyName : uniqueFieldNames) {
-			log.debug("getViolatingRecords, adding predicate for field: {}", propertyName);
-			Object propertyValue = PropertyUtils.getProperty(value, propertyName);
-			Predicate predicate = criteriaBuilder.equal(root.get(propertyName), propertyValue);
-			predicates.add(predicate);
-		}
+        log.debug("getViolatingRecords, for pathFragment: {}, uniqueFieldNames: {}", value, uniqueFieldNames);
+        CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery criteriaQuery = criteriaBuilder.createQuery(domainClass);
+        Root<? extends Persistable<Serializable>> root = criteriaQuery.from(domainClass);
+        List<Predicate> predicates = new ArrayList<Predicate>(uniqueFieldNames.size());
+        for (String propertyName : uniqueFieldNames) {
+            log.debug("getViolatingRecords, adding predicate for field: {}", propertyName);
+            Object propertyValue = PropertyUtils.getProperty(value, propertyName);
+            Predicate predicate = criteriaBuilder.equal(root.get(propertyName), propertyValue);
+            predicates.add(predicate);
+        }
 
-		criteriaQuery.where(predicates.toArray(new Predicate[predicates.size()]));
-		TypedQuery<SettableIdModel> typedQuery = this.entityManager.createQuery(criteriaQuery);
+        criteriaQuery.where(predicates.toArray(new Predicate[predicates.size()]));
+        TypedQuery<Persistable> typedQuery = this.entityManager.createQuery(criteriaQuery);
 
-		// tell JPA not to flush just vbecause we want to check existing records
-		typedQuery.setFlushMode(FlushModeType.COMMIT);
-		return typedQuery.getResultList();
+        // tell JPA not to flush just vbecause we want to check existing records
+        typedQuery.setFlushMode(FlushModeType.COMMIT);
+        return typedQuery.getResultList();
 	}
 
 }

@@ -28,7 +28,7 @@ import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
 import com.github.manosbatsis.scrudbeans.common.util.ClassUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -41,17 +41,17 @@ import org.springframework.core.convert.ConversionService;
  * A predicate for members that are Many2one/OneToOne.
  */
 @Slf4j
-public class AnyToOnePredicateFactory<T extends SettableIdModel<PK>, PK extends Serializable> extends AbstractPredicateFactory<T> {
+public class AnyToOnePredicateFactory<T extends Persistable<PK>, PK extends Serializable> extends AbstractPredicateFactory<T> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AnyToOnePredicateFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnyToOnePredicateFactory.class);
 
-	private Class<PK> idType;
+    private Class<PK> idType;
 
-	public AnyToOnePredicateFactory() {
-	}
+    public AnyToOnePredicateFactory() {
+    }
 
-	@Override
-	public Class<?> getValueType() {
+    @Override
+    public Class<?> getValueType() {
 		return this.idType;
 	}
 

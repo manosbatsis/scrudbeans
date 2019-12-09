@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.domain.event.EntityCreatedEvent;
 import com.github.manosbatsis.scrudbeans.api.domain.event.EntityDeletedEvent;
@@ -62,24 +62,24 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 /**
- * SCRUD service handling a specific type of {@link SettableIdModel} using a {@link ModelRepository}
+ * SCRUD service handling a specific type of {@link Persistable} using a {@link ModelRepository}
  *
  * @param <T>  Your resource class to manage, usually an entity class
  * @param <PK> Resource id type, usually Long or String
  * @param <R>  The repository class to automatically inject
  */
 @Slf4j
-public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, PK extends Serializable, R extends ModelRepository<T, PK>>
-		extends AbstractBaseServiceImpl
-		implements PersistableModelService<T, PK> {
+public class AbstractPersistableModelServiceImpl<T extends Persistable<PK>, PK extends Serializable, R extends ModelRepository<T, PK>>
+        extends AbstractBaseServiceImpl
+        implements PersistableModelService<T, PK> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelServiceImpl.class);
 
-	protected R repository;
+    protected R repository;
 
-	@SuppressWarnings("SpringJavaAutowiringInspection")
+    @SuppressWarnings("SpringJavaAutowiringInspection")
 
-	@Autowired
+    @Autowired
 	public void setRepository(R repository) {
 		this.repository = repository;
 	}
@@ -168,43 +168,26 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 	@Override
 	@Transactional(readOnly = false)
 	public T create(@P("resource") T resource) {
-		Assert.notNull(resource, "Resource can't be null");
-		// Persist
-		resource = repository.save(resource);
-		// Do any post-processing
-		this.postCreate(resource);
-		// Fire "created" event
-		this.applicationEventPublisher.publishEvent(new EntityCreatedEvent<>(resource));
-		// Return persisted
-		return resource;
-	}
+        Assert.notNull(resource, "Resource can't be null");
+        // Persist
+        resource = repository.create(resource);
+        // Do any post-processing
+        this.postCreate(resource);
+        // Fire "created" event
+        this.applicationEventPublisher.publishEvent(new EntityCreatedEvent<>(resource));
+        // Return persisted
+        return resource;
+    }
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	@Transactional(readOnly = false)
-	public T update(@P("resource") T resource) {
+	public T update(@P("id") PK id, @P("resource") T resource) {
 		Assert.notNull(resource, "Resource can't be null");
 		// Persist
-		resource = repository.save(resource);
-		// Do any post-processing
-		this.postUpdate(resource);
-		// Fire "updated" event
-		this.applicationEventPublisher.publishEvent(new EntityUpdatedEvent<>(resource));
-		// Return persisted
-		return resource;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@Transactional(readOnly = false)
-	public T patch(@P("resource") T resource) {
-		Assert.notNull(resource, "Resource can't be null");
-		// Persist
-		resource = repository.patch(resource);
+		resource = repository.update(id, resource);
 		// Do any post-processing
 		this.postUpdate(resource);
 		// Fire "updated" event
@@ -218,10 +201,26 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 	 */
 	@Override
 	@Transactional(readOnly = false)
-	public void delete(T resource) {
+	public T patch(@P("id") PK id, @P("resource") T resource) {
 		Assert.notNull(resource, "Resource can't be null");
 		// Persist
-		repository.delete(resource);
+		resource = repository.patch(id, resource);
+		// Do any post-processing
+		this.postUpdate(resource);
+		// Fire "updated" event
+		this.applicationEventPublisher.publishEvent(new EntityUpdatedEvent<>(resource));
+		// Return persisted
+		return resource;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = false)
+	public void delete(PK id, T resource) {
+		Assert.notNull(resource, "Resource can't be null");
+		delete(id);
 		// Do any post-processing
 		this.postDelete(resource);
 		// Fire "deleted" event
@@ -234,7 +233,7 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 	@Override
 	@Transactional(readOnly = false)
 	public void delete(PK id) {
-		Assert.notNull(id, "Resource PK can't be null");
+		Assert.notNull(id, "Resource id can't be null");
 		repository.deleteById(id);
 	}
 
@@ -277,33 +276,32 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 		return repository.findAllById(ids);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public SettableIdModel findRelatedSingle(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
-		// throw error if not valid or linkable relationship
-		if (!fieldInfo.isLinkableResource() || !fieldInfo.isToOne()) {
-			throw new IllegalArgumentException("Related must be linkable and *ToOne");
-		}
-		return repository.findRelatedEntityByOwnId(id, fieldInfo);
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Persistable findRelatedSingle(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
+        // throw error if not valid or linkable relationship
+        if (!fieldInfo.isLinkableResource() || !fieldInfo.isToOne()) {
+            throw new IllegalArgumentException("Related must be linkable and *ToOne");
+        }
+        return repository.findRelatedEntityByOwnId(id, fieldInfo);
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public <M extends SettableIdModel<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable) {
-		ModelRepository<M, MID> repo = (ModelRepository) this.repositoryRegistryService.getRepositoryFor(entityType);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <M extends Persistable<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable) {
+        ModelRepository<M, MID> repo = (ModelRepository) this.repositoryRegistryService.getRepositoryFor(entityType);
 
-		if (repo == null) {
-			throw new IllegalArgumentException("Could not find a repository for model type: " + entityType);
-		}
+        if (repo == null) {
+            throw new IllegalArgumentException("Could not find a repository for model type: " + entityType);
+        }
 
-		if (spec != null) {
-			return repo.findAll(spec, pageable);
-		}
-		else {
+        if (spec != null) {
+            return repo.findAll(spec, pageable);
+        } else {
 			return repo.findAll(pageable);
 		}
 	}
@@ -423,7 +421,7 @@ public class AbstractPersistableModelServiceImpl<T extends SettableIdModel<PK>, 
 			throw new RuntimeException("Failed to update files", e);
 		}
 		// return the updated entity
-		entity = this.update(entity);
+		entity = this.update(id, entity);
 
 		log.debug("Entity after uploading files: {}", entity);
 		return entity;

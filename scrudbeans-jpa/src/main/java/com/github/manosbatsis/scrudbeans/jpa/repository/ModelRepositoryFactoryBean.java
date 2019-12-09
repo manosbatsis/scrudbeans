@@ -26,7 +26,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.Validator;
 
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,17 +42,17 @@ import org.springframework.data.repository.core.support.RepositoryFactorySupport
 import org.springframework.data.repository.core.support.TransactionalRepositoryFactoryBeanSupport;
 
 //@Component
-public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extends SettableIdModel<PK>, PK extends Serializable>
-		extends TransactionalRepositoryFactoryBeanSupport<R, T, PK> {
+public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extends Persistable<PK>, PK extends Serializable>
+        extends TransactionalRepositoryFactoryBeanSupport<R, T, PK> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ModelRepositoryFactoryBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ModelRepositoryFactoryBean.class);
 
-	private Validator validator;
+    private Validator validator;
 
-	private EntityManager entityManager;
+    private EntityManager entityManager;
 
-	public ModelRepositoryFactoryBean(Class<? extends R> repositoryInterface) {
-		super(repositoryInterface);
+    public ModelRepositoryFactoryBean(Class<? extends R> repositoryInterface) {
+        super(repositoryInterface);
 	}
 
 	/**
@@ -89,26 +89,26 @@ public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extend
 	 * Returns a {@link RepositoryFactorySupport}.
 	 *
 	 * @param entityManager
-	 * @return
-	 */
-	protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
-		LOGGER.debug("getModelRepository, validator: {}", validator);
-		RepositoryFactorySupport repositoryFactorySupport = new RepositoryFactory(entityManager, this.validator);
-		LOGGER.debug("getModelRepository, repositoryFactorySupport: {}, entityManager: {}", repositoryFactorySupport, entityManager);
-		return repositoryFactorySupport;
-	}
+     * @return
+     */
+    protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
+        LOGGER.debug("getModelRepository, validator: {}", validator);
+        RepositoryFactorySupport repositoryFactorySupport = new RepositoryFactory(entityManager, this.validator);
+        LOGGER.debug("getModelRepository, repositoryFactorySupport: {}, entityManager: {}", repositoryFactorySupport, entityManager);
+        return repositoryFactorySupport;
+    }
 
 
-	private static class RepositoryFactory<T extends SettableIdModel<PK>, PK extends Serializable> extends JpaRepositoryFactory {
+    private static class RepositoryFactory<T extends Persistable<PK>, PK extends Serializable> extends JpaRepositoryFactory {
 
-		private EntityManager entityManager;
+        private EntityManager entityManager;
 
-		private Validator validator;
+        private Validator validator;
 
-		public RepositoryFactory(EntityManager entityManager, Validator validator) {
-			super(entityManager);
-			this.validator = validator;
-			LOGGER.debug("RepositoryFactory, validator: {}, entityManager: {}", validator, entityManager);
+        public RepositoryFactory(EntityManager entityManager, Validator validator) {
+            super(entityManager);
+            this.validator = validator;
+            LOGGER.debug("RepositoryFactory, validator: {}, entityManager: {}", validator, entityManager);
 
 		}
 

@@ -42,7 +42,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ComputedRelationship;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldMappingType;
@@ -67,91 +67,105 @@ import org.springframework.core.GenericTypeResolver;
 public class FieldInfoImpl implements FieldInfo {
 
 
-	public static FieldInfo create(@NonNull Class<? extends IdModel> modelType, PropertyDescriptor property) {
-		FieldInfo fieldInfo = null;
-		Field field = FieldUtils.getField(modelType, property.getName(), true);
+    public static FieldInfo create(@NonNull Class<? extends Persistable> modelType, PropertyDescriptor property) {
+        FieldInfo fieldInfo = null;
+        Field field = FieldUtils.getField(modelType, property.getName(), true);
 
-		// ensure proper bean property, i.e. read/write
-		Method getter = property.getReadMethod();
-		Method setter = property.getWriteMethod();
-		if (field != null && getter != null && setter != null) {
-			//log.debug("create, modelType: {}, property: {}", modelType, property);
-			fieldInfo = new FieldInfoImpl(modelType, property, field, getter, setter);
-		}
+        // ensure proper bean property, i.e. read/write
+        Method getter = property.getReadMethod();
+        Method setter = property.getWriteMethod();
+        if (field != null && getter != null && setter != null) {
+            //log.debug("create, modelType: {}, property: {}", modelType, property);
+            fieldInfo = new FieldInfoImpl(modelType, property, field, getter, setter);
+        }
 		else {
 			// log.debug("create, ignoring modelType: {}, property: {}", modelType, property);
 		}
 		return fieldInfo;
 
-	}
+    }
 
-	@Getter private boolean relationship;
+    @Getter
+    private boolean relationship;
 
-	@Getter private String fieldName;
+    @Getter
+    private String fieldName;
 
-	@Getter private Class<?> fieldType;
+    @Getter
+    private Class<?> fieldType;
 
-	@Getter private FieldMappingType fieldMappingType;
+    @Getter
+    private FieldMappingType fieldMappingType;
 
-	@Getter private Class<? extends IdModel> fieldModelType;
+    @Getter
+    private Class<? extends Persistable> fieldModelType;
 
-	@Setter private String reverseFieldName = null;
+    @Setter
+    private String reverseFieldName = null;
 
-	@Getter private boolean inverse = false;
+    @Getter
+    private boolean inverse = false;
 
-	@Getter private CascadeType[] cascadeTypes;
+    @Getter
+    private CascadeType[] cascadeTypes;
 
-	@Getter private Method getterMethod;
+    @Getter
+    private Method getterMethod;
 
-	@Getter private Method setterMethod;
+    @Getter
+    private Method setterMethod;
 
-	@Getter private boolean getter;
+    @Getter
+    private boolean getter;
 
-	@Getter private boolean setter;
+    @Getter
+    private boolean setter;
 
-	@Getter private boolean lazy = false;
+    @Getter
+    private boolean lazy = false;
 
-	@Getter private ModelInfo relatedModelInfo;
+    @Getter
+    private ModelInfo relatedModelInfo;
 
 
-	private FieldInfoImpl(@NonNull Class<? extends IdModel> modelType, @NonNull PropertyDescriptor property, @NonNull Field field, @NonNull Method getter, @NonNull Method setter) {
-		// add basic info
-		this.fieldType = property.getPropertyType();
-		this.fieldName = property.getName();
+    private FieldInfoImpl(@NonNull Class<? extends Persistable> modelType, @NonNull PropertyDescriptor property, @NonNull Field field, @NonNull Method getter, @NonNull Method setter) {
+        // add basic info
+        this.fieldType = property.getPropertyType();
+        this.fieldName = property.getName();
 
-		this.getterMethod = getter;
-		this.setterMethod = setter;
+        this.getterMethod = getter;
+        this.setterMethod = setter;
 
-		this.getter = getter != null;
-		this.setter = setter != null;
+        this.getter = getter != null;
+        this.setter = setter != null;
 
 		scanMappings(field, getter, setter);
 
 		// set the Modelnfo for if a relationship
 		if (this.isLinkableResource()) {//if(this.isRelationship()){
-			if (IdModel.class.isAssignableFrom(this.fieldType)) {
-				this.fieldModelType = (Class<? extends IdModel>) this.fieldType;
-			}
-			// if collection but not a Map
-			else if (Collection.class.isAssignableFrom(this.fieldType) && !Map.class.isAssignableFrom(this.fieldType)) {
-				ParameterizedType pType = (ParameterizedType) field.getGenericType();
-				log.debug("FieldInfoImpl, fieldType: {}, pType: {}", fieldType, pType);
-				Map<TypeVariable<?>, Type> types = TypeUtils.getTypeArguments(pType);
-				for (TypeVariable<?> var : types.keySet()) {
+            if (Persistable.class.isAssignableFrom(this.fieldType)) {
+                this.fieldModelType = (Class<? extends Persistable>) this.fieldType;
+            }
+            // if collection but not a Map
+            else if (Collection.class.isAssignableFrom(this.fieldType) && !Map.class.isAssignableFrom(this.fieldType)) {
+                ParameterizedType pType = (ParameterizedType) field.getGenericType();
+                log.debug("FieldInfoImpl, fieldType: {}, pType: {}", fieldType, pType);
+                Map<TypeVariable<?>, Type> types = TypeUtils.getTypeArguments(pType);
+                for (TypeVariable<?> var : types.keySet()) {
 
-					Type t = types.get(var);
-					String tName = t.getTypeName();
+                    Type t = types.get(var);
+                    String tName = t.getTypeName();
 					log.debug("FieldInfoImpl, var: {}, t.getTypeName: '{}', tName: '{}'", var, t.getTypeName(), tName);
 					if (tName.contains(".")) {
-						this.fieldModelType = (Class<? extends IdModel>) ClassUtils.getClass(tName);
-					}
+                        this.fieldModelType = (Class<? extends Persistable>) ClassUtils.getClass(tName);
+                    }
 				}
 				if (this.fieldModelType == null) {
 					String tName = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName();
 					log.debug("FieldInfoImpl, tName: '{}'", tName);
 					if (tName.contains(".")) {
-						this.fieldModelType = (Class<? extends IdModel>) ClassUtils.getClass(tName);
-					}
+                        this.fieldModelType = (Class<? extends Persistable>) ClassUtils.getClass(tName);
+                    }
 				}
 				Class<?> resolved = GenericTypeResolver.resolveTypeArgument(fieldType, pType.getClass());
 				log.debug("FieldInfoImpl, resolved: {}", this.fieldModelType);

@@ -23,23 +23,23 @@ package com.github.manosbatsis.scrudbeans.api.mdd.registry;
 import java.io.Serializable;
 import java.util.Set;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
 
 /**
  * Contains metadata for a specific Model class.
  */
-public interface ModelInfo<T extends IdModel<PK>, PK extends Serializable> {
-	String getRequestMapping();
+public interface ModelInfo<T extends Persistable<PK>, PK extends Serializable> {
+    String getRequestMapping();
 
-	void setRequestMapping(String pattern);
+    void setRequestMapping(String pattern);
 
-	String getParentPath(String defaultValue);
+    String getParentPath(String defaultValue);
 
-	String getBasePath(String defaultValue);
+    String getBasePath(String defaultValue);
 
-	FieldInfo getField(String fieldName);
+    FieldInfo getField(String fieldName);
 
 	Boolean isLinkableResource();
 

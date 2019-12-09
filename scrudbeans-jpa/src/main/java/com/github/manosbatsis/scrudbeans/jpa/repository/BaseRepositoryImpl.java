@@ -26,12 +26,7 @@ import static org.springframework.data.jpa.repository.query.QueryUtils.getQueryS
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
@@ -49,8 +44,7 @@ import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
 import com.github.manosbatsis.scrudbeans.api.domain.DisableableModel;
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.exception.BeanValidationException;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
@@ -73,17 +67,17 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 
-public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
-		extends SimpleJpaRepository<T, PK>
-		implements ModelRepository<T, PK> {
+public class BaseRepositoryImpl<T extends Persistable<PK>, PK extends Serializable>
+        extends SimpleJpaRepository<T, PK>
+        implements ModelRepository<T, PK> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BaseRepositoryImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseRepositoryImpl.class);
 
-	private boolean skipValidation = false;
+    private boolean skipValidation = false;
 
-	private EntityManager entityManager;
+    private EntityManager entityManager;
 
-	private JpaEntityInformation<T, ?> entityInformation;
+    private JpaEntityInformation<T, ?> entityInformation;
 
 	private Class<T> domainClass;
 
@@ -130,14 +124,57 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 		return this.entityManager;
 	}
 
+    /***
+     * {@inheritDoc}
+     * @deprecated use {@link #create(Persistable)}
+     */
+	@Deprecated
+	@Override
+	public <S extends T> S save(@NonNull S entity) {
+		this.validate(entity);
+		return super.save(entity);
+	}
+
 	/***
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <S extends T> S save(S entity) {
+	public T create(@NonNull T entity) {
 		this.validate(entity);
-		entity = super.save(entity);
-		return entity;
+		return super.save(entity);
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public T update(@NonNull PK id, @NonNull T resource) {
+		String[] ignored = {"id"};
+		return patch(id, resource, ignored);
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public T patch(@NonNull @P("id") PK id, @NonNull @P("resource") T delta) {
+		// update it by copying all non-null properties from the given transient instance
+		List<String> ignoredList = Arrays.asList(EntityUtil.getNullPropertyNames(delta));
+		ignoredList.add("id");
+		return patch(id, delta, ignoredList.toArray(new String[ignoredList.size()]));
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	private T patch(@NonNull @P("id") PK id, @NonNull @P("resource") T delta, @NonNull String[] ignoredPropertyNames) {
+		// load existing
+		T persisted = this.getOne(id);
+		BeanUtils.copyProperties(delta, persisted, ignoredPropertyNames);
+		// validate
+		this.validate(persisted);
+		// persist changes
+		return this.entityManager.merge(persisted);
 	}
 
 	/***
@@ -155,28 +192,12 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public T patch(@P("resource") T delta) {
-		// load existing
-		T persisted = this.getOne(delta.getId());
-		// update it by copying all non-null properties from the given transient instance
-		String[] nullPropertyNames = EntityUtil.getNullPropertyNames(delta);
-		BeanUtils.copyProperties(delta, persisted, nullPropertyNames);
-		// validate
-		this.validate(persisted);
-		// persist changes
-		return this.entityManager.merge(persisted);
-	}
-
-	/***
-	 * {@inheritDoc}
-	 */
-	@Override
 	public Set<ConstraintViolation<T>> validateConstraints(T resource) {
-		LOGGER.debug("validateConstraints, validator: {}, resource: {}", validator, resource);
-		Set<ConstraintViolation<T>> constraintViolations = validator.<T>validate(resource);
+        LOGGER.debug("validateConstraints, validator: {}, resource: {}", validator, resource);
+        Set<ConstraintViolation<T>> constraintViolations = validator.validate(resource);
 
-		return constraintViolations;
-	}
+        return constraintViolations;
+    }
 
 	/**
 	 * Validate the resource
@@ -202,25 +223,26 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 
 	}
 
-	/**
-	 *  Used to validate relations
-	 * @param id the id of the root model
-	 * @param fieldInfo the attribute name of the relationship
-	 * @param <RT>
-	 * @return
-	 */
-	@Override
-	public <RT extends SettableIdModel> RT findRelatedEntityByOwnId(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
-		if (!fieldInfo.getFieldMappingType().isToOne()) {
-			throw new IllegalArgumentException("Field " + fieldInfo.getFieldName() + " is not a relation to a single entity");
-		}
+    /**
+     * Used to validate relations
+     *
+     * @param id        the id of the root model
+     * @param fieldInfo the attribute name of the relationship
+     * @param <RT>
+     * @return
+     */
+    @Override
+    public <RT extends Persistable> RT findRelatedEntityByOwnId(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
+        if (!fieldInfo.getFieldMappingType().isToOne()) {
+            throw new IllegalArgumentException("Field " + fieldInfo.getFieldName() + " is not a relation to a single entity");
+        }
 
-		CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
-		CriteriaQuery query = cb.createQuery(fieldInfo.getFieldType());
+        CriteriaBuilder cb = this.entityManager.getCriteriaBuilder();
+        CriteriaQuery query = cb.createQuery(fieldInfo.getFieldType());
 
-		// if we can match by reverse
-		Optional<String> reverseName = fieldInfo.getReverseFieldName();
-		if (fieldInfo.isOneToOne() && reverseName.isPresent()) {
+        // if we can match by reverse
+        Optional<String> reverseName = fieldInfo.getReverseFieldName();
+        if (fieldInfo.isOneToOne() && reverseName.isPresent()) {
 
 			Root root = query.from(fieldInfo.getFieldModelType());
 			query.where(cb.equal(root.<T>get(reverseName.get()).get("id"), id));
@@ -293,19 +315,18 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 			this.softDelete(id);
 		}
 		else super.deleteById(id);
-	}
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Object)
+    /**
+     * (non-Javadoc)
+     * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Object)
+     * @deprecated use #delete(java.io.Serializable, com.github.manosbatsis.scrudbeans.api.domain.Persistable)
 	 */
+	@Deprecated
 	@Override
-	@Transactional
 	public void delete(T entity) {
-		if (this.disableableDomainClass) {
-			this.softDelete(entity.getId());
-		}
-		else super.delete(entity);
+		super.delete(entity);
+		throw new UnsupportedOperationException("Signature without explicit ID is not supported");
 	}
 
 	/*
@@ -317,7 +338,7 @@ public class BaseRepositoryImpl<T extends IdModel<PK>, PK extends Serializable>
 	public void deleteAll(@NotNull Iterable<? extends T> entities) {
 		if (this.disableableDomainClass) {
 			for (T entity : entities) {
-				this.softDelete(entity.getId());
+				this.softDelete(entity.getScrudBeanId());
 			}
 		}
 		else super.deleteAll(entities);

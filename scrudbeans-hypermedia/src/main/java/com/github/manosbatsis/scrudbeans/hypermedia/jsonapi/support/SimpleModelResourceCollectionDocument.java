@@ -25,7 +25,7 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceCollectionDocument;
 import io.swagger.annotations.ApiModel;
@@ -33,24 +33,24 @@ import io.swagger.annotations.ApiModel;
 /**
  * {@value #CLASS_DESCRIPTION}
  *
+ * @param <T>  the JSON API Resource model type
+ * @param <PK> the JSON API Resource model key type
  * @see SimpleModelResourceDocument
  * @see <a href="http://jsonapi.org/format/upcoming/#document-structure">JSON API Documents</a>
- * @param <T> the JSON API Resource model type
- * @param <PK> the JSON API Resource model key type
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @ApiModel(value = "Collection Document (JSON-API)", description = SimpleModelResourceDocument.CLASS_DESCRIPTION)
-public class SimpleModelResourceCollectionDocument<T extends IdModel<PK>, PK extends Serializable>
-		extends AbstractJsonApiDocument<Collection<JsonApiModelResource<T, PK>>>
-		implements JsonApiModelResourceCollectionDocument<T, PK> {
+public class SimpleModelResourceCollectionDocument<T extends Persistable<PK>, PK extends Serializable>
+        extends AbstractJsonApiDocument<Collection<JsonApiModelResource<T, PK>>>
+        implements JsonApiModelResourceCollectionDocument<T, PK> {
 
-	public static final String CLASS_DESCRIPTION = "A JSON API Document that may contain multiple model-based Resources";
+    public static final String CLASS_DESCRIPTION = "A JSON API Document that may contain multiple model-based Resources";
 
-	private Collection<JsonApiModelResource<T, PK>> data;
+    private Collection<JsonApiModelResource<T, PK>> data;
 
-	public SimpleModelResourceCollectionDocument() {
-		super();
-	}
+    public SimpleModelResourceCollectionDocument() {
+        super();
+    }
 
 	public SimpleModelResourceCollectionDocument(Collection<JsonApiModelResource<T, PK>> data) {
 		super(data);

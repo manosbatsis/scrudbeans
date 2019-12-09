@@ -28,12 +28,13 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractAssignedIdPersistableModel;
+import com.github.manosbatsis.scrudbeans.jpa.model.AbstractAssignedPersistable;
 import io.swagger.annotations.ApiModel;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.hibernate.annotations.Formula;
 import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,24 +50,27 @@ import org.springframework.hateoas.core.Relation;
 @Entity
 @Table(name = "country")
 @AttributeOverrides({
-		@AttributeOverride(name = "id", column = @Column(unique = true, nullable = false, length = 2)),
-		@AttributeOverride(name = "name", column = @Column(unique = true, nullable = false, length = 50)),
+        @AttributeOverride(name = "id", column = @Column(unique = true, nullable = false, length = 2)),
+        @AttributeOverride(name = "name", column = @Column(unique = true, nullable = false, length = 50)),
 })
 @ScrudBean(pathFragment = "countries", apiName = "Countries", apiDescription = "Operations about countries"
-		/*TODO , controllerSuperClass = CountryController.class*/)
+        /*TODO , controllerSuperClass = CountryController.class*/)
 @ApiModel(value = "Country", description = "A model representing a country, meaning a region that is identified as a distinct entity in political geography.")
 @Relation(value = "country", collectionRelation = "countries")
-public class Country extends AbstractAssignedIdPersistableModel<String> {
+public class Country extends AbstractAssignedPersistable<String> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Country.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Country.class);
 
-	@NotNull @Getter @Setter
-	@Column(name = "name", nullable = false)
-	private String name;
+    @NotNull
+    @Getter
+    @Setter
+    @Column(name = "name", nullable = false)
+    private String name;
 
-	@Getter @Setter
-	@Column(name = "native_name", unique = true, nullable = true, length = 50)
-	private String nativeName;
+    @Getter
+    @Setter
+    @Column(name = "native_name", unique = true, nullable = true, length = 50)
+    private String nativeName;
 
 	@Getter @Setter
 	@Column(name = "calling_code", unique = false, nullable = true, length = 15)

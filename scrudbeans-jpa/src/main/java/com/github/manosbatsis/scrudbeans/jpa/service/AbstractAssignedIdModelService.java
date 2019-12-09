@@ -24,28 +24,29 @@ package com.github.manosbatsis.scrudbeans.jpa.service;
 import java.io.Serializable;
 
 import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractAssignedIdPersistableModel;
+import com.github.manosbatsis.scrudbeans.jpa.model.AbstractAssignedPersistable;
 
 import org.springframework.security.access.method.P;
 import org.springframework.stereotype.Service;
 
 /**
  * Provides SCRUD and utility operations for {@link T} model
- * @author manos
  *
- * @param <T> the entity type
+ * @param <T>  the entity type
  * @param <PK> the entity PK type
+ * @author manos
  */
 @Deprecated
 @Service
-public interface AbstractAssignedIdModelService<T extends AbstractAssignedIdPersistableModel<PK>, PK extends Serializable>
-		extends PersistableModelService<T, PK> {
+public interface AbstractAssignedIdModelService<T extends AbstractAssignedPersistable<PK>, PK extends Serializable>
+        extends PersistableModelService<T, PK> {
 
-	/**
-	 * Return the entity matching the PK of the given resource if any, or the newly persisted instance otherwise
-	 * @param resource
-	 * @return
-	 */
-	public T findOrCreate(@P("resource") T resource);
+    /**
+     * Return the entity matching the PK of the given resource if any, or the newly persisted instance otherwise
+     *
+     * @param resource
+     * @return
+     */
+    public T findOrCreate(@P("resource") T resource);
 
 }

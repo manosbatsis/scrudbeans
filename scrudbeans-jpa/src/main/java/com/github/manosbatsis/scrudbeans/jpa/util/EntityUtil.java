@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedBean;
@@ -163,21 +163,20 @@ public class EntityUtil {
 				if (annotation != null) {
 					caseSensitive = annotation.value();
 				}
-				fieldCaseSensitivity.put(fieldKey, caseSensitive);
-			}
-		}
-		else {
-			caseSensitive = fieldCaseSensitivity.get(fieldKey);
-		}
+                fieldCaseSensitivity.put(fieldKey, caseSensitive);
+            }
+        } else {
+            caseSensitive = fieldCaseSensitivity.get(fieldKey);
+        }
 
-		return caseSensitive;
-	}
+        return caseSensitive;
+    }
 
-	public static <PK extends Serializable> PK idOrNull(IdModel<PK> user) {
-		return user != null ? user.getId() : null;
-	}
+    public static <PK extends Serializable> PK idOrNull(Persistable<PK> user) {
+        return user != null ? user.getScrudBeanId() : null;
+    }
 
-	public static String idOrNEmpty(IdModel entity) {
-		return entity != null ? entity.getId().toString() : StringUtils.EMPTY;
-	}
+    public static String idOrNEmpty(Persistable entity) {
+        return entity != null ? entity.getScrudBeanId().toString() : StringUtils.EMPTY;
+    }
 }

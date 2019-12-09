@@ -28,31 +28,30 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
 import lombok.NonNull;
 
 /**
  * A model wrapper that allows serializing as a Resource according to JSON API  1.1
  *
- * @see <a href="http://jsonapi.org/format/#document-resource-objects">JSON API Resources</a>
- *
- * @param <T> the JSON API Resource model type
+ * @param <T>  the JSON API Resource model type
  * @param <PK> the JSON API Resource model key type
+ * @see <a href="http://jsonapi.org/format/#document-resource-objects">JSON API Resources</a>
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonPropertyOrder({"id", "type", "attributes", "relationships", "links", "meta"})
-public class SimpleModelResource<T extends IdModel<PK>, PK extends Serializable> extends SimpleModelResourceIdentifier<T, PK> implements JsonApiModelResource<T, PK> {
+public class SimpleModelResource<T extends Persistable<PK>, PK extends Serializable> extends SimpleModelResourceIdentifier<T, PK> implements JsonApiModelResource<T, PK> {
 
-	private T attributes;
+    private T attributes;
 
-	protected SimpleModelResource() {
-		super();
-	}
+    protected SimpleModelResource() {
+        super();
+    }
 
-	public SimpleModelResource(@NonNull T attributesModel, @NonNull String type) {
-		super(attributesModel, type);
-		this.attributes = attributesModel;
+    public SimpleModelResource(@NonNull T attributesModel, @NonNull String type) {
+        super(attributesModel, type);
+        this.attributes = attributesModel;
 	}
 
 	@JsonCreator

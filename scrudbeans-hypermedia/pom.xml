@@ -5,12 +5,17 @@
 	<artifactId>scrudbeans-hypermedia</artifactId>
 
 	<parent>
-		<artifactId>scrudbeans</artifactId>
-		<groupId>com.github.manosbatsis.scrudbeans</groupId>
-		<version>0.14-SNAPSHOT</version>
-	</parent>
+        <artifactId>scrudbeans</artifactId>
+        <groupId>com.github.manosbatsis.scrudbeans</groupId>
+        <version>0.14</version>
+    </parent>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.github.jonpeterson</groupId>
+			<artifactId>jackson-module-json-interceptor</artifactId>
+			<version>${jackson-module-json-interceptor.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.github.manosbatsis.scrudbeans</groupId>
 			<artifactId>scrudbeans-common</artifactId>

@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.github.manosbatsis.scrudbeans.api.domain.IdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
@@ -99,9 +99,9 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
 		for (String basePackage : basePackages) {
 			Set<BeanDefinition> entityBeanDefs = EntityUtil.findAllModels(basePackage);
 			for (BeanDefinition beanDef : entityBeanDefs) {
-				Class<? extends IdModel> modelType = (Class<? extends IdModel>) ClassUtils.getClass(beanDef.getBeanClassName());
-				this.addEntryFor(modelType);
-			}
+                Class<? extends Persistable> modelType = (Class<? extends Persistable>) ClassUtils.getClass(beanDef.getBeanClassName());
+                this.addEntryFor(modelType);
+            }
 		}
 
 		// field > model ref
@@ -139,27 +139,27 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
 	private void setRelatedFieldsModelInfo(ModelInfo modelInfo, Set<String> fNames) {
 		for (String fieldName : fNames) {
 			FieldInfo field = modelInfo.getField(fieldName);
-			log.debug("setRelatedFieldModelInfo, model: {}, fieldName: {}, field: {}", modelInfo.getModelType(), fieldName, field);
-			Class<?> fieldModelType = field.getFieldModelType();
+            log.debug("setRelatedFieldModelInfo, model: {}, fieldName: {}, field: {}", modelInfo.getModelType(), fieldName, field);
+            Class<?> fieldModelType = field.getFieldModelType();
 
-			ModelInfo relatedModelInfo = fieldModelType != null ? this.getEntryFor(field.getFieldModelType()) : null;
-			if (relatedModelInfo != null) {
-				field.setRelatedModelInfo(relatedModelInfo);
-			}
-		}
-	}
+            ModelInfo relatedModelInfo = fieldModelType != null ? this.getEntryFor(field.getFieldModelType()) : null;
+            if (relatedModelInfo != null) {
+                field.setRelatedModelInfo(relatedModelInfo);
+            }
+        }
+    }
 
-	protected <T extends IdModel<PK>, PK extends Serializable> void addEntryFor(Class<T> modelClass) {
-		Assert.notNull(modelClass, "Parameter modelClass cannot be null");
+    protected <T extends Persistable<PK>, PK extends Serializable> void addEntryFor(Class<T> modelClass) {
+        Assert.notNull(modelClass, "Parameter modelClass cannot be null");
 
-		// ignore abstract classes
-		if (Modifier.isAbstract(modelClass.getModifiers())) {
-			log.warn("addEntryFor, given model class is abstract: {}", modelClass);
-		}
+        // ignore abstract classes
+        if (Modifier.isAbstract(modelClass.getModifiers())) {
+            log.warn("addEntryFor, given model class is abstract: {}", modelClass);
+        }
 
-		log.debug("addEntryFor model class {}", modelClass.getCanonicalName());
-		// check for existing
-		if (this.modelEntries.containsKey(modelClass)) {
+        log.debug("addEntryFor model class {}", modelClass.getCanonicalName());
+        // check for existing
+        if (this.modelEntries.containsKey(modelClass)) {
 			throw new RuntimeException("ModelInfoRegistry entry already exists, failed to add model type: " + modelClass.getCanonicalName());
 		}
 

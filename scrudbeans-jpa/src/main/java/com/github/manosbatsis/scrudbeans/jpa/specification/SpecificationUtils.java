@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import com.github.manosbatsis.scrudbeans.api.domain.SettableIdModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
 import com.github.manosbatsis.scrudbeans.common.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.jpa.specification.factory.BooleanPredicateFactory;
@@ -50,17 +50,17 @@ import org.springframework.util.Assert;
  * of org.springframework.data.domain.Persistable
  */
 @Slf4j
-public class SpecificationUtils<T extends SettableIdModel<PK>, PK extends Serializable> {
+public class SpecificationUtils<T extends Persistable<PK>, PK extends Serializable> {
 
-	private static final HashMap<String, Class> FIELD_TYPE_CACHE = new HashMap<String, Class>();
+    private static final HashMap<String, Class> FIELD_TYPE_CACHE = new HashMap<String, Class>();
 
-	private static final HashMap<String, Field> FIELD_CACHE = new HashMap<String, Field>();
+    private static final HashMap<String, Field> FIELD_CACHE = new HashMap<String, Field>();
 
-	protected static final HashMap<Class, List<Field>> SIMPLE_SEARCH_FIELDs_CACHE = new HashMap<Class, List<Field>>();
+    protected static final HashMap<Class, List<Field>> SIMPLE_SEARCH_FIELDs_CACHE = new HashMap<Class, List<Field>>();
 
-	protected static final String SIMPLE_SEARCH_PARAM_NAME = "_all";
+    protected static final String SIMPLE_SEARCH_PARAM_NAME = "_all";
 
-	protected static final String SEARCH_MODE = "_searchmode";
+    protected static final String SEARCH_MODE = "_searchmode";
 
 	protected static final StringPredicateFactory stringPredicateFactory = new StringPredicateFactory();
 

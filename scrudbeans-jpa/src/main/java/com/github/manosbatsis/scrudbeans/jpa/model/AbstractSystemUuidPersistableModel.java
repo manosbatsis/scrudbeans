@@ -24,6 +24,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -37,21 +38,37 @@ public abstract class AbstractSystemUuidPersistableModel extends AbstractPersist
 	@Id
 	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
-	private String id;
+    private String id;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getId() {
-		return id;
-	}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getScrudBeanId() {
+        return getId();
+    }
 
-	/**
-	 * {@inheritDoc}
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isNew() {
+        return id == null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * {@inheritDoc}
 	 */
 	public void setId(String id) {
-		this.id = id;
+        this.id = id;
 	}
+
 
 }
