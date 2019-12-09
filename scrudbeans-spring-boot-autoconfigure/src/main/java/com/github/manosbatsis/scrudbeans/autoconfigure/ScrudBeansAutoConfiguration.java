@@ -10,10 +10,12 @@ import com.github.manosbatsis.scrudbeans.jpa.validation.UniqueValidator;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.orm.hibernate5.HibernateExceptionTranslator;
@@ -46,12 +48,29 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 	}
 
 	/**
+	 * Condition that pases if a HandlerExceptionResolver is not already set
+	 * and if RestExceptionHandler is available
+	 */
+	static class RestExceptionHandlerConditions extends AllNestedConditions {
+		RestExceptionHandlerConditions() {
+			super(ConfigurationPhase.REGISTER_BEAN);
+		}
+
+		@ConditionalOnMissingBean(name = "restExceptionHandler")
+		static class OnMissing {
+		}
+
+		@ConditionalOnClass(RestExceptionHandler.class)
+		static class OnAvailable {
+		}
+	}
+
+	/**
 	 * Automatically handle errors by creating a REST exception response.
 	 * To disable, simply exclude "scrudbeans-error" as a transitive dependency of the starter.
 	 */
 	@Bean
-	@ConditionalOnMissingBean
-	@ConditionalOnClass(RestExceptionHandler.class)
+	@Conditional(RestExceptionHandlerConditions.class)
 	public HandlerExceptionResolver restExceptionHandler() {
 		return new RestExceptionHandler();
 	}

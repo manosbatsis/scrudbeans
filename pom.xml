@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.manosbatsis.scrudbeans</groupId>
 	<artifactId>scrudbeans</artifactId>
-	<version>0.14</version>
+	<version>0.15</version>
 	<packaging>pom</packaging>
 	<inceptionYear>2016</inceptionYear>
 	<name>scrudbeans</name>
@@ -91,7 +91,9 @@
 		<kotlin.version>1.2.71</kotlin.version>
 		<kotlinpoet.version>1.4.1</kotlinpoet.version>
 		<kotlinpoet-utils.version>0.2</kotlinpoet-utils.version>
-		<kotlin.compiler.jvmTarget>1.8</kotlin.compiler.jvmTarget>
+		<kotlin.compiler.jvmTarget>${java.version}</kotlin.compiler.jvmTarget>
+		<kotlin.apiVersion>1.2</kotlin.apiVersion>
+		<kotlin.languageVersion>1.2</kotlin.languageVersion>
 		<!-- plugins -->
 		<maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
 
@@ -357,6 +359,10 @@
 					<groupId>org.jetbrains.dokka</groupId>
 					<artifactId>dokka-maven-plugin</artifactId>
 					<version>${dokka.version}</version>
+					<configuration>
+						<apiVersion>${kotlin.apiVersion}</apiVersion>
+						<languageVersion>${kotlin.languageVersion}</languageVersion>
+					</configuration>
 					<executions>
 						<execution>
 							<id>dokka</id>
@@ -429,6 +435,9 @@
 						<compilerPlugins>
 							<plugin>spring</plugin>
 						</compilerPlugins>
+						<apiVersion>${kotlin.apiVersion}</apiVersion>
+						<languageVersion>${kotlin.languageVersion}</languageVersion>
+						<jvmTarget>${kotlin.compiler.jvmTarget}</jvmTarget>
 					</configuration>
 					<dependencies>
 						<dependency>
