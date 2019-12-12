@@ -67,7 +67,9 @@ public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extend
 
     @Override
     protected RepositoryFactorySupport createRepositoryFactory(EntityManager entityManager) {
-        return new ModelRepositoryFactory<T, PK>(entityManager, validator);
+        ModelRepositoryFactory<T, PK> repositoryFactorySupport = new ModelRepositoryFactory<>(entityManager);
+        repositoryFactorySupport.setValidator(this.validator);
+        return repositoryFactorySupport;
     }
 
     private static class ModelRepositoryFactory<T extends Persistable<PK>, PK extends Serializable> extends JpaRepositoryFactory {
@@ -75,10 +77,9 @@ public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extend
         private EntityManager entityManager;
         private Validator validator;
 
-        public ModelRepositoryFactory(EntityManager entityManager, Validator validator) {
+        public ModelRepositoryFactory(EntityManager entityManager) {
             super(entityManager);
             this.entityManager = entityManager;
-            this.validator = validator;
         }
 
         @Override
@@ -100,8 +101,12 @@ public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extend
         }
 
         @Override
-		protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
+        protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
             return ModelRepositoryImpl.class;
         }
-	}
+
+        public void setValidator(Validator validator) {
+            this.validator = validator;
+        }
+    }
 }
