@@ -1,8 +1,8 @@
 package mykotlinpackage.service
 
-import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository
-import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService
-import com.github.manosbatsis.scrudbeans.jpa.service.AbstractPersistableModelServiceImpl
+import com.github.manosbatsis.scrudbeans.repository.ModelRepository
+import com.github.manosbatsis.scrudbeans.service.PersistableModelService
+import com.github.manosbatsis.scrudbeans.service.AbstractPersistableModelServiceImpl
 import mykotlinpackage.model.OrderLine
 import mykotlinpackage.model.Product
 import org.springframework.beans.factory.annotation.Autowired

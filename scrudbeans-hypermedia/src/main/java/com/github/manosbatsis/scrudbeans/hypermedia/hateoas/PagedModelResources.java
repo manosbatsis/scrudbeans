@@ -28,13 +28,13 @@ import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import lombok.Getter;
 
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedResources;
+import org.springframework.hateoas.PagedModel;
 
 /**
  * Created by manos on 21/2/2017.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PagedModelResources<M extends Persistable> extends PagedResources<ModelResource<M>> {
+public class PagedModelResources<M extends Persistable> extends PagedModel<ModelResource<M>> {
 
 
     @Getter
@@ -44,24 +44,24 @@ public class PagedModelResources<M extends Persistable> extends PagedResources<M
     }
 
     /**
-     * Creates a new {@link PagedResources} from the given content, {@link PageMetadata}, URL parameters and {@link Link}s (optional).
+     * Creates a new {@link PagedModel} from the given content, {@link PageMetadata}, URL parameters and {@link Link}s (optional).
      *
-	 * @param content must not be {@literal null}.
-	 * @param paginationMetadata the pagination information
-	 * @param urlParameters the original URL parameters used to construct the page
-	 * @param links
-	 */
+     * @param content            must not be {@literal null}.
+     * @param paginationMetadata the pagination information
+     * @param urlParameters      the original URL parameters used to construct the page
+     * @param links
+     */
 	protected PagedModelResources(Collection<ModelResource<M>> content, PageMetadata paginationMetadata, Map<String, String[]> urlParameters, Link... links) {
 		super(content, paginationMetadata, links);
 		this.urlParameters = urlParameters;
-	}
+    }
 
-	/**
-	 * Creates a new {@link PagedResources} from the given content, {@link PageMetadata}, URL parameters and {@link Link}s (optional).
-	 *
-	 * @param content must not be {@literal null}.
-	 * @param paginationMetadata the pagination information
-	 * @param urlParameters the original URL parameters used to construct the page
+    /**
+     * Creates a new {@link PagedModel} from the given content, {@link PageMetadata}, URL parameters and {@link Link}s (optional).
+     *
+     * @param content must not be {@literal null}.
+     * @param paginationMetadata the pagination information
+     * @param urlParameters the original URL parameters used to construct the page
 	 * @param links
 	 */
 	public PagedModelResources(Collection<ModelResource<M>> content, PageMetadata paginationMetadata, Map<String, String[]> urlParameters, Iterable<Link> links) {

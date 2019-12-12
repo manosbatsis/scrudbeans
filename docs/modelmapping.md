@@ -59,7 +59,7 @@ data class Order(
 
         @field:NotNull
         @field:Column(nullable = false)
-        @field:ApiModelProperty(value = "The client's email", required = true)
+        @field:Schema(title = "The client's email", required = true)
         var email: String? = null,
 
         // other constructor params...
@@ -112,13 +112,13 @@ operations/endpoints for this entity's REST controller .
 
 - `javax.persistence.Column` for not-null and unique values
 - `javax.validation.constraints` annotations
-- Any custom Java Bean Validation annotation. See `com.github.manosbatsis.scrudbeans.jpa.validation.Unique` for an 
+- Any custom Java Bean Validation annotation. See `Unique` for an 
 example, or create your own.
 
 ### Documentation
 
-Annotating your models and their fields properly with `io.swagger.annotations.ApiModel` and 
-`io.swagger.annotations.ApiModelProperty` respectively will increase the quality of the generated Springfox/Swagger 
+Annotating your models and their fields properly with `io.swagger.v3.oas.annotations.media.Schema` and 
+`io.swagger.v3.oas.annotations.media.SchemaProperty` respectively will increase the quality of the generated Springfox/Swagger 
 documentation.
 
 

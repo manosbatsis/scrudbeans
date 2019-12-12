@@ -28,9 +28,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelResource;
 
 /**
- * A Resource as defined in JSON API 1.1. Deserialized as a @link SimpleModelResource} by default
+ * A EntityModel as defined in JSON API 1.1. Deserialized as a @link SimpleModelResource} by default
  *
- * @param <RID> the JSON API Resource model key type
+ * @param <RID> the JSON API EntityModel model key type
  */
 @JsonDeserialize(as = SimpleModelResource.class)
 public interface JsonApiResourceIdentifier<RID extends Serializable> extends JsonApiLinksContainer {

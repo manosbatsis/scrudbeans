@@ -30,8 +30,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
  * A Document according to JSON API 1.1
  *
  * @param <D> the JSON API Document data type\
- * @see <a href="http://jsonapi.org/format/upcoming/#document-structure">JSON API Resources</a>
- *
+ * @see <a href="http://jsonapi.org/format/upcoming/#document-structure">JSON API CollectionModel</a>
  */
 @JsonPropertyOrder({"data", "errors", "meta", "jsonapi", "links", "included"})
 public interface JsonApiDocument<D extends Object> extends JsonApiLinksContainer {

@@ -1,7 +1,7 @@
 package mykotlinpackage.model
 
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractEmbeddableManyToManyIdentifier
-import io.swagger.annotations.ApiModel
+import com.github.manosbatsis.scrudbeans.model.AbstractEmbeddableManyToManyIdentifier
+import io.swagger.v3.oas.annotations.media.Schema
 import java.io.Serializable
 import javax.persistence.Embeddable
 
@@ -10,7 +10,7 @@ import javax.persistence.Embeddable
  * @see AbstractEmbeddableManyToManyIdentifier
  */
 @Embeddable
-@ApiModel(value = "ProductRelationshipIdentifier", description = "A composite identifier used an ID in ProductRelationship entities")
+@Schema(name = "ProductRelationshipIdentifier", description = "A composite identifier used an ID in ProductRelationship entities")
 class ProductRelationshipIdentifier : AbstractEmbeddableManyToManyIdentifier<Product, String, Product, String>() {
     override fun buildLeft(left: Serializable) = Product(id = left.toString())
 

@@ -15,15 +15,15 @@ import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
-import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository;
-import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService;
-import com.github.manosbatsis.scrudbeans.common.util.ClassUtils;
-import com.github.manosbatsis.scrudbeans.common.util.ScrudStringUtils;
-import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractModelServiceBackedController;
-import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractPersistableModelController;
-import com.github.manosbatsis.scrudbeans.jpa.service.AbstractModelServiceImpl;
-import com.github.manosbatsis.scrudbeans.jpa.service.AbstractPersistableModelServiceImpl;
-import com.github.manosbatsis.scrudbeans.jpa.specification.factory.AnyToOnePredicateFactory;
+import com.github.manosbatsis.scrudbeans.repository.ModelRepository;
+import com.github.manosbatsis.scrudbeans.service.PersistableModelService;
+import com.github.manosbatsis.scrudbeans.util.ClassUtils;
+import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils;
+import com.github.manosbatsis.scrudbeans.controller.AbstractModelServiceBackedController;
+import com.github.manosbatsis.scrudbeans.controller.AbstractPersistableModelController;
+import com.github.manosbatsis.scrudbeans.service.AbstractModelServiceImpl;
+import com.github.manosbatsis.scrudbeans.service.AbstractPersistableModelServiceImpl;
+import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.EntityModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ScrudModelDescriptor;
@@ -31,7 +31,7 @@ import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -40,7 +40,7 @@ import org.mapstruct.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.hateoas.ExposesResourceFor;
+import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -119,10 +119,9 @@ class TypeSpecBuilder {
 						AnnotationSpec.builder(RestController.class)
 								.addMember("value", "\"" + beanName + "\"").build())
 				.addAnnotation(
-						AnnotationSpec.builder(Api.class)
-								.addMember("tags", "\"" + apiName + "\"")
-								.addMember("description", "\"" + apiDescription + "\"")
-								.addMember("produces", "\"" + MIMES_PRODUCED + "\"").build())
+                        AnnotationSpec.builder(OpenAPIDefinition.class)
+                                .addMember("tags", "@io.swagger.v3.oas.annotations.tags.Tag(name=\"" + apiName + "\", description=\"" + apiDescription + "\")")
+                                .build())
 				.addAnnotation(
 						AnnotationSpec.builder(RequestMapping.class)
 								.addMember("value", getRequestMappingPattern(descriptor)).build())

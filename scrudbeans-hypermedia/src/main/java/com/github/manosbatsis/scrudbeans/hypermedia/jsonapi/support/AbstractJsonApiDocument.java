@@ -32,13 +32,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- *
  * Abstract base class implementation of {@JsonApiDocument}
  *
- * @see JsonApiModelBasedDocumentBuilder
- * @see <a href="http://jsonapi.org/format/upcoming/#document-structure">JSON API Resources</a>
- *
  * @param <D> the JSON API Document data type
+ * @see JsonApiModelBasedDocumentBuilder
+ * @see <a href="http://jsonapi.org/format/upcoming/#document-structure">JSON API CollectionModel</a>
  */
 public abstract class AbstractJsonApiDocument<D extends Object> implements JsonApiDocument<D> {
 

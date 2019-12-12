@@ -27,22 +27,21 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceDocument;
-import io.swagger.annotations.ApiModel;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * {@value #CLASS_DESCRIPTION}
  *
+ * @param <T>  the JSON API EntityModel model type
+ * @param <PK> the JSON API EntityModel model key type
  * @see SimpleModelResourceCollectionDocument
  * @see <a href="http://jsonapi.org/format/upcoming/#document-structure">JSON API Documents</a>
- *
- * @param <T> the JSON API Resource model type
- * @param <PK> the JSON API Resource model key type
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel(value = "Document (JSON-API)", description = SimpleModelResourceDocument.CLASS_DESCRIPTION)
+@Schema(name = "Document (JSON-API)", description = SimpleModelResourceDocument.CLASS_DESCRIPTION)
 public class SimpleModelResourceDocument<T extends Persistable<PK>, PK extends Serializable> extends AbstractJsonApiDocument<JsonApiModelResource<T, PK>> implements JsonApiModelResourceDocument<T, PK> {
 
-    public static final String CLASS_DESCRIPTION = "A Document that may contain up to a single Resource model (as defined by JSON API 1.1)";
+    public static final String CLASS_DESCRIPTION = "A Document that may contain up to a single EntityModel model (as defined by JSON API 1.1)";
 
     private SimpleModelResource<T, PK> data;
 

@@ -1,12 +1,12 @@
 package com.github.manosbatsis.scrudbeans.autoconfigure;
 
 import com.github.manosbatsis.scrudbeans.error.RestExceptionHandler;
-import com.github.manosbatsis.scrudbeans.jpa.binding.CustomEnumConverterFactory;
-import com.github.manosbatsis.scrudbeans.jpa.binding.StringToEmbeddableCompositeIdConverterFactory;
-import com.github.manosbatsis.scrudbeans.jpa.fs.FilePersistenceConfigPostProcessor;
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractEmbeddableManyToManyIdentifier;
-import com.github.manosbatsis.scrudbeans.jpa.registry.JpaModelInfoRegistry;
-import com.github.manosbatsis.scrudbeans.jpa.validation.UniqueValidator;
+import com.github.manosbatsis.scrudbeans.binding.CustomEnumConverterFactory;
+import com.github.manosbatsis.scrudbeans.binding.StringToEmbeddableCompositeIdConverterFactory;
+import com.github.manosbatsis.scrudbeans.fs.FilePersistenceConfigPostProcessor;
+import com.github.manosbatsis.scrudbeans.model.AbstractEmbeddableManyToManyIdentifier;
+import com.github.manosbatsis.scrudbeans.registry.JpaModelInfoRegistry;
+import com.github.manosbatsis.scrudbeans.validation.UniqueValidator;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;

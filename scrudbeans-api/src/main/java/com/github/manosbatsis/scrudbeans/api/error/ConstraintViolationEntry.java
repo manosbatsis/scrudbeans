@@ -20,16 +20,17 @@
  */
 package com.github.manosbatsis.scrudbeans.api.error;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.io.Serializable;
 
 import javax.validation.ConstraintViolation;
 
-import io.swagger.annotations.ApiModel;
 
 /**
  * DTO class for {@link ConstraintViolation} instances
  */
-@ApiModel(value = "ConstraintViolationEntry", description = "DTO class for serialization of bean validation violations. ")
+@Schema(description = "DTO class for serialization of bean validation violations. ")
 public class ConstraintViolationEntry implements Serializable {
 
 	private String message;

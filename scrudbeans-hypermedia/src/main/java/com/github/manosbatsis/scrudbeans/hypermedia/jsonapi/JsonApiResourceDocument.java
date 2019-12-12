@@ -23,12 +23,11 @@ package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi;
 import java.io.Serializable;
 
 /**
- * A Document that may contain up to a single Resource according to JSON API 1.1
+ * A Document that may contain up to a single EntityModel according to JSON API 1.1
  *
- * @param <D> the JSON API Resource type
- * @param <A> the JSON API Resource attributes object type
- * @param <ID> the JSON API Resource id  type
- *
+ * @param <D>  the JSON API EntityModel type
+ * @param <A>  the JSON API EntityModel attributes object type
+ * @param <ID> the JSON API EntityModel id  type
  */
 public interface JsonApiResourceDocument<D extends JsonApiResource<A, ID>, A extends Serializable, ID extends Serializable> extends JsonApiDocument<D> {
 

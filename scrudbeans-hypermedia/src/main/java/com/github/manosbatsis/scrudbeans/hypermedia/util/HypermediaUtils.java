@@ -21,11 +21,7 @@
 package com.github.manosbatsis.scrudbeans.hypermedia.util;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -43,9 +39,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedResources;
-import org.springframework.hateoas.Resources;
-import org.springframework.hateoas.mvc.BasicLinkBuilder;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.server.mvc.BasicLinkBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
 
 /**
@@ -60,29 +56,29 @@ public class HypermediaUtils {
 		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(request.getRequestURL() + "?" + request.getQueryString());
 		// add first
 		if (!page.isFirst()) {
-			uriComponentsBuilder.replaceQueryParam(pageNumberParamName, 0);
-			// create the link builder
-			links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder).withRel("first"));
-		}
+            uriComponentsBuilder.replaceQueryParam(pageNumberParamName, 0);
+            // create the link builder
+            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder, Collections.emptyList()).withRel("first"));
+        }
 		// add previous
 		if (page.hasPrevious()) {
-			uriComponentsBuilder.replaceQueryParam(pageNumberParamName, 1);
-			// create the link builder
-			links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder).withRel("previous"));
-		}
+            uriComponentsBuilder.replaceQueryParam(pageNumberParamName, 1);
+            // create the link builder
+            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder, Collections.emptyList()).withRel("previous"));
+        }
 
 		// add next
 		if (page.hasNext()) {
-			uriComponentsBuilder.replaceQueryParam(pageNumberParamName, page.getNumber() + 1);
-			// create the link builder
-			links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder).withRel("next"));
-		}
+            uriComponentsBuilder.replaceQueryParam(pageNumberParamName, page.getNumber() + 1);
+            // create the link builder
+            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder, Collections.emptyList()).withRel("next"));
+        }
 
         // add last
         if (!page.isLast()) {
             uriComponentsBuilder.replaceQueryParam(pageNumberParamName, page.getTotalPages() - 1);
             // create the link builder
-            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder).withRel("last"));
+            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder, Collections.emptyList()).withRel("last"));
         }
         return links;
     }
@@ -129,7 +125,7 @@ public class HypermediaUtils {
     }
 
     /**
-     * Wrap the given models in a {@link Resources} and add {@link org.springframework.hateoas.Link}s
+     * Wrap the given models in a {@link CollectionModel} and add {@link org.springframework.hateoas.Link}s
      *
      * @param models
      */
@@ -160,7 +156,7 @@ public class HypermediaUtils {
         List<Link> tmp = HypermediaUtils.buileHateoasLinks(model, modelInfo);
         if (CollectionUtils.isNotEmpty(tmp)) {
             for (Link l : tmp) {
-                doc.add(l.getRel(), l.getHref());
+                doc.add(l.getRel().value(), l.getHref());
             }
         }
         return doc;
@@ -168,7 +164,7 @@ public class HypermediaUtils {
 
     public static <M extends Persistable> PagedModelResources<M> toHateoasPagedResources(@NonNull ParamsAwarePage<M> page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName, ModelInfoRegistry modelInfoRegistry) {
 
-        PagedResources.PageMetadata paginationInfo = new PagedResources.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements(), page.getTotalPages());
+        PagedModel.PageMetadata paginationInfo = new PagedModel.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements(), page.getTotalPages());
         List<Link> links = HypermediaUtils.buileHateoasLinks(page, request, pageNumberParamName);
 
         ArrayList<ModelResource<M>> wrapped = new ArrayList<>();

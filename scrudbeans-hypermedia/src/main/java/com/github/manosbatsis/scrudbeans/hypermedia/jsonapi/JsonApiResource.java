@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelResource;
 
 /**
- * A Resource as defined in JSON API 1.1. Deserialized as a @link SimpleModelResource} by default
+ * A EntityModel as defined in JSON API 1.1. Deserialized as a @link SimpleModelResource} by default
  *
  * @param <A> the attributes object type
  */

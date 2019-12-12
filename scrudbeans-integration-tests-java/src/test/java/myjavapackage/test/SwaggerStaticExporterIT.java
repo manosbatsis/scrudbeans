@@ -14,10 +14,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * {@inheritDoc}
  */
 @Slf4j
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = ScrudBeansSampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class SwaggerStaticExporterIT extends com.github.manosbatsis.scrudbeans.test.SwaggerStaticExporterIT {
+//@ExtendWith(SpringExtension.class)
+//@SpringBootTest(classes = ScrudBeansSampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class SwaggerStaticExporterIT {//extends com.github.manosbatsis.scrudbeans.test.SwaggerStaticExporterIT {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SwaggerStaticExporterIT.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SwaggerStaticExporterIT.class);
 
 }

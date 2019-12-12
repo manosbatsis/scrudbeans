@@ -33,8 +33,8 @@ import com.github.manosbatsis.scrudbeans.api.error.ConstraintViolationEntry;
 import com.github.manosbatsis.scrudbeans.api.error.Error;
 import com.github.manosbatsis.scrudbeans.api.exception.ConstraintViolationException;
 import com.github.manosbatsis.scrudbeans.api.util.HttpUtil;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,40 +42,40 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 
 
-@ApiModel(value = "Error", description = "Created exclusively by the system " +
-		"(i.e. without manual intervention) to handle and inform the user about runtime exceptions. ")
+@Schema(name = "Error", description = "Created exclusively by the system " +
+        "(i.e. without manual intervention) to handle and inform the user about runtime exceptions. ")
 @JsonPropertyOrder({"title", "createdDate", "httpStatusCode", "requestMethod", "requestUrl", "validationErrors", "user"})
 @Data
 public class ErrorResponse implements Error {
-	@ApiModelProperty(value = "The error title", readOnly = true)
-	private String title;
+    @Schema(description = "The error title", readOnly = true)
+    private String title;
 
-	@ApiModelProperty(value = "The address the request originated from", readOnly = true)
-	private String remoteAddress;
+    @Schema(description = "The address the request originated from", readOnly = true)
+    private String remoteAddress;
 
-	@ApiModelProperty(value = "The HTTP request method")
-	private String requestMethod;
+    @Schema(description = "The HTTP request method")
+    private String requestMethod;
 
-	@ApiModelProperty(value = "The HTTP request URL, relative to system base URL")
-	private String requestUrl;
+    @Schema(description = "The HTTP request URL, relative to system base URL")
+    private String requestUrl;
 
-	@ApiModelProperty(value = "The HTTP response status code ")
-	private Integer httpStatusCode;
+    @Schema(description = "The HTTP response status code ")
+    private Integer httpStatusCode;
 
-	@ApiModelProperty(value = "The UA string if provided with a request")
-	private String userAgent;
+    @Schema(description = "The UA string if provided with a request")
+    private String userAgent;
 
-	@ApiModelProperty(value = "Failed constraint validation rules, if any")
-	private Set<ConstraintViolationEntry> validationErrors;
+    @Schema(description = "Failed constraint validation rules, if any")
+    private Set<ConstraintViolationEntry> validationErrors;
 
-	@JsonIgnore
-	private Map<String, String> responseHeaders;
+    @JsonIgnore
+    private Map<String, String> responseHeaders;
 
-	@JsonIgnore
-	private Throwable throwable;
+    @JsonIgnore
+    private Throwable throwable;
 
-	protected ErrorResponse(HttpServletRequest request, String title) {
-		this.setTitle(title);
+    protected ErrorResponse(HttpServletRequest request, String title) {
+        this.setTitle(title);
 		// note reguest details
 		this.addRequestInfo(request);
 	}

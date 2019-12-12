@@ -4,16 +4,16 @@ import java.io.Serializable;
 
 import javax.persistence.Embeddable;
 
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractEmbeddableManyToManyIdentifier;
-import io.swagger.annotations.ApiModel;
+import com.github.manosbatsis.scrudbeans.model.AbstractEmbeddableManyToManyIdentifier;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Sample composite identifier for manyToMany relationship entities.
  * @see AbstractEmbeddableManyToManyIdentifier
  */
 @Embeddable
-@ApiModel(value = "ProductRelationshipIdentifier",
-		description = "A composite identifier used an ID in ProductRelationship entities")
+@Schema(name = "ProductRelationshipIdentifier",
+        description = "A composite identifier used an ID in ProductRelationship entities")
 public class ProductRelationshipIdentifier extends AbstractEmbeddableManyToManyIdentifier<Product, String, Product, String> {
 
 	@Override
