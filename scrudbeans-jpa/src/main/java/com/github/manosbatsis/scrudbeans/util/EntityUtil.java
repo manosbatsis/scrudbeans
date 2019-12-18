@@ -25,8 +25,7 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.io.Serializable;
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.persistence.Embeddable;
@@ -55,8 +54,18 @@ public class EntityUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EntityUtil.class);
 
-    private static ConcurrentHashMap<String, Boolean> fieldCaseSensitivity = new ConcurrentHashMap<String, Boolean>();
+    private static ConcurrentHashMap<String, Boolean> fieldCaseSensitivity = new ConcurrentHashMap<>();
     private static ClassPathScanningCandidateComponentProvider provider = null;
+    private static Map<Class<?>, Boolean> scrudBeanTypes = new ConcurrentHashMap<>();
+
+    public static Boolean isScrudBean(Class<?> domainType) {
+        Boolean isScrudBean = scrudBeanTypes.get(domainType);
+        if (Objects.isNull(isScrudBean)) {
+            isScrudBean = Persistable.class.isAssignableFrom(domainType) || domainType.isAnnotationPresent(ScrudBean.class);
+            scrudBeanTypes.put(domainType, true);
+        }
+        return isScrudBean;
+    }
 
     @SuppressWarnings("unchecked")
     public static <T> T getParentEntity(Object child) {

@@ -1,6 +1,5 @@
 package com.github.manosbatsis.scrudbeans.autoconfigure;
 
-import com.github.manosbatsis.scrudbeans.error.RestExceptionHandler;
 import com.github.manosbatsis.scrudbeans.binding.CustomEnumConverterFactory;
 import com.github.manosbatsis.scrudbeans.binding.StringToEmbeddableCompositeIdConverterFactory;
 import com.github.manosbatsis.scrudbeans.fs.FilePersistenceConfigPostProcessor;
@@ -13,15 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.orm.hibernate5.HibernateExceptionTranslator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Slf4j
@@ -45,34 +43,6 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 	public void addFormatters(FormatterRegistry registry) {
 		registry.addConverterFactory(new StringToEmbeddableCompositeIdConverterFactory());
 		registry.addConverterFactory(new CustomEnumConverterFactory());
-	}
-
-	/**
-	 * Condition that pases if a HandlerExceptionResolver is not already set
-	 * and if RestExceptionHandler is available
-	 */
-	static class RestExceptionHandlerConditions extends AllNestedConditions {
-		RestExceptionHandlerConditions() {
-			super(ConfigurationPhase.REGISTER_BEAN);
-		}
-
-		@ConditionalOnMissingBean(name = "restExceptionHandler")
-		static class OnMissing {
-		}
-
-		@ConditionalOnClass(RestExceptionHandler.class)
-		static class OnAvailable {
-		}
-	}
-
-	/**
-	 * Automatically handle errors by creating a REST exception response.
-	 * To disable, simply exclude "scrudbeans-error" as a transitive dependency of the starter.
-	 */
-	@Bean
-	@Conditional(RestExceptionHandlerConditions.class)
-	public HandlerExceptionResolver restExceptionHandler() {
-		return new RestExceptionHandler();
 	}
 
 	/** Improve exception handling */

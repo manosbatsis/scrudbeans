@@ -2,27 +2,33 @@ package myjavapackage.test;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.manosbatsis.scrudbeans.api.error.ConstraintViolationEntry;
 import com.github.manosbatsis.scrudbeans.api.error.Error;
 import lombok.Data;
 
+
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SimpleErrorResponse implements Error {
 
-	private String title;
+    private String message;
 
-	private String remoteAddress;
+    private String remoteAddress;
 
-	private String requestMethod;
+    private String requestMethod;
 
-	private String requestUrl;
+    private String requestUrl;
 
-	private Integer httpStatusCode;
+    private Integer httpStatusCode;
 
-	private String userAgent;
+    private String httpStatusMessage;
 
-	private Throwable throwable;
+    private String userAgent;
 
-	private Set<ConstraintViolationEntry> validationErrors;
+    private Throwable throwable;
+
+    private Set<ConstraintViolationEntry> validationErrors;
 
 }

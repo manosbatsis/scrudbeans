@@ -67,14 +67,18 @@ public class ScrudBeansProperties {
 	}
 
 	public Set<String> getPackagesToScanAsSet() {
-		Set<String> nameSet = new HashSet<String>();
-		if (StringUtils.isNoneBlank(packages)) {
-			List<String> names = Arrays.asList(packages.replaceAll(",", " ").split(" "));
-			if (!names.isEmpty()) {
-				nameSet.addAll(names);
-			}
-		}
-		return nameSet;
+        Set<String> nameSet = new HashSet<String>();
+        if (StringUtils.isNotBlank(packages)) {
+            List<String> names = Arrays.asList(packages.replaceAll(",", " ").split(" "));
+            if (!names.isEmpty()) {
+                for (String name : names) {
+                    if (StringUtils.isNotBlank(name)) {
+                        nameSet.add(name);
+                    }
+                }
+            }
+        }
+        return nameSet;
 
 	}
 }

@@ -37,7 +37,8 @@ import java.util.Locale
 @EntityScan(ScrudBeansSampleApplication.PACKAGE_NAME)
 @EnableJpaRepositories(
         basePackages = [ScrudBeansSampleApplication.PACKAGE_NAME],
-        includeFilters = [ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = [ModelRepository::class])],
+        includeFilters = [ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+                classes = [ModelRepository::class])],
         repositoryFactoryBeanClass = ModelRepositoryFactoryBean::class)
 class ScrudBeansSampleApplication {
 

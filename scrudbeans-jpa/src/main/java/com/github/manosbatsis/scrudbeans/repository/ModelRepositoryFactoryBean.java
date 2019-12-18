@@ -20,26 +20,27 @@
  */
 package com.github.manosbatsis.scrudbeans.repository;
 
-import java.io.Serializable;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.validation.Validator;
-
 import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
+import com.github.manosbatsis.scrudbeans.util.EntityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.support.*;
+import org.springframework.data.jpa.repository.support.JpaEntityInformation;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactory;
+import org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean;
+import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
+import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 
-public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extends Persistable<PK>, PK extends Serializable>
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.validation.Validator;
+
+public class ModelRepositoryFactoryBean<R extends Repository<T, PK>, T, PK>
         extends JpaRepositoryFactoryBean<R, T, PK> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelRepositoryFactoryBean.class);
@@ -51,6 +52,8 @@ public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extend
 
     public ModelRepositoryFactoryBean(Class<? extends R> repositoryInterface) {
         super(repositoryInterface);
+        LOGGER.debug("ModelRepositoryFactoryBean for repo interface: {}", repositoryInterface.getCanonicalName());
+
     }
 
     @Override
@@ -72,7 +75,7 @@ public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extend
         return repositoryFactorySupport;
     }
 
-    private static class ModelRepositoryFactory<T extends Persistable<PK>, PK extends Serializable> extends JpaRepositoryFactory {
+    private static class ModelRepositoryFactory<T, PK> extends JpaRepositoryFactory {
 
         private EntityManager entityManager;
         private Validator validator;
@@ -86,23 +89,55 @@ public class ModelRepositoryFactoryBean<R extends JpaRepository<T, PK>, T extend
         public <T, PK> JpaEntityInformation<T, PK> getEntityInformation(Class<T> domainClass) {
             Assert.notNull(domainClass, "Domain class must not be null!");
             Assert.notNull(entityManager, "EntityManager must not be null!");
+            JpaEntityInformation<T, PK> entityInfo;
             if (Persistable.class.isAssignableFrom(domainClass)) {
-                return new ModelEntityInformation(domainClass, entityManager.getMetamodel());
+                entityInfo = new ModelEntityInformation(domainClass, entityManager.getMetamodel());
             } else {
-                return super.getEntityInformation(domainClass);
+                entityInfo = super.getEntityInformation(domainClass);
             }
+            LOGGER.debug("getEntityInformation for {}: {}", domainClass, entityInfo.toString());
+
+            return entityInfo;
         }
 
+
+        /**
+         * Prepares a {@link ModelRepositoryImpl} instance if a ScrudBean,
+         * a regular {@link JpaRepositoryImplementation} otherwise.
+         */
         @Override
         protected JpaRepositoryImplementation<?, ?> getTargetRepository(RepositoryInformation information, EntityManager entityManager) {
-            ModelRepositoryImpl repository = new ModelRepositoryImpl<>((Class<T>) information.getDomainType(), entityManager);
-            repository.setValidator(this.validator);
-            return repository;
+            Class<?> domainType = information.getDomainType();
+            JpaRepositoryImplementation result;
+            if (EntityUtil.isScrudBean(domainType)) {
+                ModelRepositoryImpl repository = new ModelRepositoryImpl(domainType, entityManager);
+                repository.setValidator(this.validator);
+                result = repository;
+            } else {
+                result = super.getTargetRepository(information, entityManager);
+            }
+
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("getTargetRepository for {} returns a {}", domainType.getCanonicalName(), result.getClass().getCanonicalName());
+
+            return result;
         }
 
+        /**
+         * Prepares the {@link ModelRepositoryImpl} class if a ScrudBean,
+         * whatever super will otherwise.
+         */
         @Override
         protected Class<?> getRepositoryBaseClass(RepositoryMetadata metadata) {
-            return ModelRepositoryImpl.class;
+            Class<?> result;
+            Class<?> domainType = metadata.getDomainType();
+            if (EntityUtil.isScrudBean(domainType)) result = ModelRepositoryImpl.class;
+            else result = super.getRepositoryBaseClass(metadata);
+
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("getRepositoryBaseClass for {} returns a {}", domainType.getCanonicalName(), result.getCanonicalName());
+
+            return result;
         }
 
         public void setValidator(Validator validator) {
