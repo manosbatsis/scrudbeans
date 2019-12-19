@@ -143,8 +143,12 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 	 * @return the written file
 	 */
 	private JavaFile createController(ScrudModelDescriptor descriptor) {
-		TypeSpec typeSpec = TypeSpecBuilder.createController(descriptor);
-		return writeJavaFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".controller");
+		// Skip controller generation if controllerSuperClass is set to NONE
+		if (!ScrudBean.NONE.equals(descriptor.getScrudBean().controllerSuperClass())) {
+			TypeSpec typeSpec = TypeSpecBuilder.createController(descriptor);
+			return writeJavaFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".controller");
+		}
+		return null;
 	}
 
 	/**

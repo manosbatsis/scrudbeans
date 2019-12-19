@@ -22,10 +22,7 @@ package com.github.manosbatsis.scrudbeans.error;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.Principal;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +44,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.ServletWebRequest;
 
 
@@ -99,7 +99,8 @@ public class ScrudbeansErrorResponse implements Error {
         LOGGER.warn("ScrudbeansErrorResponse, throwable:", throwable);
         if (StringUtils.isBlank(message) && !Objects.isNull(throwable)) message = throwable.getMessage();
         if (!Objects.isNull(throwable)) {
-            this.exceptionClass = throwable.getClass().getCanonicalName();
+            Class errorClass = throwable.getClass();
+            this.exceptionClass = errorClass.getCanonicalName();
             if (includeStackTrace) {
                 StringWriter stackTrace = new StringWriter();
                 throwable.printStackTrace(new PrintWriter(stackTrace));
@@ -111,16 +112,7 @@ public class ScrudbeansErrorResponse implements Error {
             }
 
             // add validation errors, if any
-            if (ConstraintViolationException.class.isAssignableFrom(throwable.getClass())) {
-                Set<ConstraintViolation> violations = ((ConstraintViolationException) throwable)
-                        .getConstraintViolations();
-                if (CollectionUtils.isNotEmpty(violations)) {
-                    this.validationErrors = new HashSet<>();
-                    for (ConstraintViolation violation : violations) {
-                        this.validationErrors.add(new ConstraintViolationEntry(violation));
-                    }
-                }
-            }
+            initValidationErrors(throwable, errorClass);
         }
         if (Objects.isNull(status)) {
             HttpServletResponse response = request.getResponse();
@@ -135,7 +127,34 @@ public class ScrudbeansErrorResponse implements Error {
         }
         this.setMessage(message);
         this.addRequestInfo(request.getRequest());
+    }
 
+    private void initValidationErrors(Object throwable, Class errorClass) {
+        LOGGER.debug("initValidationErrors for type: {}", errorClass);
+        if (ConstraintViolationException.class.isAssignableFrom(errorClass)) {
+            Set<ConstraintViolation> violations = ((ConstraintViolationException) throwable)
+                    .getConstraintViolations();
+            if (CollectionUtils.isNotEmpty(violations)) {
+                this.validationErrors = new HashSet<>();
+                for (ConstraintViolation violation : violations) {
+                    this.validationErrors.add(new ConstraintViolationEntry(violation));
+                }
+            } else {
+                LOGGER.warn("initValidationErrors: ConstraintViolationException has zero violations");
+            }
+        } else if (MethodArgumentNotValidException.class.isAssignableFrom(errorClass)) {
+            BindingResult bindingResult = ((MethodArgumentNotValidException) throwable).getBindingResult();
+            List<ObjectError> errors = bindingResult.getAllErrors();
+            if (CollectionUtils.isNotEmpty(errors)) {
+                this.validationErrors = new HashSet<>();
+                for (ObjectError error : bindingResult.getAllErrors()) {
+                    LOGGER.debug("initValidationErrors, error: {}", error);
+                    this.validationErrors.add(new ConstraintViolationEntry(error));
+                }
+            } else {
+                LOGGER.warn("initValidationErrors: MethodArgumentNotValidException has zero errors");
+            }
+        }
     }
 
 

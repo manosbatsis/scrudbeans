@@ -63,18 +63,17 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-//@Component
-public class ModelRepositoryImpl<T extends Persistable<PK>, PK extends Serializable>
-        extends SimpleJpaRepository<T, PK>
-        implements ModelRepository<T, PK> {
+public class ModelRepositoryImpl<T, PK extends Serializable>
+		extends SimpleJpaRepository<T, PK>
+		implements ModelRepository<T, PK> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ModelRepositoryImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ModelRepositoryImpl.class);
 
-    private boolean skipValidation = false;
+	private boolean skipValidation = false;
 
-    private EntityManager em;
+	private EntityManager em;
 
-    private JpaEntityInformation<T, ?> entityInformation;
+	private JpaEntityInformation<T, ?> entityInformation;
 
     private Class<T> domainClass;
 
@@ -136,10 +135,10 @@ public class ModelRepositoryImpl<T extends Persistable<PK>, PK extends Serializa
         return em;
     }
 
-    /***
-     * {@inheritDoc}
-     * @deprecated use {@link #create(Persistable)}
-     */
+	/***
+	 * {@inheritDoc}
+	 * @deprecated use {@link #create(T)}
+	 */
     @Override
     public <S extends T> S save(@NonNull S entity) {
         this.validate(entity);
@@ -272,45 +271,6 @@ public class ModelRepositoryImpl<T extends Persistable<PK>, PK extends Serializa
         return (RT) this.em.createQuery(query).getSingleResult();
     }
 
-    /**
-     * Check if the given state is transient.
-     * Only applies to entities with non-assigned identifiers
-     */
-    @Override
-    public boolean isTransient(T resource) {
-        return resource.getScrudBeanId() == null;
-    }
-
-    /**
-     * Check if the given state is managed,
-     * i.e. contained within the current {@link EntityManager}.
-     */
-    @Override
-    public boolean isManaged(T resource) {
-        return this.em.contains(resource);
-    }
-
-    /**
-     * Check if the given state exists,
-     * i.e. is persisted.
-     */
-    @Override
-    public boolean exists(T resource) {
-        return !isTransient(resource)
-                && this.em.find(this.getDomainClass(), resource.getScrudBeanId()) != null;
-    }
-
-    /**
-     * Check if the given state is detached,
-     * i.e. not managed but already persisted.
-     */
-    @Override
-    public boolean isDetached(T resource) {
-        return !isTransient(resource)
-                && !isManaged(resource)
-                && exists(resource);
-    }
-
 
     private void buildEntityGraph(EntityGraph<T> entityGraph, String[] attributeGraph) {
         List<String> attributePaths = Arrays.asList(attributeGraph);
@@ -388,7 +348,7 @@ public class ModelRepositoryImpl<T extends Persistable<PK>, PK extends Serializa
 	public void deleteAll(@NotNull Iterable<? extends T> entities) {
 		if (this.disableableDomainClass) {
 			for (T entity : entities) {
-				this.softDelete(entity.getScrudBeanId());
+				this.softDelete(((Persistable<PK>) entity).getScrudBeanId());
 			}
 		}
 		else super.deleteAll(entities);

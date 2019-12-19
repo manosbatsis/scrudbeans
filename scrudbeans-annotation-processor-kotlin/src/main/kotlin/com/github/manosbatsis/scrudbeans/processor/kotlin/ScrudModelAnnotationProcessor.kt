@@ -1,9 +1,9 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin
 
+import com.github.manosbatsis.kotlinpoet.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.DtoMapper
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
-import com.github.manosbatsis.kotlinpoet.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.EntityModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
@@ -13,15 +13,22 @@ import com.squareup.kotlinpoet.WildcardTypeName
 import com.squareup.kotlinpoet.asTypeName
 import org.slf4j.LoggerFactory
 import java.io.File
-
-import javax.annotation.processing.*
+import java.io.IOException
+import java.util.HashMap
+import java.util.LinkedList
+import java.util.Objects
+import java.util.Properties
+import javax.annotation.processing.AbstractProcessor
+import javax.annotation.processing.Filer
+import javax.annotation.processing.ProcessingEnvironment
+import javax.annotation.processing.RoundEnvironment
+import javax.annotation.processing.SupportedAnnotationTypes
+import javax.annotation.processing.SupportedSourceVersion
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Name
 import javax.lang.model.element.TypeElement
 import javax.persistence.Entity
 import javax.tools.StandardLocation
-import java.io.IOException
-import java.util.*
 
 /**
  * Annotation processor that generates SCRUD components
@@ -156,8 +163,9 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
      * @return the written file
      */
     private fun createController(descriptor: ScrudModelDescriptor): FileSpec? {
-        val typeSpec = typeSpecBuilder.createController(descriptor)
-        return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".controller")
+        return if (ScrudBean.NONE != descriptor.scrudBean.controllerSuperClass)
+            writeKotlinFile(descriptor, typeSpecBuilder.createController(descriptor), descriptor.parentPackageName + ".controller")
+        else null
     }
 
     /**

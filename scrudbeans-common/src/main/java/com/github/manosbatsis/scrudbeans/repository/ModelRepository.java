@@ -44,17 +44,17 @@ import org.springframework.data.repository.query.QueryByExampleExecutor;
  * @param <PK> the type of the id of the entity the repository manages
  */
 @NoRepositoryBean
-public interface ModelRepository<T extends Persistable<PK>, PK extends Serializable>
-        extends JpaRepository<T, PK>, JpaSpecificationExecutor<T> {
+public interface ModelRepository<T, PK extends Serializable>
+		extends JpaRepository<T, PK>, JpaSpecificationExecutor<T> {
 
-    EntityManager getEntityManager();
+	EntityManager getEntityManager();
 
-    /**
-     * Get the domain type class
-     *
-     * @return the domain type class
-     */
-    Class<T> getDomainClass();
+	/**
+	 * Get the domain type class
+	 *
+	 * @return the domain type class
+	 */
+	Class<T> getDomainClass();
 
     /**
      * Create a resource.
@@ -82,29 +82,6 @@ public interface ModelRepository<T extends Persistable<PK>, PK extends Serializa
 	 */
 	T patch(PK id, T delta);
 
-    /**
-     * Check if the given state is transient.
-     * Only applies to entities with non-assigned identifiers
-     */
-    boolean isTransient(T resource);
-
-    /**
-     * Check if the given state is managed,
-     * i.e. contained within the current {@link EntityManager}.
-     */
-    boolean isManaged(T resource);
-
-    /**
-     * Check if the given state exists,
-     * i.e. is persisted.
-     */
-    boolean exists(T resource);
-
-    /**
-     * Check if the given state is detached,
-     * i.e. not managed but already persisted.
-     */
-    boolean isDetached(T resource);
 
 //	MetadatumModel addMetadatum(PK subjectId, String predicate, String object);
 //
