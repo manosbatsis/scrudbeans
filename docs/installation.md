@@ -8,7 +8,7 @@ This document will help you get a quick start with ScrudBeans and Spring Boot.
 
 The [scrudbeans-template-java](https://github.com/manosbatsis/scrudbeans-template-java) and 
 [scrudbeans-template-kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin) projects 
-replicates this quick tutorial and can help you get started with ScrudBeans right away. 
+replicate this quick tutorial and can help you get started with ScrudBeans right away. 
 > Both Maven and Gradle build scripts are included in the above samples.
 
 For Kotlin:
