@@ -1,6 +1,6 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin
 
-import com.github.manosbatsis.kotlinpoet.utils.ProcessingEnvironmentAware
+import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.DtoMapper
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
@@ -111,8 +111,9 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
                     if (element is TypeElement) {
                         // Parse model to something more convenient
                         val descriptor = ScrudModelDescriptor(processingEnv, element, configProps)
-                        // Generate components for model
+                        // Mappers for manual DTOs
                         generateDtoMappers(descriptor)
+                        generateDto(descriptor)
                         createRepository(descriptor)
                         createService(descriptor)
                         createController(descriptor)
@@ -126,6 +127,17 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
 
             }
         }
+    }
+
+    /**
+     * Create a DTO source file
+     * @param descriptor The target model descriptor
+     * @return the written file
+     */
+    private fun generateDto(descriptor: ScrudModelDescriptor): FileSpec? {
+        val typeSpec = typeSpecBuilder.dtoSpecBuilder(descriptor).build()
+        return writeKotlinFile(descriptor, typeSpec, descriptor.packageName)
+
     }
 
     /**

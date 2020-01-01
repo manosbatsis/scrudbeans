@@ -20,14 +20,14 @@
  */
 package com.github.manosbatsis.scrudbeans.service;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Set;
-
 import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractModelServiceImpl<T extends Persistable<PK>, PK extends Serializable>
         extends AbstractBaseServiceImpl
@@ -69,34 +69,32 @@ public abstract class AbstractModelServiceImpl<T extends Persistable<PK>, PK ext
     /**
      * Update an existing resource.
      *
-     * @param id EntityModel identifier
      * @param resource EntityModel body to use for the update
      * @return resource updated
-	 */
-	@Override
-	public T update(PK id, T resource) {
-		return null;
+     */
+    @Override
+    public T update(T resource) {
+        return null;
     }
 
     /**
      * Partially update an existing resource.
      *
-     * @param id EntityModel identifier
      * @param resource EntityModel body to use for as patch
      * @return resource updated
-	 */
-	@Override
-	public T patch(PK id, T resource) {
-		return null;
+     */
+    @Override
+    public T patch(T resource) {
+        return null;
     }
 
     /**
      * Delete an existing resource.
      *
      * @param resource EntityModel to delete
-	 */
-	@Override
-	public void delete(PK id, T resource) {
+     */
+    @Override
+    public void delete(T resource) {
 
     }
 

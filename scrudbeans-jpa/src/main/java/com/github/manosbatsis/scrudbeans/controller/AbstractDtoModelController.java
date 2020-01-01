@@ -1,20 +1,19 @@
 /**
- *
  * ScrudBeans: Model driven development for Spring Boot
  * -------------------------------------------------------------------
- *
+ * <p>
  * Copyright © 2005 Manos Batsis (manosbatsis gmail)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -76,10 +75,14 @@ import java.util.*;
  * @param <PK> EntityModel id type, usually Long or String
  * @param <S>  The service class
  */
-public class AbstractPersistableModelController<T extends Persistable<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
-		extends AbstractModelServiceBackedController<T, PK, S, Dto<T>> {
+public class AbstractDtoModelController<
+		T extends Persistable<PK>,
+		PK extends Serializable,
+		S extends PersistableModelService<T, PK>,
+		DTO extends Dto<T>>
+		extends AbstractModelServiceBackedController<T, PK, S, DTO> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractDtoModelController.class);
 
 	private SpecificationsBuilder<T, PK> specificationsBuilder;
 
@@ -94,7 +97,8 @@ public class AbstractPersistableModelController<T extends Persistable<PK>, PK ex
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.CREATED)
 	@Operation(description = "Create a new resource")
-	public T create(@RequestBody T resource) {
+	@Override
+	public T create(@RequestBody DTO resource) {
 		return super.create(resource);
 	}
 
@@ -103,9 +107,10 @@ public class AbstractPersistableModelController<T extends Persistable<PK>, PK ex
 	// =====================
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
 	@Operation(description = "Update a resource")
+	@Override
 	public T update(
 			@Parameter(name = "id", required = true)
-			@PathVariable PK id, @RequestBody T model) {
+			@PathVariable PK id, @RequestBody DTO model) {
 		return super.update(id, model);
 	}
 
@@ -115,9 +120,10 @@ public class AbstractPersistableModelController<T extends Persistable<PK>, PK ex
 	@Operation(
 			summary = "Patch (partially update) a resource",
 			description = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
+	@Override
 	public T patch(
 			@Parameter(name = "id", required = true)
-			@PathVariable PK id, @RequestBody T model) {
+			@PathVariable PK id, @RequestBody DTO model) {
 		return super.patch(id, model);
 	}
 
@@ -197,12 +203,11 @@ public class AbstractPersistableModelController<T extends Persistable<PK>, PK ex
 
 		// if ToOne
 		if (fieldInfo.isToOne()) {
-            Persistable related = this.findRelatedSingle(id, fieldInfo);
-            // if found
+			Persistable related = this.findRelatedSingle(id, fieldInfo);
+			// if found
 			EntityModel res = HypermediaUtils.toHateoasResource(related, fieldInfo.getRelatedModelInfo());
-            responseEntity = new ResponseEntity(res, HttpStatus.OK);
-        }
-		else if (fieldInfo.isOneToMany()) {
+			responseEntity = new ResponseEntity(res, HttpStatus.OK);
+		} else if (fieldInfo.isOneToMany()) {
 			Pageable pageable = PageableUtil.buildPageable(page, size, sort);
 			ParamsAwarePageImpl resultsPage = this.findRelatedPaginated(id, pageable, fieldInfo);
 			responseEntity = new ResponseEntity(resultsPage, HttpStatus.OK);
@@ -240,46 +245,44 @@ public class AbstractPersistableModelController<T extends Persistable<PK>, PK ex
 	}
 
 
+	/**
+	 * Find the other end of a ToOne relationship
+	 *
+	 * @param id        the root entity ID
+	 * @param fieldInfo the member/relation name
+	 * @return the single related entity, if any
+	 * @see PersistableModelService#findRelatedSingle(Serializable, FieldInfo)
+	 */
+	protected Persistable findRelatedSingle(PK id, FieldInfo fieldInfo) {
+		Persistable resource = this.service.findRelatedSingle(id, fieldInfo);
+		return resource;
+	}
 
-    /**
-     * Find the other end of a ToOne relationship
-     *
-     * @param id        the root entity ID
-     * @param fieldInfo the member/relation name
-     * @return the single related entity, if any
-     * @see PersistableModelService#findRelatedSingle(Serializable, FieldInfo)
-     */
-    protected Persistable findRelatedSingle(PK id, FieldInfo fieldInfo) {
-        Persistable resource = this.service.findRelatedSingle(id, fieldInfo);
-        return resource;
-    }
 
+	/**
+	 * Find a page of results matching the other end of a ToMany relationship
+	 *
+	 * @param id        the root entity ID
+	 * @param pageable  the page config
+	 * @param fieldInfo the member/relation name
+	 * @return the page of results, may be <code>null</code>
+	 * @see PersistableModelService#findRelatedPaginated(Class, Specification, Pageable)
+	 */
+	protected <M extends Persistable> ParamsAwarePageImpl<M> findRelatedPaginated(PK id, Pageable pageable, FieldInfo fieldInfo) {
+		ParamsAwarePageImpl<M> page = null;
+		Optional<String> reverseFieldName = fieldInfo.getReverseFieldName();
+		if (reverseFieldName.isPresent()) {
+			Map<String, String[]> params = request.getParameterMap();
+			Map<String, String[]> implicitCriteria = new HashMap<>();
+			implicitCriteria.put(reverseFieldName.get(), new String[]{id.toString()});
 
-    /**
-     * Find a page of results matching the other end of a ToMany relationship
-     *
-     * @param id        the root entity ID
-     * @param pageable  the page config
-     * @param fieldInfo the member/relation name
-     * @return the page of results, may be <code>null</code>
-     * @see PersistableModelService#findRelatedPaginated(java.lang.Class, org.springframework.data.jpa.domain.Specification, org.springframework.data.domain.Pageable)
-     */
-    protected <M extends Persistable> ParamsAwarePageImpl<M> findRelatedPaginated(PK id, Pageable pageable, FieldInfo fieldInfo) {
-        ParamsAwarePageImpl<M> page = null;
-        Optional<String> reverseFieldName = fieldInfo.getReverseFieldName();
-        if (reverseFieldName.isPresent()) {
-            Map<String, String[]> params = request.getParameterMap();
-            Map<String, String[]> implicitCriteria = new HashMap<>();
-            implicitCriteria.put(reverseFieldName.get(), new String[]{id.toString()});
-
-            ModelInfo relatedModelInfo = fieldInfo.getRelatedModelInfo();
-            // optionally create a query specification
-            Specification<M> spec = RsqlUtils.buildSpecification(relatedModelInfo, this.service.getConversionService(), params, implicitCriteria, SpecificationsBuilder.PARAMS_IGNORE_FOR_CRITERIA);
+			ModelInfo relatedModelInfo = fieldInfo.getRelatedModelInfo();
+			// optionally create a query specification
+			Specification<M> spec = RsqlUtils.buildSpecification(relatedModelInfo, this.service.getConversionService(), params, implicitCriteria, SpecificationsBuilder.PARAMS_IGNORE_FOR_CRITERIA);
 			// get the page of related children
 			Page<M> tmp = this.service.findRelatedPaginated(relatedModelInfo.getModelType(), spec, pageable);
 			page = new ParamsAwarePageImpl<M>(params, tmp.getContent(), pageable, tmp.getTotalElements());
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("Related field info has no reverse field name");
 		}
 		return page;

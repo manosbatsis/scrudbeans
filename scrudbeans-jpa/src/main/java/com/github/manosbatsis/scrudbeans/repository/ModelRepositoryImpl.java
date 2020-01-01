@@ -20,36 +20,17 @@
  */
 package com.github.manosbatsis.scrudbeans.repository;
 
-import static org.springframework.data.jpa.repository.query.QueryUtils.DELETE_ALL_QUERY_STRING;
-import static org.springframework.data.jpa.repository.query.QueryUtils.applyAndBind;
-import static org.springframework.data.jpa.repository.query.QueryUtils.getQueryString;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.*;
-
-import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-
+import com.github.manosbatsis.kotlin.utils.api.Dto;
 import com.github.manosbatsis.scrudbeans.api.domain.DisableableModel;
 import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.exception.BeanValidationException;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.util.EntityUtil;
 import lombok.NonNull;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -63,6 +44,18 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.*;
+import javax.persistence.criteria.*;
+import javax.persistence.metamodel.SingularAttribute;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static org.springframework.data.jpa.repository.query.QueryUtils.*;
+
 public class ModelRepositoryImpl<T, PK extends Serializable>
 		extends SimpleJpaRepository<T, PK>
 		implements ModelRepository<T, PK> {
@@ -73,62 +66,71 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 
 	private EntityManager em;
 
-	private JpaEntityInformation<T, ?> entityInformation;
+	private JpaEntityInformation<T, PK> entityInformation;
 
-    private Class<T> domainClass;
+	private Class<T> domainClass;
 
-    protected Validator validator;
+	protected Validator validator;
 
-    protected final boolean disableableDomainClass;
+	protected final boolean disableableDomainClass;
 
-    /**
-     * Creates a new {@link ModelRepositoryImpl} to manage objects of the given domain type.
-     *
+	/**
+	 * Creates a new {@link ModelRepositoryImpl} to manage objects of the given domain type.
+	 *
      * @param domainClass must not be {@literal null}.
      * @param em          must not be {@literal null}.
      */
     public ModelRepositoryImpl(Class<T> domainClass, EntityManager em) {
-        this(JpaEntityInformationSupport.getEntityInformation(domainClass, em), em);
+		this((JpaEntityInformation<T, PK>) JpaEntityInformationSupport.getEntityInformation(domainClass, em), em);
     }
 
-    /**
-     * Creates a new {@link SimpleJpaRepository} to manage objects of the given {@link JpaEntityInformation}.
-     *
-     * @param entityInformation must not be {@literal null}.
-     * @param entityManager     must not be {@literal null}.
-     */
-    public ModelRepositoryImpl(JpaEntityInformation<T, ?> entityInformation,
-                               EntityManager entityManager) {
-        super(entityInformation, entityManager);
-        LOGGER.debug("new ModelRepositoryImpl, entityInformation: {}, entityManager: {}, validator: {}",
-                entityInformation, entityManager, validator);
-        Assert.notNull(entityInformation, "ModelRepositoryImpl requires a non-null entityInformation constructor parameter");
-        Assert.notNull(entityManager, "ModelRepositoryImpl requires a non-null entityManager constructor parameter");
-        this.em = entityManager;
-        this.entityInformation = entityInformation;
-        this.domainClass = entityInformation.getJavaType();
-        this.disableableDomainClass = DisableableModel.class.isAssignableFrom(this.domainClass);
-        //Configuration config = ConfigurationFactory.getConfiguration();
-        String[] validatorExcludeClasses = {};//TODO config.getStringArray(ConfigurationFactory.VALIDATOR_EXCLUDES_CLASSESS);
-        // TODO this.skipValidation = Arrays.asList(validatorExcludeClasses).contains(domainClass.getCanonicalName());
-    }
+	/**
+	 * Creates a new {@link SimpleJpaRepository} to manage objects of the given {@link JpaEntityInformation}.
+	 *
+	 * @param entityInformation must not be {@literal null}.
+	 * @param entityManager     must not be {@literal null}.
+	 */
+	public ModelRepositoryImpl(JpaEntityInformation<T, PK> entityInformation,
+							   EntityManager entityManager) {
+		super(entityInformation, entityManager);
+		LOGGER.debug("new ModelRepositoryImpl, entityInformation: {}, entityManager: {}, validator: {}",
+				entityInformation, entityManager, validator);
+		Assert.notNull(entityInformation, "ModelRepositoryImpl requires a non-null entityInformation constructor parameter");
+		Assert.notNull(entityManager, "ModelRepositoryImpl requires a non-null entityManager constructor parameter");
+		this.em = entityManager;
+		this.entityInformation = entityInformation;
+		this.domainClass = entityInformation.getJavaType();
+		this.disableableDomainClass = DisableableModel.class.isAssignableFrom(this.domainClass);
+		//Configuration config = ConfigurationFactory.getConfiguration();
+		String[] validatorExcludeClasses = {};//TODO config.getStringArray(ConfigurationFactory.VALIDATOR_EXCLUDES_CLASSESS);
+		// TODO this.skipValidation = Arrays.asList(validatorExcludeClasses).contains(domainClass.getCanonicalName());
+	}
 
-    /***
-     * {@inheritDoc}
-     */
-    @Override
-    public Class<T> getDomainClass() {
-        return this.domainClass;
-    }
 
-    @PersistenceContext
-    public void setEntityManager(EntityManager entityManager) {
-        this.em = entityManager;
-    }
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getIdAttributeName() {
+		return this.entityInformation.getIdAttribute().getName();
+	}
 
-    public void setValidator(Validator validator) {
-        this.validator = validator;
-    }
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Class<T> getDomainClass() {
+		return this.domainClass;
+	}
+
+	@PersistenceContext
+	public void setEntityManager(EntityManager entityManager) {
+		this.em = entityManager;
+	}
+
+	public void setValidator(Validator validator) {
+		this.validator = validator;
+	}
 
     @Override
     public EntityManager getEntityManager() {
@@ -139,13 +141,13 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * {@inheritDoc}
 	 * @deprecated use {@link #create(T)}
 	 */
-    @Override
-    public <S extends T> S save(@NonNull S entity) {
-        this.validate(entity);
-        return super.save(entity);
-    }
+	@Override
+	public <S extends T> S save(@NonNull S entity) {
+		this.validate(entity);
+		return super.save(entity);
+	}
 
-    /***
+	/***
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -158,32 +160,92 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public T update(@NonNull PK id, @NonNull T resource) {
-		String[] ignored = {"id"};
-		return patch(id, resource, ignored);
+	public T create(@NonNull Dto<T> dto) {
+		return this.create(dto.toTargetType());
 	}
 
 	/***
 	 * {@inheritDoc}
 	 */
 	@Override
-	public T patch(@NonNull @P("id") PK id, @NonNull @P("resource") T delta) {
-		// update it by copying all non-null properties from the given transient instance
-		List<String> ignoredList = Arrays.asList(EntityUtil.getNullPropertyNames(delta));
-		ignoredList.add("id");
-		return patch(id, delta, ignoredList.toArray(new String[ignoredList.size()]));
+	public T update(@NonNull T resource) {
+		String[] ignored = {this.entityInformation.getIdAttribute().getName()};
+		return patch(resource, ignored);
 	}
 
 	/***
 	 * {@inheritDoc}
 	 */
-	private T patch(@NonNull @P("id") PK id, @NonNull @P("resource") T delta, @NonNull String[] ignoredPropertyNames) {
-        // load existing
-        T persisted = this.getOne(id);
-        BeanUtils.copyProperties(delta, persisted, ignoredPropertyNames);
-        // validate
-        this.validate(persisted);
-        // persist changes
+	@Override
+	public T update(@NonNull Dto<T> dto) {
+		return this.patch(dto);
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public T patch(@NonNull @P("resource") T delta) {
+		// update it by copying all non-null properties from the given transient instance
+		List<String> ignoredList = Arrays.asList(EntityUtil.getNullPropertyNames(delta));
+		ignoredList.add(this.entityInformation.getIdAttribute().getName());
+		return patch(delta, ignoredList.toArray(new String[ignoredList.size()]));
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public T patch(@NonNull @P("resource") Dto<T> delta) {
+
+		// load existing
+		T entity = this.getOne(getIdAttribute(delta));
+		entity = delta.toPatched(entity);
+		// validate
+		this.validate(entity);
+		// persist changes
+		return this.em.merge(entity);
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public PK getIdAttribute(Object o) {
+		PK id = null;
+		try {
+			SingularAttribute attr = entityInformation.getIdAttribute();
+			LOGGER.info("getIdAttribute, o: {}, attr: {}", o, attr);
+			LOGGER.info("getIdAttribute, name: {}", attr.getName());
+			id = (PK) PropertyUtils.getProperty(o, attr.getName());
+		} catch (Throwable e) {
+			throw new RuntimeException("Error retrieving persisted patch target");
+		}
+		return id;
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setIdAttribute(Object o, PK value) {
+		try {
+			PropertyUtils.setProperty(o, entityInformation.getIdAttribute().getName(), value);
+		} catch (Exception e) {
+			throw new RuntimeException("Error retrieving persisted patch target");
+		}
+	}
+
+	/***
+	 * {@inheritDoc}
+	 */
+	private T patch(@NonNull @P("resource") T delta, @NonNull String[] ignoredPropertyNames) {
+		// load existing
+		T persisted = this.getOne(entityInformation.getId(delta));
+		BeanUtils.copyProperties(delta, persisted, ignoredPropertyNames);
+		// validate
+		this.validate(persisted);
+		// persist changes
 		return this.em.merge(persisted);
 	}
 

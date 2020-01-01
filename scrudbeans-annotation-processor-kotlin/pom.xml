@@ -23,9 +23,9 @@
             <artifactId>kotlin-stdlib-jdk8</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.manosbatsis.kotlinpoet-utils</groupId>
-            <artifactId>kotlinpoet-utils</artifactId>
-            <version>${kotlinpoet-utils.version}</version>
+            <groupId>com.github.manosbatsis.kotlin-utils</groupId>
+            <artifactId>kotlin-utils-kapt</artifactId>
+            <version>${kotlin-utils.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.manosbatsis.scrudbeans</groupId>

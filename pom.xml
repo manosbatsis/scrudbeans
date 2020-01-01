@@ -89,7 +89,7 @@
 
         <kotlin.version>1.2.71</kotlin.version>
         <kotlinpoet.version>1.4.1</kotlinpoet.version>
-        <kotlinpoet-utils.version>0.2</kotlinpoet-utils.version>
+        <kotlin-utils.version>0.8</kotlin-utils.version>
         <kotlin.compiler.jvmTarget>${java.version}</kotlin.compiler.jvmTarget>
         <kotlin.apiVersion>1.2</kotlin.apiVersion>
         <kotlin.languageVersion>1.2</kotlin.languageVersion>
@@ -188,6 +188,11 @@
 				<version>1.10</version>
 			</dependency>
 			<!-- misc -->
+			<dependency>
+				<groupId>com.github.manosbatsis.kotlin-utils</groupId>
+				<artifactId>kotlin-utils-api</artifactId>
+				<version>${kotlin-utils.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>

@@ -21,27 +21,25 @@
 package com.github.manosbatsis.scrudbeans.service;
 
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository;
 import lombok.NonNull;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 //import com.github.manosbatsis.scrudbeans.api.domain.users.model.User;
 
@@ -58,22 +56,18 @@ public interface PersistableModelService<T extends Persistable<PK>, PK extends S
 
     String PRE_AUTHORIZATION_PREFIX = "SERVICE_";
 
-    /**
-     * Override to initialize data related to your model type
-     */
-    void initData();
 
     /**
-	 * Return the id of the entity.
-	 * A generated id is not guaranteed to be available until after
-	 * the database insert has occurred.
-	 * Returns null if the entity does not yet have an id.
-	 *
-	 * @param entity entity instance
-	 *
-	 * @return id of the entity
-	 *
-	 * @throws IllegalArgumentException if the object is found not
+     * Return the id of the entity.
+     * A generated id is not guaranteed to be available until after
+     * the database insert has occurred.
+     * Returns null if the entity does not yet have an id.
+     *
+     * @param entity entity instance
+     *
+     * @return id of the entity
+     *
+     * @throws IllegalArgumentException if the object is found not
 	 * to be an entity
 	 */
 	Object getIdentifier(Object entity);
@@ -107,8 +101,8 @@ public interface PersistableModelService<T extends Persistable<PK>, PK extends S
     Persistable findRelatedSingle(PK id, FieldInfo fieldInfo);
 
     /**
-	 * @see ModelRepository#validateConstraints(Persistable)
-	 */
+     * @see ModelRepository#validateConstraints(Object)
+     */
 	Set<ConstraintViolation<T>> validateConstraints(T resource);
 
 	/**

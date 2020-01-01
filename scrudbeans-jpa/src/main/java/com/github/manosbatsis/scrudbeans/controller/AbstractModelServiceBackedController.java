@@ -20,49 +20,29 @@
  */
 package com.github.manosbatsis.scrudbeans.controller;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.manosbatsis.kotlin.utils.api.Dto;
 import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
-import com.github.manosbatsis.scrudbeans.api.util.ParamsAwarePage;
 import com.github.manosbatsis.scrudbeans.domain.RawJson;
-import com.github.manosbatsis.scrudbeans.hypermedia.hateoas.ModelResource;
-import com.github.manosbatsis.scrudbeans.hypermedia.hateoas.ModelResources;
-import com.github.manosbatsis.scrudbeans.hypermedia.hateoas.PagedModelResources;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceCollectionDocument;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceDocument;
-import com.github.manosbatsis.scrudbeans.hypermedia.util.HypermediaUtils;
-import com.github.manosbatsis.scrudbeans.hypermedia.util.JsonApiModelBasedDocumentBuilder;
 import com.github.manosbatsis.scrudbeans.uischema.model.UiSchema;
-import com.github.manosbatsis.scrudbeans.util.ParamsAwarePageImpl;
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
 import lombok.NonNull;
-import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.RepresentationModel;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
+import java.util.Set;
 
 
 /**
@@ -91,17 +71,21 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @param <PK> EntityModel id type, usually Long or String
  * @param <S>  The service class
  */
-public class AbstractModelServiceBackedController<T extends Persistable<PK>, PK extends Serializable, S extends ModelService<T, PK>> implements InitializingBean {
+public class AbstractModelServiceBackedController<
+		T extends Persistable<PK>,
+		PK extends Serializable,
+		S extends ModelService<T, PK>,
+		DTO extends Dto<T>> implements InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceBackedController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceBackedController.class);
 
-    private ModelInfo modelInfo;
+	private ModelInfo modelInfo;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+	@Autowired
+	private ObjectMapper objectMapper;
 
-    @Autowired
-    protected HttpServletRequest request;
+	@Autowired
+	protected HttpServletRequest request;
 
 	@Autowired
 	protected ModelInfoRegistry mmdelInfoRegistry;
@@ -143,152 +127,47 @@ public class AbstractModelServiceBackedController<T extends Persistable<PK>, PK 
 		return this.modelInfo;
 	}
 
-
-    /**
-     * Wrap the given model in a {@link EntityModel} and add {@link Link}s
-     *
-     * @param model
-     */
-	protected ModelResource<T> toHateoasResource(@NonNull T model) {
-		return HypermediaUtils.toHateoasResource(model, this.mmdelInfoRegistry.getEntryFor(model.getClass()));
-    }
-
-
-    /**
-     * Wrap the given models in a {@link CollectionModel} and add {@link Link}s
-     *
-     * @param models
-	 */
-	protected ModelResources<T> toHateoasResources(@NonNull Iterable<T> models) {
-		Class<T> modelType = this.modelType;
-		return HypermediaUtils.toHateoasResources(models, modelType, this.mmdelInfoRegistry);
-    }
-
-    /**
-     * Convert the given {@link Page} to a {@link PagedModel} object and add {@link Link}s
-     *
-     * @param page
-	 */
-	protected PagedModelResources<T> toHateoasPagedResources(@NonNull ParamsAwarePageImpl<T> page, @NonNull String pageNumberParamName) {
-		Class<T> modelType = this.modelType;
-		return toHateoasPagedResources(page, modelType, pageNumberParamName);
-    }
-
-    /**
-     * Convert the given {@link Page} to a {@link PagedModel} object and add {@link Link}s
-     *
-     * @param page
-     */
-    protected <RT extends Persistable> PagedModelResources<RT> toHateoasPagedResources(@NonNull ParamsAwarePage<RT> page, @NonNull Class<RT> modelType, @NonNull String pageNumberParamName) {
-        ModelInfo rootModelInfo = this.mmdelInfoRegistry.getEntryFor(modelType);
-
-        // long size, long number, long totalElements, long totalPages
-        PagedModelResources<RT> pagedResources = HypermediaUtils.toHateoasPagedResources(page, request, pageNumberParamName, this.mmdelInfoRegistry);
-
-
-        return pagedResources;
-    }
-
-	/**
-	 * Wrap the given model in a JSON API Document
-	 * @param model the model to wrap
-	 */
-	protected JsonApiModelResourceDocument<T, PK> toDocument(T model) {
-		return HypermediaUtils.toDocument(model, this.getModelInfo());
-	}
-
-
-	/**
-	 * Wrap the given collection of models in a JSON API Document
-	 * @param models the models to wrap
-	 */
-	protected JsonApiModelResourceCollectionDocument<T, PK> toDocument(Collection<T> models) {
-		return new JsonApiModelBasedDocumentBuilder<T, PK>(this.getModelInfo().getUriComponent())
-				.withData(models)
-				.buildModelCollectionDocument();
-	}
-
-	/**
-	 * Wrap the given iterable of models of models in a JSON API Document
-	 * @param models the models to wrap
-	 */
-	protected JsonApiModelResourceCollectionDocument<T, PK> toDocument(Iterable<T> models) {
-		return new JsonApiModelBasedDocumentBuilder<T, PK>(this.getModelInfo().getUriComponent())
-				.withData(models)
-				.buildModelCollectionDocument();
-	}
-
-	/**
-	 * Wrap the given {@link Page} of models in a JSON API Document
-	 * @param page the page to wrap
-	 */
-	protected JsonApiModelResourceCollectionDocument<T, PK> toPageDocument(ParamsAwarePage<T> page) {
-
-		Class<T> modelType = this.modelType;
-		return toPageDocument(page, this.getModelInfo(), "page[number]");
-    }
-
-    /*
-     * Wrap the given {@link Page} of models in a JSON API Document
-     * @param page the page to wrap
-     * @param modelInfo
-     * @param pageNumberParamName
-     * @param <RT>
-     * @param <RPK>
-     */
-    protected <RT extends Persistable<RPK>, RPK extends Serializable> JsonApiModelResourceCollectionDocument<RT, RPK> toPageDocument(@NonNull ParamsAwarePage<RT> page, @NonNull ModelInfo<RT, RPK> modelInfo, @NonNull String pageNumberParamName) {
-        JsonApiModelResourceCollectionDocument<RT, RPK> doc = new JsonApiModelBasedDocumentBuilder<RT, RPK>(this.getModelInfo().getUriComponent())
-                .withData(page)
-                .buildModelCollectionDocument();
-        List<Link> tmp = HypermediaUtils.buileHateoasLinks(page, request, pageNumberParamName);
-        LOGGER.debug("toPageDocument, pageLinks: {}", tmp);
-        if (CollectionUtils.isNotEmpty(tmp)) {
-            for (Link l : tmp) {
-                doc.add(l.getRel().value(), l.getHref());
-			}
-		}
-		return doc;
-	}
-
-	/**
-	 * Unwrap the single model given as a JSON API Document
-	 */
-	protected T toModel(@NonNull @RequestBody JsonApiModelResourceDocument<T, PK> document) {
-		T entity = null;
-		JsonApiModelResource<T, PK> resource = document.getData();
-		if (resource != null) {
-			entity = resource.getAttributes();
-		}
-		return entity;
-	}
-
-
 	protected T create(@NonNull T resource) {
 		applyCurrentPrincipal(resource);
 		return this.service.create(resource);
 	}
 
-
-	protected T update(PK id, T resource) {
-		Assert.notNull(id, "id cannot be null");
+	protected T create(@NonNull DTO resource) {
 		applyCurrentPrincipal(resource);
-		resource = this.service.update(id, resource);
+		return this.service.create(resource);
+	}
+
+	protected T update(@NonNull PK id, @NonNull T resource) {
+		service.setIdAttribute(resource, id);
+		applyCurrentPrincipal(resource);
+		resource = this.service.update(resource);
 		return resource;
 	}
 
-
-	protected T patch(PK id, T resource) {
+	protected T update(@NonNull PK id, @NonNull DTO resource) {
+		service.setIdAttribute(resource, id);
 		applyCurrentPrincipal(resource);
-		resource = this.service.patch(id, resource);
+		return this.service.update(resource);
+	}
+
+	protected T patch(@NonNull PK id, @NonNull T resource) {
+		service.setIdAttribute(resource, id);
+		applyCurrentPrincipal(resource);
+		resource = this.service.patch(resource);
 		return resource;
 	}
 
+	protected T patch(@NonNull PK id, @NonNull DTO resource) {
+		service.setIdAttribute(resource, id);
+		applyCurrentPrincipal(resource);
+		return this.service.patch(resource);
+	}
 
 	protected Iterable<T> findAll() {
 		return service.findAll();
 	}
 
-	protected T findById(PK id) {
+	protected T findById(@NonNull PK id) {
 		LOGGER.debug("plainJsonGetById, id: {}, model type: {}", id, this.service.getDomainClass());
 		T resource = this.service.findById(id);
 		return resource;
@@ -302,7 +181,7 @@ public class AbstractModelServiceBackedController<T extends Persistable<PK>, PK 
 
 
 	protected void delete(@NonNull PK id) {
-		this.service.delete(id, this.findById(id));
+		this.service.delete(this.findById(id));
 	}
 
 
@@ -325,11 +204,7 @@ public class AbstractModelServiceBackedController<T extends Persistable<PK>, PK 
 		return schema;
 	}
 
-
-
-
-
-	protected void applyCurrentPrincipal(T resource) {
+	protected void applyCurrentPrincipal(Object resource) {
 		// TODO
 //        Field[] fields = FieldUtils.getFieldsWithAnnotation(this.service.getDomainClass(), CurrentPrincipal.class);
 //        //ApplyPrincipalUse predicate = this.service.getDomainClass().getAnnotation(CurrentPrincipalField.class);

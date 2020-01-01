@@ -20,11 +20,12 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.service;
 
+import com.github.manosbatsis.kotlin.utils.api.Dto;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 
 /**
  * CRUD Service interface.
@@ -35,20 +36,32 @@ import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 public interface ModelService<T extends Persistable<PK>, PK extends Serializable> extends BaseService {
 
 
-    /**
-     * Get the entity Class corresponding to the generic T
-     *
-     * @return the corresponding entity Class
-     */
-    Class<T> getDomainClass();
+	/**
+	 * Get the entity Class corresponding to the generic T
+	 *
+	 * @return the corresponding entity Class
+	 */
+	Class<T> getDomainClass();
 
-    /**
-     * Create a new resource.
-     *
-     * @param resource EntityModel to create
-     * @return new resource
-     */
+	PK getIdAttribute(Object o);
+
+	void setIdAttribute(Object o, PK value);
+
+	/**
+	 * Create a new resource.
+	 *
+	 * @param resource EntityModel to create
+	 * @return new resource
+	 */
 	T create(T resource);
+
+	/**
+	 * Create a new resource.
+	 *
+	 * @param resource EntityModel to create
+	 * @return new resource
+	 */
+	T create(Dto<T> resource);
 
 	/**
 	 * Override to handle post-create
@@ -71,31 +84,47 @@ public interface ModelService<T extends Persistable<PK>, PK extends Serializable
 	 */
 	void postDelete(T resource);
 
-    /**
-     * Update an existing resource.
-     *
-     * @param resource EntityModel to update
-     * @return resource updated
+	/**
+	 * Update an existing resource.
+	 *
+	 * @param resource EntityModel to update
+	 * @return resource updated
 	 */
-	T update(PK id, T resource);
+	T update(T resource);
 
-
-    /**
-     * Partially update an existing resource.
-     *
-     * @param resource EntityModel to update
-     * @return resource updated
+	/**
+	 * Update an existing resource.
+	 *
+	 * @param resource EntityModel to update
+	 * @return resource updated
 	 */
-	T patch(PK id, T resource);
+	T update(Dto<T> resource);
 
-    /**
-     * Delete an existing resource.
-     *
-     * @param resource EntityModel to delete
+
+	/**
+	 * Partially update an existing resource.
+	 *
+	 * @param resource EntityModel to update
+	 * @return resource updated
 	 */
-	void delete(PK id, T resource);
+	T patch(T resource);
 
-    /**
+	/**
+	 * Partially update an existing resource.
+	 *
+	 * @param resource EntityModel to update
+	 * @return resource updated
+	 */
+	T patch(Dto<T> resource);
+
+	/**
+	 * Delete an existing resource.
+	 *
+	 * @param resource EntityModel to delete
+	 */
+	void delete(T resource);
+
+	/**
      * Delete an existing resource.
      *
      * @param id EntityModel id

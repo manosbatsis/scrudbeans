@@ -20,17 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.service;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
-
+import com.github.manosbatsis.kotlin.utils.api.Dto;
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
 import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
@@ -46,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,6 +48,12 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * SCRUD service handling a specific type of {@link Persistable} using a {@link ModelRepository}
@@ -93,6 +88,22 @@ public class AbstractPersistableModelServiceImpl<T extends Persistable<PK>, PK e
 		return this.repository.getDomainClass();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public PK getIdAttribute(Object o) {
+		return this.repository.getIdAttribute(o);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setIdAttribute(Object o, PK value) {
+		this.repository.setIdAttribute(o, value);
+	}
+
 
 	/**
 	 * {@inheritDoc}
@@ -102,56 +113,16 @@ public class AbstractPersistableModelServiceImpl<T extends Persistable<PK>, PK e
 		return this.repository.getEntityManager().getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
 	}
 
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	@Transactional(readOnly = false)
-	public void initData() {
-// TODO
-//        User systemUser = (User) this.getPrincipalLocalUser();
-//        boolean wasAnonymous = Objects.isNull(systemUser) || StringUtils.isBlank(systemUser.getId());
-//
-//
-//        //? login?
-//        if(wasAnonymous){
-//
-//            // load system user if it exists
-//            systemUser = this.userRepository.findByUsername("admin");
-//
-//            Authentication auth = null;
-//
-//            // init auth with system user or emulate
-//            if(systemUser != null){
-//                auth = new UserDetailsAuthenticationToken(UserDetailsImpl.fromUser(systemUser));
-//            }
-//            else{
-//                auth = new AnonymousAuthenticationToken(this.getClass().getName(), this.getClass().getName(),
-//                        Arrays.asList(new SimpleGrantedAuthority[]{new SimpleGrantedAuthority(Roles.ROLE_USER), new SimpleGrantedAuthority(Roles.ROLE_ADMIN)}));
-//            }
-//
-//            // login
-//            SecurityContextHolder.getContext().setAuthentication(auth);
-//        }
-//
-//        // init data
-//        log.debug("initData, type: {}, was anonymous: {} ", this.getDomainClass().getSimpleName(), wasAnonymous);
-//        log.debug("initData > initDataOverride with user: {}", systemUser);
-//        this.initDataOverride(systemUser);
-//
-//        // logout?
-//        if(wasAnonymous) {
-//            SecurityContextHolder.clearContext();
-//        }
-	}
-
-	/** {@inheritDoc} */
-	@Override
 	public void postCreate(T resource) {
 	}
 
-	/** {@inheritDoc} */
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void postUpdate(T resource) {
 	}
@@ -167,64 +138,107 @@ public class AbstractPersistableModelServiceImpl<T extends Persistable<PK>, PK e
 	@Override
 	@Transactional(readOnly = false)
 	public T create(@P("resource") T resource) {
-        Assert.notNull(resource, "EntityModel can't be null");
-        // Persist
-        resource = repository.create(resource);
-        // Do any post-processing
-        this.postCreate(resource);
-        // Fire "created" event
-        this.applicationEventPublisher.publishEvent(new EntityCreatedEvent<>(resource));
-        // Return persisted
-        return resource;
-    }
+		Assert.notNull(resource, "EntityModel can't be null");
+		// Persist
+		resource = repository.create(resource);
+		// Do any post-processing
+		this.postCreate(resource);
+		// Fire "created" event
+		this.applicationEventPublisher.publishEvent(new EntityCreatedEvent<>(resource));
+		// Return persisted
+		return resource;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	@Transactional(readOnly = false)
-	public T update(@P("id") PK id, @P("resource") T resource) {
-        Assert.notNull(resource, "EntityModel can't be null");
-        // Persist
-        resource = repository.update(id, resource);
-        // Do any post-processing
-        this.postUpdate(resource);
-        // Fire "updated" event
-        this.applicationEventPublisher.publishEvent(new EntityUpdatedEvent<>(resource));
-        // Return persisted
-        return resource;
-    }
+	public T create(@P("resource") Dto<T> resource) {
+		return create(resource.toTargetType());
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	@Transactional(readOnly = false)
-	public T patch(@P("id") PK id, @P("resource") T resource) {
-        Assert.notNull(resource, "EntityModel can't be null");
-        // Persist
-        resource = repository.patch(id, resource);
-        // Do any post-processing
-        this.postUpdate(resource);
-        // Fire "updated" event
-        this.applicationEventPublisher.publishEvent(new EntityUpdatedEvent<>(resource));
-        // Return persisted
-        return resource;
-    }
+	public T update(@P("resource") T resource) {
+		Assert.notNull(resource, "EntityModel can't be null");
+		// Persist
+		resource = repository.update(resource);
+		// Do any post-processing
+		this.postUpdate(resource);
+		// Fire "updated" event
+		this.applicationEventPublisher.publishEvent(new EntityUpdatedEvent<>(resource));
+		// Return persisted
+		return resource;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	@Transactional(readOnly = false)
-	public void delete(PK id, T resource) {
-        Assert.notNull(resource, "EntityModel can't be null");
-        delete(id);
-        // Do any post-processing
-        this.postDelete(resource);
-        // Fire "deleted" event
-        this.applicationEventPublisher.publishEvent(new EntityDeletedEvent<>(resource));
-    }
+	public T update(@P("resource") Dto<T> resource) {
+		Assert.notNull(resource, "EntityModel can't be null");
+		// Persist
+		T updated = repository.update(resource);
+		// Do any post-processing
+		this.postUpdate(updated);
+		// Fire "updated" event
+		this.applicationEventPublisher.publishEvent(new EntityUpdatedEvent<>(updated));
+		// Return persisted
+		return updated;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = false)
+	public T patch(@P("resource") T resource) {
+		Assert.notNull(resource, "EntityModel can't be null");
+		// Persist
+		resource = repository.patch(resource);
+		// Do any post-processing
+		this.postUpdate(resource);
+		// Fire "updated" event
+		this.applicationEventPublisher.publishEvent(new EntityUpdatedEvent<>(resource));
+		// Return persisted
+		return resource;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = false)
+	public T patch(@P("resource") Dto<T> resource) {
+		Assert.notNull(resource, "EntityModel can't be null");
+		// Persist
+		T updated = repository.patch(resource);
+		// Do any post-processing
+		this.postUpdate(updated);
+		// Fire "updated" event
+		this.applicationEventPublisher.publishEvent(new EntityUpdatedEvent<>(updated));
+		// Return persisted
+		return updated;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	@Transactional(readOnly = false)
+	public void delete(T resource) {
+		Assert.notNull(resource, "EntityModel can't be null");
+		delete(repository.getIdAttribute(resource));
+		// Do any post-processing
+		this.postDelete(resource);
+		// Fire "deleted" event
+		this.applicationEventPublisher.publishEvent(new EntityDeletedEvent<>(resource));
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -415,12 +429,11 @@ public class AbstractPersistableModelServiceImpl<T extends Persistable<PK>, PK e
 				BeanUtils.setProperty(entity, propertyName, url);
 
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeException("Failed to update files", e);
 		}
 		// return the updated entity
-		entity = this.update(id, entity);
+		entity = this.update(entity);
 
 		log.debug("Entity after uploading files: {}", entity);
 		return entity;

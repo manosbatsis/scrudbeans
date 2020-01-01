@@ -20,22 +20,17 @@
  */
 package com.github.manosbatsis.scrudbeans.repository;
 
-import java.io.Serializable;
-import java.util.Set;
+import com.github.manosbatsis.kotlin.utils.api.Dto;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
+import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.repository.NoRepositoryBean;
 
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
-import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
-import org.springframework.data.repository.NoRepositoryBean;
-import org.springframework.data.repository.query.QueryByExampleExecutor;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Generic repository that provides SCRUD and utility methods based on domain and id type variables.
@@ -49,6 +44,8 @@ public interface ModelRepository<T, PK extends Serializable>
 
 	EntityManager getEntityManager();
 
+	String getIdAttributeName();
+
 	/**
 	 * Get the domain type class
 	 *
@@ -56,31 +53,35 @@ public interface ModelRepository<T, PK extends Serializable>
 	 */
 	Class<T> getDomainClass();
 
-    /**
-     * Create a resource.
+	/**
+	 * Create a resource.
 	 *
 	 * @param resource the state to apply
 	 * @return resource updated
 	 */
 	T create(T resource);
 
+	T create(Dto<T> dto);
+
 	/**
 	 * Update an existing resource.
 	 *
-	 * @param id the resource identifier
 	 * @param resource the state to apply
 	 * @return resource updated
 	 */
-	T update(PK id, T resource);
+	T update(T resource);
+
+	T update(Dto<T> dto);
 
 	/**
 	 * Partially update an existing resource.
 	 *
-	 * @param id the resource identifier
 	 * @param delta the patch to apply
 	 * @return resource updated
 	 */
-	T patch(PK id, T delta);
+	T patch(T delta);
+
+	T patch(Dto<T> dto);
 
 
 //	MetadatumModel addMetadatum(PK subjectId, String predicate, String object);
@@ -99,6 +100,10 @@ public interface ModelRepository<T, PK extends Serializable>
 //	 */
 //	List<UploadedFileModel> getUploadsForProperty(PK subjectId, String propertyName);
 
+
+	PK getIdAttribute(Object o);
+
+	void setIdAttribute(Object o, PK value);
 
 	/**
 	 * Validate the given resource using bean validator. {@link javax.persistence.Column} annotations are
