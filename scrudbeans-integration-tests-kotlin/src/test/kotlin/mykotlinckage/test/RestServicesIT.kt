@@ -75,7 +75,7 @@ class RestServicesIT : AbstractRestAssuredIT() {
         order = RestAssured.given()
                 .spec(defaultSpec())
                 .body(order)
-                .put("/api/rest/orders/" + order.getScrudBeanId())
+                .put("/api/rest/orders/" + order.id)
                 .then()
                 .statusCode(200).extract().`as`(Order::class.java)
         assertEquals(email + "_updated", order.email)
@@ -84,7 +84,7 @@ class RestServicesIT : AbstractRestAssuredIT() {
         //============================
         // Prepare the patch
         val orderMap: MutableMap<String, Any> = HashMap()
-        orderMap.put("id", order.getScrudBeanId())
+        orderMap.put("id", order.id!!)
         orderMap["email"] = order.email.toString() + "_patched"
         // Submit the patch
         order = RestAssured.given()
