@@ -4,7 +4,8 @@ package com.github.manosbatsis.scrudbeans.api.error;
  *
  */
 public interface Error {
-	String getTitle();
+
+	String getMessage();
 
 	String getRemoteAddress();
 
@@ -14,9 +15,10 @@ public interface Error {
 
 	Integer getHttpStatusCode();
 
+	String getHttpStatusMessage();
+
 	String getUserAgent();
 
 	java.util.Set<ConstraintViolationEntry> getValidationErrors();
 
-	Throwable getThrowable();
 }

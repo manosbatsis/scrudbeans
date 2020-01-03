@@ -8,9 +8,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 
 /**
  * {@inheritDoc}
- */
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(classes = [mykotlinpackage.ScrudBeansSampleApplication::class], webEnvironment = RANDOM_PORT)
 object SwaggerStaticExporterIT : com.github.manosbatsis.scrudbeans.test.SwaggerStaticExporterIT() {
     private val LOGGER = LoggerFactory.getLogger(SwaggerStaticExporterIT::class.java)
 }
+ */

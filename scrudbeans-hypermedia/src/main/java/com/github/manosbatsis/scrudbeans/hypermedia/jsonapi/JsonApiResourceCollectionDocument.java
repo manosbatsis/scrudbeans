@@ -23,9 +23,9 @@ package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi;
 import java.util.Collection;
 
 /**
- * A Document that may contain multiple Resources according to JSON API 1.1
+ * A Document that may contain multiple CollectionModel according to JSON API 1.1
  *
- * @param <D> the JSON API Resource collection type
+ * @param <D> the JSON API EntityModel collection type
  */
 public interface JsonApiResourceCollectionDocument<D extends Collection<R>, R extends JsonApiResource> extends JsonApiDocument<D> {
 

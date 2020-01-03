@@ -26,10 +26,10 @@ import java.util.Collection;
 import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 
 /**
- * A Document that may contain multiple model-based Resources according to JSON API 1.1
+ * A Document that may contain multiple model-based CollectionModel according to JSON API 1.1
  *
- * @param <T>  the JSON API Resource model type
- * @param <PK> the JSON API Resource model key type
+ * @param <T>  the JSON API EntityModel model type
+ * @param <PK> the JSON API EntityModel model key type
  */
 public interface JsonApiModelResourceCollectionDocument<T extends Persistable<PK>, PK extends Serializable> extends JsonApiResourceCollectionDocument<Collection<JsonApiModelResource<T, PK>>, JsonApiModelResource<T, PK>> {
 

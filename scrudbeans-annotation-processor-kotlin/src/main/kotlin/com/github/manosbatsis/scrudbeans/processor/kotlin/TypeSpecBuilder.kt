@@ -1,6 +1,7 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin
 
-import com.github.manosbatsis.kotlinpoet.utils.ProcessingEnvironmentAware
+import com.github.manosbatsis.kotlin.utils.DtoInfo
+import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.DtoMapper
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
@@ -8,29 +9,30 @@ import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService
 import com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATIOM_JSON_VALUE
 import com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATION_VND_API_PLUS_JSON_VALUE
 import com.github.manosbatsis.scrudbeans.api.util.Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE
-import com.github.manosbatsis.scrudbeans.common.repository.ModelRepository
-import com.github.manosbatsis.scrudbeans.common.service.PersistableModelService
-import com.github.manosbatsis.scrudbeans.common.util.ClassUtils
-import com.github.manosbatsis.scrudbeans.common.util.ScrudStringUtils
-import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractModelServiceBackedController
-import com.github.manosbatsis.scrudbeans.jpa.controller.AbstractPersistableModelController
-import com.github.manosbatsis.scrudbeans.jpa.service.AbstractModelServiceImpl
-import com.github.manosbatsis.scrudbeans.jpa.service.AbstractPersistableModelServiceImpl
-import com.github.manosbatsis.scrudbeans.jpa.specification.factory.AnyToOnePredicateFactory
+import com.github.manosbatsis.scrudbeans.controller.AbstractDtoModelController
+import com.github.manosbatsis.scrudbeans.controller.AbstractModelServiceBackedController
+import com.github.manosbatsis.scrudbeans.controller.AbstractPersistableModelController
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.EntityModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
+import com.github.manosbatsis.scrudbeans.repository.ModelRepository
+import com.github.manosbatsis.scrudbeans.service.AbstractModelServiceImpl
+import com.github.manosbatsis.scrudbeans.service.AbstractPersistableModelServiceImpl
+import com.github.manosbatsis.scrudbeans.service.PersistableModelService
+import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory
+import com.github.manosbatsis.scrudbeans.util.ClassUtils
+import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
-import io.swagger.annotations.Api
+import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import org.apache.commons.lang3.StringUtils
 import org.atteo.evo.inflector.English
 import org.mapstruct.Mapper
 import org.slf4j.LoggerFactory
-import org.springframework.hateoas.ExposesResourceFor
+import org.springframework.hateoas.server.ExposesResourceFor
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestMapping
@@ -67,7 +69,7 @@ internal class TypeSpecBuilder(
                 ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL to AbstractPersistableModelServiceImpl::class.java.canonicalName,
                 // Default service controller per stack
                 CLASSNAME_KEY_CONTROLLER to AbstractModelServiceBackedController::class.java.canonicalName,
-                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER to AbstractPersistableModelController::class.java.canonicalName
+                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER to AbstractDtoModelController::class.java.canonicalName
         )
     }
 
@@ -109,10 +111,8 @@ internal class TypeSpecBuilder(
                         AnnotationSpec.builder(RestController::class.java)
                                 . addMember("value = %S", beanName).build())
                 .addAnnotation(
-                        AnnotationSpec.builder(Api::class.java)
-                                .addMember("tags = [%S]", apiName)
-                                .addMember("description = %S", apiDescription)
-                                .addMember("produces = %S", MIMES_PRODUCED).build())
+                        AnnotationSpec.builder(OpenAPIDefinition::class.java)
+                                .addMember("tags = [io.swagger.v3.oas.annotations.tags.Tag(name=%S, description=%S)]", apiName, apiDescription).build())
                 .addAnnotation(
                         AnnotationSpec.builder(RequestMapping::class.java)
                                 . addMember("value = %S", getRequestMappingPattern(descriptor)).build())
@@ -123,7 +123,8 @@ internal class TypeSpecBuilder(
                         ClassName(pkgAndName.left, pkgAndName.right).parameterizedBy(
                                 ClassName(descriptor.packageName, descriptor.simpleName),
                                 descriptor.idClassName,
-                                ClassName(descriptor.parentPackageName + ".service", descriptor.simpleName + "Service")))
+                                ClassName(descriptor.parentPackageName + ".service", descriptor.simpleName + "Service"),
+                                ClassName(descriptor.packageName, descriptor.simpleName + "Dto")))
                 .addModifiers(KModifier.PUBLIC)
                 .build()
     }
@@ -237,6 +238,15 @@ internal class TypeSpecBuilder(
         return pattern.replace("/{2,}".toRegex(), "/")
     }
 
+    /** Create a DTO for the given model */
+    fun dtoSpecBuilder(stateInfo: ScrudModelDescriptor): TypeSpec.Builder {
+        return dtoSpecBuilder(DtoInfo(
+                stateInfo.typeElement,
+                stateInfo.typeElement.accessibleConstructorParameterFields(),
+                stateInfo.packageName))
+    }
+
+    /** Create a mapstruct-based mapper for non-generated DTOs */
     fun createDtoMapper(descriptor: ScrudModelDescriptor, dtoClass: String): TypeSpec {
         log.debug("createDtoMapper, dtoClass: $dtoClass")
         val dtoSimpleName = dtoClass.substring(dtoClass.lastIndexOf('.') + 1)

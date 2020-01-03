@@ -7,7 +7,7 @@
     <parent>
         <artifactId>scrudbeans</artifactId>
         <groupId>com.github.manosbatsis.scrudbeans</groupId>
-        <version>0.15</version>
+        <version>0.16-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -23,9 +23,9 @@
             <artifactId>kotlin-stdlib-jdk8</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.manosbatsis.kotlinpoet-utils</groupId>
-            <artifactId>kotlinpoet-utils</artifactId>
-            <version>${kotlinpoet-utils.version}</version>
+            <groupId>com.github.manosbatsis.kotlin-utils</groupId>
+            <artifactId>kotlin-utils-kapt</artifactId>
+            <version>${kotlin-utils.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.manosbatsis.scrudbeans</groupId>
@@ -67,6 +67,12 @@
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>

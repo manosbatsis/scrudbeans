@@ -31,13 +31,6 @@ import java.io.Serializable;
  */
 public interface Persistable<PK extends Serializable> extends Serializable {
 
-    /**
-     * The primary key, field name.
-     */
-    @JsonIgnore
-    default String getScrudBeanIdFieldName() {
-        return "id";
-    }
 
     /**
      * Get the entity's primary key.

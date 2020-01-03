@@ -20,35 +20,48 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.service;
 
+import com.github.manosbatsis.kotlin.utils.api.Dto;
+import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 
 /**
  * CRUD Service interface.
  *
  * @param <T>  Your resource POJO to manage, maybe an entity or DTO class
- * @param <PK> Resource id type, usually Long or String
+ * @param <PK> EntityModel id type, usually Long or String
  */
 public interface ModelService<T extends Persistable<PK>, PK extends Serializable> extends BaseService {
 
 
-    /**
-     * Get the entity Class corresponding to the generic T
-     *
-     * @return the corresponding entity Class
-     */
-    Class<T> getDomainClass();
+	/**
+	 * Get the entity Class corresponding to the generic T
+	 *
+	 * @return the corresponding entity Class
+	 */
+	Class<T> getDomainClass();
 
-    /**
+	PK getIdAttribute(Object o);
+
+	void setIdAttribute(Object o, PK value);
+
+	/**
 	 * Create a new resource.
 	 *
-	 * @param resource Resource to create
+	 * @param resource EntityModel to create
 	 * @return new resource
 	 */
 	T create(T resource);
+
+	/**
+	 * Create a new resource.
+	 *
+	 * @param resource EntityModel to create
+	 * @return new resource
+	 */
+	T create(Dto<T> resource);
 
 	/**
 	 * Override to handle post-create
@@ -74,47 +87,63 @@ public interface ModelService<T extends Persistable<PK>, PK extends Serializable
 	/**
 	 * Update an existing resource.
 	 *
-	 * @param resource Resource to update
+	 * @param resource EntityModel to update
 	 * @return resource updated
 	 */
-	T update(PK id, T resource);
+	T update(T resource);
+
+	/**
+	 * Update an existing resource.
+	 *
+	 * @param resource EntityModel to update
+	 * @return resource updated
+	 */
+	T update(Dto<T> resource);
 
 
 	/**
 	 * Partially update an existing resource.
 	 *
-	 * @param resource Resource to update
+	 * @param resource EntityModel to update
 	 * @return resource updated
 	 */
-	T patch(PK id, T resource);
+	T patch(T resource);
 
 	/**
-	 * Delete an existing resource.
+	 * Partially update an existing resource.
 	 *
-	 * @param resource Resource to delete
+	 * @param resource EntityModel to update
+	 * @return resource updated
 	 */
-	void delete(PK id, T resource);
+	T patch(Dto<T> resource);
 
 	/**
 	 * Delete an existing resource.
 	 *
-	 * @param id Resource id
+	 * @param resource EntityModel to delete
+	 */
+	void delete(T resource);
+
+	/**
+     * Delete an existing resource.
+     *
+     * @param id EntityModel id
 	 */
 	void delete(PK id);
 
-	/**
-	 * Find resource by id.
-	 *
-	 * @param id Resource id
-	 * @return resource
+    /**
+     * Find resource by id.
+     *
+     * @param id EntityModel id
+     * @return resource
 	 */
 	T findById(PK id);
 
-	/**
-	 * Find resources by their ids.
-	 *
-	 * @param ids Resource ids
-	 * @return a list of retrieved resources, empty if no resource found
+    /**
+     * Find resources by their ids.
+     *
+     * @param ids EntityModel ids
+     * @return a list of retrieved resources, empty if no resource found
 	 */
 	List<T> findByIds(Set<PK> ids);
 

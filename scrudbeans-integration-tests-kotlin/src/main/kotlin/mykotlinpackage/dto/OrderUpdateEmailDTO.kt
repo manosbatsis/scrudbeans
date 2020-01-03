@@ -1,6 +1,6 @@
 package mykotlinpackage.dto
 
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractSystemUuidPersistableModel
+import com.github.manosbatsis.scrudbeans.model.AbstractSystemUuidPersistableModel
 
 class OrderUpdateEmailDTO : AbstractSystemUuidPersistableModel() {
     val email: String? = null

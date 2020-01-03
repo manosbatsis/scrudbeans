@@ -63,15 +63,24 @@ import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 @Documented
 public @interface ScrudBean {
 
-	/** DTO classes to generate {@link DtoMapper}s for */
-	Class[] dtoTypes() default Object.class;
+    /**
+     * Used to disable generation when used in {@link #controllerSuperClass()}
+     */
+    String NONE = "NONE";
 
-	/** DTO class canonical names to generate {@link DtoMapper}s for */
-	String[] dtoTypeNames() default "";
+    /**
+     * DTO classes to generate {@link DtoMapper}s for
+     */
+    Class[] dtoTypes() default Object.class;
 
-	/**
-	 * The superclass for the generated controller
-	 */
+    /**
+     * DTO class canonical names to generate {@link DtoMapper}s for
+     */
+    String[] dtoTypeNames() default "";
+
+    /**
+     * The superclass for the generated controller
+     */
 	String controllerSuperClass() default "";
 
 	/**

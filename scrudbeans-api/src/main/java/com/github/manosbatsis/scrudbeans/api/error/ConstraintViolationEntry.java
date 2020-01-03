@@ -20,16 +20,18 @@
  */
 package com.github.manosbatsis.scrudbeans.api.error;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.validation.ObjectError;
+
 import java.io.Serializable;
 
 import javax.validation.ConstraintViolation;
 
-import io.swagger.annotations.ApiModel;
 
 /**
  * DTO class for {@link ConstraintViolation} instances
  */
-@ApiModel(value = "ConstraintViolationEntry", description = "DTO class for serialization of bean validation violations. ")
+@Schema(description = "DTO class for serialization of bean validation violations. ")
 public class ConstraintViolationEntry implements Serializable {
 
 	private String message;
@@ -42,25 +44,32 @@ public class ConstraintViolationEntry implements Serializable {
 
 	public ConstraintViolationEntry(String message, String propertyPath) {
 		this.message = message;
-		this.propertyPath = propertyPath;
-	}
+        this.propertyPath = propertyPath;
+    }
 
-	public ConstraintViolationEntry(ConstraintViolation constraintViolation) {
-		if (constraintViolation != null) {
-			this.message = constraintViolation.getMessage();
-			this.propertyPath = constraintViolation.getPropertyPath().toString();
-		}
-	}
+    public ConstraintViolationEntry(ConstraintViolation constraintViolation) {
+        if (constraintViolation != null) {
+            this.message = constraintViolation.getMessage();
+            this.propertyPath = constraintViolation.getPropertyPath().toString();
+        }
+    }
 
-	public String getMessage() {
-		return message;
-	}
+    public ConstraintViolationEntry(ObjectError objectError) {
+        if (objectError != null) {
+            this.message = objectError.getDefaultMessage();
+            this.propertyPath = objectError.getObjectName();
+        }
+    }
 
-	public void setMessage(String message) {
-		this.message = message;
-	}
+    public String getMessage() {
+        return message;
+    }
 
-	public String getPropertyPath() {
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getPropertyPath() {
 		return propertyPath;
 	}
 

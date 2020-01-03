@@ -1,6 +1,7 @@
 package mykotlinpackage
 
-import com.github.manosbatsis.scrudbeans.jpa.repository.ModelRepositoryFactoryBean
+import com.github.manosbatsis.scrudbeans.repository.ModelRepository
+import com.github.manosbatsis.scrudbeans.repository.ModelRepositoryFactoryBean
 import mykotlinpackage.model.Order
 import mykotlinpackage.model.OrderLine
 import mykotlinpackage.model.Product
@@ -14,6 +15,8 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.FilterType
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.format.Formatter
@@ -24,11 +27,19 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@SpringBootApplication(exclude = [SecurityAutoConfiguration::class, ErrorMvcAutoConfiguration::class]) // Enable transactions and auditing
+
+// Remove security and error handling
+@SpringBootApplication(exclude = [SecurityAutoConfiguration::class, ErrorMvcAutoConfiguration::class])
+// Enable transactions and auditing
 @EnableTransactionManagement
-@EnableJpaAuditing // Scan for existing or runtime-generated (scrudbeans) components
+@EnableJpaAuditing
+// Scan for existing or runtime-generated (scrudbeans) components
 @EntityScan(ScrudBeansSampleApplication.PACKAGE_NAME)
-@EnableJpaRepositories(basePackages = [ScrudBeansSampleApplication.PACKAGE_NAME], repositoryFactoryBeanClass = ModelRepositoryFactoryBean::class)
+@EnableJpaRepositories(
+        basePackages = [ScrudBeansSampleApplication.PACKAGE_NAME],
+        includeFilters = [ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
+                classes = [ModelRepository::class])],
+        repositoryFactoryBeanClass = ModelRepositoryFactoryBean::class)
 class ScrudBeansSampleApplication {
 
     companion object {

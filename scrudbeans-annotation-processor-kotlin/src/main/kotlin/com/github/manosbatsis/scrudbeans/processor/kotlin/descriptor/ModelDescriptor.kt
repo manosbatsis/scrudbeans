@@ -1,9 +1,7 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 
-import com.github.manosbatsis.kotlinpoet.utils.ProcessingEnvironmentAware
+import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.asClassName
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.Element
 import javax.lang.model.element.ElementKind
@@ -17,9 +15,7 @@ import javax.lang.model.type.TypeKind.DECLARED
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
 import javax.lang.model.util.Types
-import javax.persistence.EmbeddedId
 import javax.persistence.Entity
-import javax.persistence.Id
 
 /**
  * Base implementation for classes describing (entity) models

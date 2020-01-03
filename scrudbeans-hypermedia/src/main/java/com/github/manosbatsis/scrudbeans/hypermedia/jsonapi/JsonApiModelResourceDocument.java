@@ -29,12 +29,11 @@ import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.JsonApiModel
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelResourceDocument;
 
 /**
- * A Document that may contain up to a single model-based Resource according to JSON API 1.1.
+ * A Document that may contain up to a single model-based EntityModel according to JSON API 1.1.
  * Configured for deserialization as a {@link SimpleModelResourceDocument}
  *
- *
- * @param <T> the JSON API Resource model type
- * @param <PK> the JSON API Resource model key type
+ * @param <T>  the JSON API EntityModel model type
+ * @param <PK> the JSON API EntityModel model key type
  */
 @JsonInterceptors(
         beforeDeserialization = JsonApiModelResourceDocumentJacksonInterceptor.class)

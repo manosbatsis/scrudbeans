@@ -1,6 +1,6 @@
 package myjavapackage.dto;
 
-import com.github.manosbatsis.scrudbeans.jpa.model.AbstractSystemUuidPersistableModel;
+import com.github.manosbatsis.scrudbeans.model.AbstractSystemUuidPersistableModel;
 import lombok.Data;
 
 @Data

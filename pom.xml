@@ -1,19 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.github.manosbatsis.scrudbeans</groupId>
-	<artifactId>scrudbeans</artifactId>
-	<version>0.15</version>
-	<packaging>pom</packaging>
-	<inceptionYear>2016</inceptionYear>
-	<name>scrudbeans</name>
-	<url>https://manosbatsis.github.io/scrudbeans</url>
-	<description>Model-driven apps for Spring Boot</description>
-	<developers>
-		<developer>
-			<name>Manos Batsis</name>
-			<timezone>GMT+2</timezone>
-			<email>manosbatsis@gmail.com</email>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.github.manosbatsis.scrudbeans</groupId>
+    <artifactId>scrudbeans</artifactId>
+    <version>0.16-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <inceptionYear>2016</inceptionYear>
+    <name>scrudbeans</name>
+    <url>https://manosbatsis.github.io/scrudbeans</url>
+    <description>Model-driven apps for Spring Boot</description>
+    <developers>
+        <developer>
+            <name>Manos Batsis</name>
+            <timezone>GMT+2</timezone>
+            <email>manosbatsis@gmail.com</email>
 			<url>https://manosbatsis.github.io</url>
 		</developer>
 	</developers>
@@ -74,40 +74,39 @@
 		<pdfbox.version>2.0.15</pdfbox.version>
 		<jodconverter-local.version>4.2.2</jodconverter-local.version>
 		<java.version>1.8</java.version>
-		<h2.version>1.4.197</h2.version>
 		<jaxb.api.version>2.3.0</jaxb.api.version>
-		<junit.version>5.3.2</junit.version>
-		<junit-platform.version>1.3.2</junit-platform.version>
-		<!-- javers auditing -->
-		<javapoet.version>1.11.1</javapoet.version>
-		<javers-spring-boot-starter-sql.version>5.0.0</javers-spring-boot-starter-sql.version>
-		<jackson-module-json-interceptor.version>1.0.0</jackson-module-json-interceptor.version>
-		<lombok.version>1.18.4</lombok.version>
-		<mapstruct.version>1.2.0.Final</mapstruct.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<rest-assured.version>3.1.0</rest-assured.version>
+        <junit.version>5.3.2</junit.version>
+        <junit-platform.version>1.3.2</junit-platform.version>
+        <!-- javers auditing -->
+        <javapoet.version>1.11.1</javapoet.version>
+        <javers-spring-boot-starter-sql.version>5.0.0</javers-spring-boot-starter-sql.version>
+        <jackson-module-json-interceptor.version>1.0.0</jackson-module-json-interceptor.version>
+        <lombok.version>1.18.4</lombok.version>
+        <mapstruct.version>1.2.0.Final</mapstruct.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <rest-assured.version>3.1.1</rest-assured.version>
 
-		<kotlin.version>1.2.71</kotlin.version>
-		<kotlinpoet.version>1.4.1</kotlinpoet.version>
-		<kotlinpoet-utils.version>0.2</kotlinpoet-utils.version>
-		<kotlin.compiler.jvmTarget>${java.version}</kotlin.compiler.jvmTarget>
-		<kotlin.apiVersion>1.2</kotlin.apiVersion>
-		<kotlin.languageVersion>1.2</kotlin.languageVersion>
-		<!-- plugins -->
-		<maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
+        <kotlin.version>1.2.71</kotlin.version>
+        <kotlinpoet.version>1.4.1</kotlinpoet.version>
+        <kotlin-utils.version>0.8</kotlin-utils.version>
+        <kotlin.compiler.jvmTarget>${java.version}</kotlin.compiler.jvmTarget>
+        <kotlin.apiVersion>1.2</kotlin.apiVersion>
+        <kotlin.languageVersion>1.2</kotlin.languageVersion>
+        <!-- plugins -->
+        <maven-compiler-plugin.version>3.8.0</maven-compiler-plugin.version>
 
-		<!-- Use most recent failsafe and surefire plugin versions-->
-		<maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
-		<maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
-		<maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
-		<nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-		<spring-boot.version>2.1.1.RELEASE</spring-boot.version>
-		<spring.version>5.1.3.RELEASE</spring.version>
-		<springfox-swagger.version>2.9.2</springfox-swagger.version>
-		<thin.version>1.0.11.RELEASE</thin.version>
+        <!-- Use most recent failsafe and surefire plugin versions-->
+        <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
+        <maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
+        <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
+        <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+        <spring.version>5.2.2.RELEASE</spring.version>
+        <swagger.version>2.1.0</swagger.version>
+        <thin.version>1.0.11.RELEASE</thin.version>
 
-	</properties>
+    </properties>
 
 	<modules>
 		<module>scrudbeans-annotation-processor-java</module>
@@ -135,21 +134,16 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<dependency>
-				<groupId>io.springfox</groupId>
-				<artifactId>springfox-swagger2</artifactId>
-				<version>${springfox-swagger.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.springfox</groupId>
-				<artifactId>springfox-bean-validators</artifactId>
-				<version>${springfox-swagger.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.springfox</groupId>
-				<artifactId>springfox-swagger-ui</artifactId>
-				<version>${springfox-swagger.version}</version>
-			</dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-ui</artifactId>
+                <version>1.2.17</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
@@ -194,6 +188,11 @@
 				<version>1.10</version>
 			</dependency>
 			<!-- misc -->
+			<dependency>
+				<groupId>com.github.manosbatsis.kotlin-utils</groupId>
+				<artifactId>kotlin-utils-api</artifactId>
+				<version>${kotlin-utils.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-core</artifactId>
@@ -264,25 +263,22 @@
 				<artifactId>javax.inject</artifactId>
 				<version>1</version>
 			</dependency>
-			<dependency>
-				<groupId>io.rest-assured</groupId>
-				<artifactId>rest-assured</artifactId>
-			</dependency>
+            <dependency>
+                <groupId>io.rest-assured</groupId>
+                <artifactId>rest-assured</artifactId>
+                <version>${rest-assured.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot</artifactId>
 				<version>${spring-boot.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.springframework.data</groupId>
-				<artifactId>spring-data-commons</artifactId>
-				<version>2.1.3.RELEASE</version>
-			</dependency>
 
-			<dependency>
-				<groupId>org.springframework.security</groupId>
-				<artifactId>spring-security-config</artifactId>
-			</dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-config</artifactId>
+                <version>5.2.1.RELEASE</version>
+            </dependency>
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-starter</artifactId>
@@ -354,32 +350,43 @@
 
 	<build>
 		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.jetbrains.dokka</groupId>
-					<artifactId>dokka-maven-plugin</artifactId>
-					<version>${dokka.version}</version>
-					<configuration>
-						<apiVersion>${kotlin.apiVersion}</apiVersion>
-						<languageVersion>${kotlin.languageVersion}</languageVersion>
-					</configuration>
-					<executions>
-						<execution>
-							<id>dokka</id>
-							<phase>pre-site</phase>
-							<goals>
-								<goal>dokka</goal>
-							</goals>
-						</execution>
-						<execution>
-							<id>javadocJar</id>
-							<phase>package</phase>
-							<goals>
-								<goal>javadocJar</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.7</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jetbrains.dokka</groupId>
+                    <artifactId>dokka-maven-plugin</artifactId>
+                    <version>${dokka.version}</version>
+                    <configuration>
+                        <apiVersion>${kotlin.apiVersion}</apiVersion>
+                        <languageVersion>${kotlin.languageVersion}</languageVersion>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>dokka</id>
+                            <phase>pre-site</phase>
+                            <goals>
+                                <goal>dokka</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>javadocJar</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>javadocJar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
@@ -484,16 +491,22 @@
 		<profile>
 			<id>deploy</id>
 			<build>
-				<plugins>
-					<!-- disable default maven deployment... -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-deploy-plugin</artifactId>
-						<version>${maven-deploy-plugin.version}</version>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>versions-maven-plugin</artifactId>
+                        <version>2.7</version>
+                    </plugin>
+
+                    <!-- disable default maven deployment... -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <version>${maven-deploy-plugin.version}</version>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
 					<!-- ... replace with nexus staging -->
 					<plugin>
 						<groupId>org.sonatype.plugins</groupId>

@@ -20,23 +20,26 @@
  */
 package com.github.manosbatsis.scrudbeans.hypermedia.util;
 
-import org.springframework.hateoas.LinkBuilder;
-import org.springframework.hateoas.core.LinkBuilderSupport;
+import org.springframework.hateoas.Affordance;
+import org.springframework.hateoas.server.LinkBuilder;
+import org.springframework.hateoas.server.core.LinkBuilderSupport;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
 
 /**
  * An implementation of {@link LinkBuilder} that can be used on top of a {@link UriComponentsBuilder}
  */
 public class UriComponentsBuilderAdapterLinkBuilder extends LinkBuilderSupport<UriComponentsBuilderAdapterLinkBuilder> {
 
-	/**
-	 * Creates a new {@link UriComponentsBuilderAdapterLinkBuilder} using the given {@link UriComponentsBuilder}.
-	 *
-	 * @param builder must not be {@literal null}.
-	 */
-	public UriComponentsBuilderAdapterLinkBuilder(UriComponentsBuilder builder) {
-		super(builder);
-	}
+    /**
+     * Creates a new {@link UriComponentsBuilderAdapterLinkBuilder} using the given {@link UriComponentsBuilder}.
+     *
+     * @param builder must not be {@literal null}.
+     */
+    public UriComponentsBuilderAdapterLinkBuilder(UriComponentsBuilder builder, List<Affordance> affordances) {
+        super(builder, affordances);
+    }
 
 
 	/**
@@ -45,16 +48,17 @@ public class UriComponentsBuilderAdapterLinkBuilder extends LinkBuilderSupport<U
 	@Override
 	protected UriComponentsBuilderAdapterLinkBuilder getThis() {
 		return this;
+    }
+
+    /**
+     * Creates a new instance
+     *
+     * @param builder will never be {@literal null}.
+     * @return
+     */
+    @Override
+    protected UriComponentsBuilderAdapterLinkBuilder createNewInstance(UriComponentsBuilder builder, List<Affordance> affordances) {
+        return new UriComponentsBuilderAdapterLinkBuilder(builder, affordances);
 	}
 
-	/**
-	 * Creates a new instance
-	 *
-	 * @param builder will never be {@literal null}.
-	 * @return
-	 */
-	@Override
-	protected UriComponentsBuilderAdapterLinkBuilder createNewInstance(UriComponentsBuilder builder) {
-		return new UriComponentsBuilderAdapterLinkBuilder(builder);
-	}
 }
