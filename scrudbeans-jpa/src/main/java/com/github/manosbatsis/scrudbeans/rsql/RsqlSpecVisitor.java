@@ -20,31 +20,29 @@
  */
 package com.github.manosbatsis.scrudbeans.rsql;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import cz.jirutka.rsql.parser.ast.AndNode;
 import cz.jirutka.rsql.parser.ast.ComparisonNode;
 import cz.jirutka.rsql.parser.ast.OrNode;
 import cz.jirutka.rsql.parser.ast.RSQLVisitor;
 import lombok.NonNull;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.jpa.domain.Specification;
 
 /**
  * Used to generate a {@link Specification}-based query from a root RSQL {@link cz.jirutka.rsql.parser.ast.Node}
  */
-public class RsqlSpecVisitor<T extends Persistable> implements RSQLVisitor<Specification<T>, Void> {
+public class RsqlSpecVisitor<T> implements RSQLVisitor<Specification<T>, Void> {
 
-    private RsqlSpecBuilder<T> builder;
+	private RsqlSpecBuilder<T> builder;
 
-    public RsqlSpecVisitor(@NonNull ModelInfo modelInfo, @NonNull ConversionService conversionService) {
-        builder = new RsqlSpecBuilder<T>(modelInfo, conversionService);
-    }
+	public RsqlSpecVisitor(@NonNull ModelInfo modelInfo, @NonNull ConversionService conversionService) {
+		builder = new RsqlSpecBuilder<T>(modelInfo, conversionService);
+	}
 
-    @Override
-    public Specification<T> visit(AndNode node, Void param) {
-        return builder.createSpecification(node);
+	@Override
+	public Specification<T> visit(AndNode node, Void param) {
+		return builder.createSpecification(node);
 	}
 
 	@Override

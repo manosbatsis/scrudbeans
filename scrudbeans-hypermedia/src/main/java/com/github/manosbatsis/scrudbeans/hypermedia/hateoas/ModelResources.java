@@ -21,16 +21,14 @@
 package com.github.manosbatsis.scrudbeans.hypermedia.hateoas;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
-
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.Link;
 
 /**
  * Created by manos on 20/2/2017.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class ModelResources<M extends Persistable> extends CollectionModel<ModelResource<M>> {
+public class ModelResources<M> extends CollectionModel<ModelResource<M>> {
 
 
     /**

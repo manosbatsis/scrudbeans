@@ -21,12 +21,10 @@
 package com.github.manosbatsis.scrudbeans.api.domain.event;
 
 
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
-
 /**
- * Fired when a new {@link Persistable} instance has been deleted
+ * Fired when an instance has been deleted
  */
-public class EntityDeletedEvent<T extends Persistable> extends EntityEvent<T> {
+public class EntityDeletedEvent<T> extends EntityEvent<T> {
 
     public EntityDeletedEvent(T source) {
         super(source);

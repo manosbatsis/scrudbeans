@@ -20,17 +20,13 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBeansModelAnnotation;
+
+import java.lang.annotation.*;
 
 
 /**
- * <p>Marks a t6ype as predicate factory of a JPA entity type.
+ * Marks a type as predicate factory of a JPA entity type.
  */
 @ScrudBeansModelAnnotation
 @Retention(RetentionPolicy.RUNTIME)

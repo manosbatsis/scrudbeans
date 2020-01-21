@@ -20,10 +20,6 @@
  */
 package com.github.manosbatsis.scrudbeans.rsql;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.specification.PredicateFactorySpecification;
 import cz.jirutka.rsql.parser.ast.ComparisonNode;
@@ -32,15 +28,17 @@ import cz.jirutka.rsql.parser.ast.LogicalOperator;
 import cz.jirutka.rsql.parser.ast.Node;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Used by {@link RsqlSpecVisitor} to generate {@link Specification}-based predicates from individual RSQL {@link Node}s
  */
 @Slf4j
-public class RsqlSpecBuilder<T extends Persistable> {
+public class RsqlSpecBuilder<T> {
 
     private final ModelInfo modelInfo;
 

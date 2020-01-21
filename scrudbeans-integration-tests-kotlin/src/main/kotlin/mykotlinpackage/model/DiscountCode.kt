@@ -1,6 +1,6 @@
 package mykotlinpackage.model
 
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable
+import com.github.manosbatsis.scrudbeans.api.domain.KPersistable
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.validation.Unique
 import io.swagger.v3.oas.annotations.media.Schema
@@ -25,7 +25,7 @@ import javax.validation.constraints.NotNull
 data class DiscountCode(
         @field:Id
         @field:GeneratedValue(strategy = IDENTITY)
-        var id: Long? = null,
+        override var id: Long? = null,
 
         @field:NotNull
         @field:Column(nullable = false, unique = true)
@@ -36,7 +36,6 @@ data class DiscountCode(
         @field:Column(nullable = false)
         @field:Schema(title = "The discount percentage", required = true)
         var percentage: Int? = null
-) : Persistable<Long> {
-    override fun getScrudBeanId(): Long = id!!
-    override fun isNew(): Boolean = id == null
+) : KPersistable<Long> {
+        override fun isNew(): Boolean = id == null
 }

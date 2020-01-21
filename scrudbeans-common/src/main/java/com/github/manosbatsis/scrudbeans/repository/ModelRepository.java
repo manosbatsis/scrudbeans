@@ -21,7 +21,6 @@
 package com.github.manosbatsis.scrudbeans.repository;
 
 import com.github.manosbatsis.kotlin.utils.api.Dto;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -122,6 +121,6 @@ public interface ModelRepository<T, PK extends Serializable>
      * @param fieldInfo the attribute name of the relationship
      * @return the single entity in the other side of the relation if any, null otherwise
      */
-    <RT extends Persistable> RT findRelatedEntityByOwnId(PK id, FieldInfo fieldInfo);
+    <RT> RT findRelatedEntityByOwnId(PK id, FieldInfo fieldInfo);
 
 }

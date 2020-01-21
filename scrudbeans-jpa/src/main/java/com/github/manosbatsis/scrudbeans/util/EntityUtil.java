@@ -20,27 +20,18 @@
  */
 package com.github.manosbatsis.scrudbeans.util;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedBean;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
+import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry;
 import com.github.manosbatsis.scrudbeans.validation.CaseSensitive;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -49,6 +40,21 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StopWatch;
+
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityUtil {
 
@@ -61,7 +67,7 @@ public class EntityUtil {
     public static Boolean isScrudBean(Class<?> domainType) {
         Boolean isScrudBean = scrudBeanTypes.get(domainType);
         if (Objects.isNull(isScrudBean)) {
-            isScrudBean = Persistable.class.isAssignableFrom(domainType) || domainType.isAnnotationPresent(ScrudBean.class);
+            isScrudBean = domainType.isAnnotationPresent(ScrudBean.class);
             scrudBeanTypes.put(domainType, true);
         }
         return isScrudBean;
@@ -88,20 +94,11 @@ public class EntityUtil {
     }
 
 	public static Set<BeanDefinition> findEntities(String... basePackages) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.setKeepTaskList(true);
-        stopWatch.start("findEntities init");
         createComponentScanner(Entity.class);
-        stopWatch.stop();
-        print(stopWatch.getLastTaskInfo());
         Set<BeanDefinition> entities = new HashSet<>();
         for (String basePackage : basePackages) {
-            stopWatch.start("findEntities " + basePackage);
             entities.addAll(provider.findCandidateComponents(basePackage));
-            stopWatch.stop();
-            print(stopWatch.getLastTaskInfo());
         }
-        stopWatch.prettyPrint();
         return entities;
     }
 
@@ -111,24 +108,16 @@ public class EntityUtil {
         LOGGER.debug(task.toString());
     }
 
-    public static Set<BeanDefinition> findAllPredicateFactories(String... basePackages) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.setKeepTaskList(true);
-        stopWatch.start("findAllPredicateFactories init");
-        createComponentScanner(EntityPredicateFactory.class);
-        stopWatch.stop();
-        print(stopWatch.getLastTaskInfo());
+    public static Set<BeanDefinition> findAllHelpers(String... basePackages) {
+        createComponentScanner(EntityPredicateFactory.class, IdentifierAdapterBean.class);
         Set<BeanDefinition> predicateFactories = new HashSet<>();
         for (String basePackage : basePackages) {
-            stopWatch.start("findAllPredicateFactories in " + basePackage);
             predicateFactories.addAll(provider.findCandidateComponents(basePackage));
-            stopWatch.stop();
-            LOGGER.debug(stopWatch.prettyPrint());
         }
-        stopWatch.prettyPrint();
         return predicateFactories;
     }
-	public static Set<BeanDefinition> findAllModels(String... basePackages) {
+
+    public static Set<BeanDefinition> findAllModels(String... basePackages) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.setKeepTaskList(true);
         stopWatch.start("findAllModels init");
@@ -183,32 +172,49 @@ public class EntityUtil {
 	}
 
 	public static String[] getNullPropertyNames(Object source) {
-		final BeanWrapper src = new BeanWrapperImpl(source);
-		java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        PropertyDescriptor[] pds = src.getPropertyDescriptors();
 
-		Set<String> emptyNames = new HashSet<String>();
-		for (java.beans.PropertyDescriptor pd : pds) {
-			Object srcValue = src.getPropertyValue(pd.getName());
-			if (srcValue == null) emptyNames.add(pd.getName());
-		}
-		String[] result = new String[emptyNames.size()];
-		return emptyNames.toArray(result);
-	}
-
-	public static boolean isCaseSensitive(Class domainClass, String propertyName) {
-		boolean caseSensitive = false;
-		String fieldKey = new StringBuffer(domainClass.getCanonicalName()).append('.').append(propertyName).toString();
+        Set<String> emptyNames = new HashSet<String>();
+        for (PropertyDescriptor pd : pds) {
+            if (isNullOrUnreadableProperty(src, pd.getName())) {
+                emptyNames.add(pd.getName());
+            }
+        }
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
+    }
 
 
-		if (!fieldCaseSensitivity.containsKey(fieldKey)) {
-			Field field = FieldUtils.getField(domainClass, propertyName, true);
+    public static boolean isNullOrUnreadableProperty(BeanWrapper source, String name) {
+        boolean nullOrUnreadable = !source.isReadableProperty(name);
+        if (!nullOrUnreadable) {
+            PropertyDescriptor descriptor = source.getPropertyDescriptor(name);
+            Method getter = descriptor.getReadMethod();
+            if (getter == null
+                    || getter.isAnnotationPresent(JsonIgnore.class)
+                    || source.getPropertyValue(name) == null) {
+                nullOrUnreadable = true;
+            }
+        }
+        LOGGER.debug("isNullOrUnreadableProperty {}: {}", name, nullOrUnreadable);
+        return nullOrUnreadable;
+    }
 
-			if (field != null && String.class.isAssignableFrom(field.getType())) {
+    public static boolean isCaseSensitive(Class domainClass, String propertyName) {
+        boolean caseSensitive = false;
+        String fieldKey = new StringBuffer(domainClass.getCanonicalName()).append('.').append(propertyName).toString();
+
+
+        if (!fieldCaseSensitivity.containsKey(fieldKey)) {
+            Field field = FieldUtils.getField(domainClass, propertyName, true);
+
+            if (field != null && String.class.isAssignableFrom(field.getType())) {
 
 				CaseSensitive annotation = field.getAnnotation(CaseSensitive.class);
 				if (annotation != null) {
 					caseSensitive = annotation.value();
-				}
+                }
                 fieldCaseSensitivity.put(fieldKey, caseSensitive);
             }
         } else {
@@ -218,11 +224,13 @@ public class EntityUtil {
         return caseSensitive;
     }
 
-    public static <PK extends Serializable> PK idOrNull(Persistable<PK> user) {
-        return user != null ? user.getScrudBeanId() : null;
+    public static <PK extends Serializable> PK idOrNull(Object entity) {
+        IdentifierAdapter identifierAdapter = IdentifierAdaptersRegistry.getAdapterForClass(entity.getClass());
+        return entity != null ? (PK) identifierAdapter.readId(entity) : null;
     }
 
-    public static String idOrNEmpty(Persistable entity) {
-        return entity != null ? entity.getScrudBeanId().toString() : StringUtils.EMPTY;
+    public static String idOrNEmpty(Object entity) {
+        IdentifierAdapter identifierAdapter = IdentifierAdaptersRegistry.getAdapterForClass(entity.getClass());
+        return entity != null ? identifierAdapter.readId(entity).toString() : StringUtils.EMPTY;
     }
 }

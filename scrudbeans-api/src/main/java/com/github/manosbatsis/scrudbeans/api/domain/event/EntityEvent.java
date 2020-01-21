@@ -20,9 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.api.domain.event;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import lombok.Getter;
-
 import org.springframework.context.ApplicationEvent;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.ResolvableTypeProvider;
@@ -30,7 +28,7 @@ import org.springframework.core.ResolvableTypeProvider;
 /**
  *
  */
-public abstract class EntityEvent<T extends Persistable> extends ApplicationEvent implements ResolvableTypeProvider {
+public abstract class EntityEvent<T> extends ApplicationEvent implements ResolvableTypeProvider {
 
     @Getter
     private T model;

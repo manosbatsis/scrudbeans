@@ -1,20 +1,19 @@
 package myjavapackage.model;
 
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Formula;
+import org.springframework.data.domain.Persistable;
+
+import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 /**
  * Sample composite ID entity
@@ -41,11 +40,6 @@ public class ProductRelationship implements Persistable<ProductRelationshipIdent
 
     @Formula(" true ")
     private boolean persisted;
-
-    @Override
-    public ProductRelationshipIdentifier getScrudBeanId() {
-        return getId();
-    }
 
     @Override
     public boolean isNew() {

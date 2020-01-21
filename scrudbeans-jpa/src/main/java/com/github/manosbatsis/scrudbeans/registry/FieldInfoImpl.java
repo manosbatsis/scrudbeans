@@ -20,29 +20,6 @@
  */
 package com.github.manosbatsis.scrudbeans.registry;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import javax.persistence.CascadeType;
-import javax.persistence.EmbeddedId;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Transient;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ComputedRelationship;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldMappingType;
@@ -57,8 +34,15 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.hibernate.annotations.Formula;
-
 import org.springframework.core.GenericTypeResolver;
+
+import javax.persistence.*;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Simple implementation of {@link FieldInfo}
@@ -67,7 +51,7 @@ import org.springframework.core.GenericTypeResolver;
 public class FieldInfoImpl implements FieldInfo {
 
 
-    public static FieldInfo create(@NonNull Class<? extends Persistable> modelType, PropertyDescriptor property) {
+    public static FieldInfo create(@NonNull Class<?> modelType, PropertyDescriptor property) {
         FieldInfo fieldInfo = null;
         Field field = FieldUtils.getField(modelType, property.getName(), true);
 
@@ -98,7 +82,7 @@ public class FieldInfoImpl implements FieldInfo {
     private FieldMappingType fieldMappingType;
 
     @Getter
-    private Class<? extends Persistable> fieldModelType;
+    private Class<?> fieldModelType;
 
     @Setter
     private String reverseFieldName = null;
@@ -128,7 +112,7 @@ public class FieldInfoImpl implements FieldInfo {
     private ModelInfo relatedModelInfo;
 
 
-    private FieldInfoImpl(@NonNull Class<? extends Persistable> modelType, @NonNull PropertyDescriptor property, @NonNull Field field, @NonNull Method getter, @NonNull Method setter) {
+    private FieldInfoImpl(@NonNull Class<?> modelType, @NonNull PropertyDescriptor property, @NonNull Field field, @NonNull Method getter, @NonNull Method setter) {
         // add basic info
         this.fieldType = property.getPropertyType();
         this.fieldName = property.getName();
@@ -139,15 +123,16 @@ public class FieldInfoImpl implements FieldInfo {
         this.getter = getter != null;
         this.setter = setter != null;
 
-		scanMappings(field, getter, setter);
+        scanMappings(field, getter, setter);
 
-		// set the Modelnfo for if a relationship
-		if (this.isLinkableResource()) {//if(this.isRelationship()){
-            if (Persistable.class.isAssignableFrom(this.fieldType)) {
-                this.fieldModelType = (Class<? extends Persistable>) this.fieldType;
+        // set the Modelnfo for a relationship
+        if (this.isLinkableResource()) {//if(this.isRelationship()){
+            // If not a collection
+            if (Collection.class.isAssignableFrom(this.fieldType)) {
+                this.fieldModelType = this.fieldType;
             }
             // if collection but not a Map
-            else if (Collection.class.isAssignableFrom(this.fieldType) && !Map.class.isAssignableFrom(this.fieldType)) {
+            else if (!Map.class.isAssignableFrom(this.fieldType)) {
                 ParameterizedType pType = (ParameterizedType) field.getGenericType();
                 log.debug("FieldInfoImpl, fieldType: {}, pType: {}", fieldType, pType);
                 Map<TypeVariable<?>, Type> types = TypeUtils.getTypeArguments(pType);
@@ -155,16 +140,16 @@ public class FieldInfoImpl implements FieldInfo {
 
                     Type t = types.get(var);
                     String tName = t.getTypeName();
-					log.debug("FieldInfoImpl, var: {}, t.getTypeName: '{}', tName: '{}'", var, t.getTypeName(), tName);
-					if (tName.contains(".")) {
-                        this.fieldModelType = (Class<? extends Persistable>) ClassUtils.getClass(tName);
+                    log.debug("FieldInfoImpl, var: {}, t.getTypeName: '{}', tName: '{}'", var, t.getTypeName(), tName);
+                    if (tName.contains(".")) {
+                        this.fieldModelType = (Class<?>) ClassUtils.getClass(tName);
                     }
 				}
 				if (this.fieldModelType == null) {
 					String tName = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0].getTypeName();
 					log.debug("FieldInfoImpl, tName: '{}'", tName);
 					if (tName.contains(".")) {
-                        this.fieldModelType = (Class<? extends Persistable>) ClassUtils.getClass(tName);
+                        this.fieldModelType = (Class<?>) ClassUtils.getClass(tName);
                     }
 				}
 				Class<?> resolved = GenericTypeResolver.resolveTypeArgument(fieldType, pType.getClass());

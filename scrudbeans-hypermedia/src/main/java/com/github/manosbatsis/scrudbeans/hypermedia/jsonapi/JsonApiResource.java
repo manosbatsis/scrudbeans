@@ -20,8 +20,6 @@
  */
 package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -34,12 +32,12 @@ import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelR
  * @param <A> the attributes object type
  */
 @JsonDeserialize(as = SimpleModelResource.class)
-public interface JsonApiResource<A extends Serializable, ID extends Serializable> extends JsonApiLinksContainer {
+public interface JsonApiResource<A, ID> extends JsonApiLinksContainer {
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	@JsonIgnoreProperties(value = {"links"})
-	A getAttributes();
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(value = {"links"})
+    A getAttributes();
 
-	@JsonProperty
-	void setAttributes(A attributes);
+    @JsonProperty
+    void setAttributes(A attributes);
 }

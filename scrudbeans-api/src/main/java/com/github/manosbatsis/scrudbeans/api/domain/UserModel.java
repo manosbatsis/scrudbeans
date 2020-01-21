@@ -20,24 +20,24 @@
  */
 package com.github.manosbatsis.scrudbeans.api.domain;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Locale;
-
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import org.springframework.data.domain.Persistable;
 import org.springframework.security.core.GrantedAuthority;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by manos on 4/2/2017.
  */
 public interface UserModel extends Persistable<String> {
 
-    Locale getLocaleObject();
+	Locale getLocaleObject();
 
-    boolean hasRole(String roleName);
+	boolean hasRole(String roleName);
 
     Boolean getActive();
 

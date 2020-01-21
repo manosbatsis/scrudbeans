@@ -21,17 +21,8 @@
 package com.github.manosbatsis.scrudbeans.model;
 
 
-import java.io.Serializable;
-
-import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableCompositeIdentifier;
 import com.github.manosbatsis.scrudbeans.binding.EmbeddableCompositeIdDeserializer;
 import com.github.manosbatsis.scrudbeans.binding.EmbeddableCompositeIdSerializer;
@@ -42,6 +33,13 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * A base class for {@link Embeddable}s used as composite IDs in model based on a many-to-many table.
@@ -79,14 +77,12 @@ import org.slf4j.LoggerFactory;
 @MappedSuperclass
 @JsonSerialize(using = EmbeddableCompositeIdSerializer.class)
 @JsonDeserialize(using = EmbeddableCompositeIdDeserializer.class)
-public abstract class AbstractEmbeddableManyToManyIdentifier<
-        L extends Persistable<LPK>, LPK extends Serializable,
-        R extends Persistable<RPK>, RPK extends Serializable
-        > implements Serializable, EmbeddableCompositeIdentifier {
+public abstract class AbstractEmbeddableManyToManyIdentifier<L, LPK extends Serializable, R, RPK extends Serializable>
+        implements Serializable, EmbeddableCompositeIdentifier {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEmbeddableManyToManyIdentifier.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEmbeddableManyToManyIdentifier.class);
 
-	public static final String SPLIT_CHAR = "_";
+    public static final String SPLIT_CHAR = "_";
 
 
     @NotNull
@@ -115,8 +111,8 @@ public abstract class AbstractEmbeddableManyToManyIdentifier<
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(EntityUtil.idOrNull(this.getLeft())).append(EntityUtil.idOrNull(this.getRight())).toHashCode();
-	}
+        return new HashCodeBuilder().append(EntityUtil.idOrNEmpty(this.getLeft())).append(EntityUtil.idOrNEmpty(this.getRight())).toHashCode();
+    }
 
 	@Override
 	public boolean equals(final Object obj) {
@@ -124,10 +120,10 @@ public abstract class AbstractEmbeddableManyToManyIdentifier<
 			return false;
 		}
 		if (AbstractEmbeddableManyToManyIdentifier.class.isAssignableFrom(obj.getClass())) {
-			final AbstractEmbeddableManyToManyIdentifier other = (AbstractEmbeddableManyToManyIdentifier) obj;
-			return new EqualsBuilder().append(EntityUtil.idOrNull(this.getLeft()), EntityUtil.idOrNull(other.getLeft()))
-					.append(EntityUtil.idOrNull(this.getRight()), EntityUtil.idOrNull(other.getRight())).isEquals();
-		}
+            final AbstractEmbeddableManyToManyIdentifier other = (AbstractEmbeddableManyToManyIdentifier) obj;
+            return new EqualsBuilder().append(EntityUtil.idOrNEmpty(this.getLeft()), EntityUtil.idOrNull(other.getLeft()))
+                    .append(EntityUtil.idOrNEmpty(this.getRight()), EntityUtil.idOrNull(other.getRight())).isEquals();
+        }
 		else {
 			return false;
 		}

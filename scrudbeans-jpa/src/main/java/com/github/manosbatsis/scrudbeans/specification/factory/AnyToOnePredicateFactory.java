@@ -20,38 +20,35 @@
  */
 package com.github.manosbatsis.scrudbeans.specification.factory;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.Path;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
 import com.github.manosbatsis.scrudbeans.util.ClassUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.core.convert.ConversionService;
+
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * A predicate for members that are Many2one/OneToOne.
  */
 @Slf4j
-public class AnyToOnePredicateFactory<T extends Persistable<PK>, PK extends Serializable> extends AbstractPredicateFactory<T> {
+public class AnyToOnePredicateFactory<T, PK extends Serializable> extends AbstractPredicateFactory<T> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AnyToOnePredicateFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AnyToOnePredicateFactory.class);
 
-    private Class<PK> idType;
+	private Class<PK> idType;
 
-    public AnyToOnePredicateFactory() {
-    }
+	public AnyToOnePredicateFactory() {
+	}
 
-    @Override
-    public Class<?> getValueType() {
+	@Override
+	public Class<?> getValueType() {
 		return this.idType;
 	}
 
@@ -62,8 +59,8 @@ public class AnyToOnePredicateFactory<T extends Persistable<PK>, PK extends Seri
 			this.idType = (Class<PK>) ClassUtils.getBeanPropertyType(fieldType, "id", false);
 		}
 		List<PK> convertedValues = this.convertValues(propertyValues, conversionService, this.idType);
-		Path<T> basePath = this.<T>getPath(root, propertyName, fieldType);
-		Path<PK> path = basePath.<PK>get("id");
+		Path<T> basePath = this.getPath(root, propertyName, fieldType);
+		Path<PK> path = basePath.get("id");
 		return buildPredicate(root, cb, path, operator, convertedValues);
 	}
 

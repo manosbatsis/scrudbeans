@@ -21,28 +21,26 @@
 package com.github.manosbatsis.scrudbeans.controller;
 
 
-import java.io.Serializable;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.metadata.MetadatumDTO;
 import com.github.manosbatsis.scrudbeans.service.PersistableModelService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-public abstract class AbstractPersistableModelWithMetadataController<T extends Persistable<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
+import java.io.Serializable;
+
+public abstract class AbstractPersistableModelWithMetadataController<T, PK extends Serializable, S extends PersistableModelService<T, PK>>
         extends AbstractPersistableModelController<T, PK, S> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelWithMetadataController.class);
 
 
-	@RequestMapping(value = "{subjectId}/metadata", method = RequestMethod.PUT)
-	@Operation(summary = "Add metadatum", description = "Add or updated a resource metadatum")
+    @RequestMapping(value = "{subjectId}/metadata", method = RequestMethod.PUT)
+    @Operation(summary = "Add metadatum", description = "Add or updated a resource metadatum")
     public void addMetadatum(@PathVariable PK subjectId,
                              @RequestBody MetadatumDTO dto) {
         service.addMetadatum(subjectId, dto);

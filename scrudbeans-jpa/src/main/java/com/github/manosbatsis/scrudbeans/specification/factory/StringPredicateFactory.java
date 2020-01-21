@@ -20,20 +20,17 @@
  */
 package com.github.manosbatsis.scrudbeans.specification.factory;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.convert.ConversionService;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Path;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-
-import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.springframework.core.convert.ConversionService;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StringPredicateFactory extends AbstractPredicateFactory<String> {
 
@@ -60,7 +57,7 @@ public class StringPredicateFactory extends AbstractPredicateFactory<String> {
 	}
 
 	@Override
-	protected <AV extends Serializable> Predicate buildPredicate(Root<?> root, CriteriaBuilder cb, Path path, PredicateOperator operator, List<AV> propertyValues) {
+	protected <AV> Predicate buildPredicate(Root<?> root, CriteriaBuilder cb, Path path, PredicateOperator operator, List<AV> propertyValues) {
 		Predicate predicate = null;
 
 
@@ -69,8 +66,7 @@ public class StringPredicateFactory extends AbstractPredicateFactory<String> {
 			case NOT_EQUAL: {
 				if (argument == null) {
 					predicate = path.isNotNull();
-				}
-				else {
+				} else {
 					if (argument.startsWith(WILDCARD)) {
 						argument = WILDCARD_JPA + argument.substring(1);
 					}

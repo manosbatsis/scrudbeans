@@ -20,35 +20,33 @@
  */
 package com.github.manosbatsis.scrudbeans.controller;
 
-import java.io.Serializable;
-import java.util.List;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.exception.NotImplementedException;
 import com.github.manosbatsis.scrudbeans.service.PersistableModelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Base class for model controllers not allowing HTTP DELETE
  * operations.
  */
-public abstract class AbstractNoDeletePersistableModelController<T extends Persistable<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
+public abstract class AbstractNoDeletePersistableModelController<T, PK extends Serializable, S extends PersistableModelService<T, PK>>
         extends AbstractPersistableModelController<T, PK, S> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractNoDeletePersistableModelController.class);
 
 
-	@Override
-	public void delete(@Parameter(name = "id", required = true) @PathVariable PK id) {
-		throw new NotImplementedException("Method is unsupported.");
-	}
+    @Override
+    public void delete(@Parameter(name = "id", required = true) @PathVariable PK id) {
+        throw new NotImplementedException("Method is unsupported.");
+    }
 
 	@Override
 	public void deleteAll() {

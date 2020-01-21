@@ -1,6 +1,6 @@
 /**
  *
- * Restdude
+ * ScrudBeans: Model driven development for Spring Boot
  * -------------------------------------------------------------------
  *
  * Copyright © 2005 Manos Batsis (manosbatsis gmail)
@@ -16,17 +16,20 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http:></http:>//www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.api.domain.event;
-
+package com.github.manosbatsis.scrudbeans.api.domain
 
 /**
- * Fired when a new instance has been persisted
+ * Base interface for kotlin model objects
+ *
+ * @param <PK> The primary key, if any
  */
-public class EntityCreatedEvent<T> extends EntityEvent<T> {
+interface KPersistable<PK> {
 
-    public EntityCreatedEvent(T source) {
-        super(source);
-    }
+    /** The model's primary key. */
+    val id: PK?
+
+    /** Whether the instance is transient */
+    fun isNew(): Boolean
 }

@@ -20,17 +20,16 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.registry;
 
-import java.io.Serializable;
-import java.util.Set;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
+
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Contains metadata for a specific Model class.
  */
-public interface ModelInfo<T extends Persistable<PK>, PK extends Serializable> {
+public interface ModelInfo<T, PK extends Serializable> {
     String getRequestMapping();
 
     void setRequestMapping(String pattern);

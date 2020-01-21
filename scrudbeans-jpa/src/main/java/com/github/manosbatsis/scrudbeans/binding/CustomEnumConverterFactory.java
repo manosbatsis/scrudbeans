@@ -20,19 +20,20 @@
  */
 package com.github.manosbatsis.scrudbeans.binding;
 
-import javax.inject.Named;
-
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
+
+import javax.inject.Named;
 
 @Named("CcstomEnumConverterFactory")
 public class CustomEnumConverterFactory implements ConverterFactory<String, Enum> {
 
-	public <T extends Enum> Converter<String, T> getConverter(Class<T> targetType) {
-		return new StringToEnumConverter(targetType);
-	}
+    public <T extends Enum> Converter<String, T> getConverter(Class<T> targetType) {
+        return new StringToEnumConverter(targetType);
+    }
 
-	private final class StringToEnumConverter<T extends Enum> implements Converter<String, T> {
+    private final class StringToEnumConverter<T extends Enum> implements Converter<String, T> {
 
 		private Class<T> enumType;
 
@@ -41,7 +42,11 @@ public class CustomEnumConverterFactory implements ConverterFactory<String, Enum
 		}
 
 		public T convert(String source) {
-			return (T) Enum.valueOf(this.enumType, source.trim());
-		}
+            T converted = null;
+            if (StringUtils.isNotBlank(source)) {
+                converted = (T) Enum.valueOf(this.enumType, source.trim());
+            }
+            return converted;
+        }
 	}
 }

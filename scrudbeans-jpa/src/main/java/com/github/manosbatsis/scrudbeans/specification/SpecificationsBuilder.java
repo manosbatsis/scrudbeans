@@ -20,43 +20,34 @@
  */
 package com.github.manosbatsis.scrudbeans.specification;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
-public class SpecificationsBuilder<T extends Persistable<PK>, PK extends Serializable> {
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import java.io.Serializable;
+import java.util.*;
 
-    public static final String PARAM_RELATION_NAME = "relationName";
+public class SpecificationsBuilder<T, PK extends Serializable> {
 
-    public static final String PARAM_FILTER = "filter";
+	public static final String PARAM_RELATION_NAME = "relationName";
 
-    public static final String PARAM_JSONAPI_PAGE_NUMBER = "page[number]";
+	public static final String PARAM_FILTER = "filter";
 
-    public static final String PARAM_JSONAPI_PAGE_SIZE = "page[size]";
+	public static final String PARAM_JSONAPI_PAGE_NUMBER = "page[number]";
 
-    public static final String PARAM_SORT = "sort";
+	public static final String PARAM_JSONAPI_PAGE_SIZE = "page[size]";
+
+	public static final String PARAM_SORT = "sort";
 
 	public static final String PARAM_PK = "id";
 

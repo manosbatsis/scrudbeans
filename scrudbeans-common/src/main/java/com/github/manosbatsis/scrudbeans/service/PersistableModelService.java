@@ -22,7 +22,6 @@ package com.github.manosbatsis.scrudbeans.service;
 
 
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
@@ -51,7 +50,7 @@ import java.util.Set;
  * @author manos
  */
 @Service
-public interface PersistableModelService<T extends Persistable<PK>, PK extends Serializable>
+public interface PersistableModelService<T, PK extends Serializable>
         extends ModelService<T, PK> {
 
     String PRE_AUTHORIZATION_PREFIX = "SERVICE_";
@@ -80,7 +79,7 @@ public interface PersistableModelService<T extends Persistable<PK>, PK extends S
      * @param pageable   the page config
      * @return the page of results, may be <code>null</code>
      */
-    <M extends Persistable<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable);
+    <M, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable);
 
 	/**
 	 * Find resources page-by-page
@@ -98,7 +97,7 @@ public interface PersistableModelService<T extends Persistable<PK>, PK extends S
      * @param fieldInfo the member/relation name
      * @return the single related entity, if any
      */
-    Persistable findRelatedSingle(PK id, FieldInfo fieldInfo);
+    Object findRelatedSingle(PK id, FieldInfo fieldInfo);
 
     /**
      * @see ModelRepository#validateConstraints(Object)

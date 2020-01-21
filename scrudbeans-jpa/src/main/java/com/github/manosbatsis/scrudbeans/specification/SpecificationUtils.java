@@ -20,6 +20,12 @@
  */
 package com.github.manosbatsis.scrudbeans.specification;
 
+import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
+import com.github.manosbatsis.scrudbeans.specification.factory.*;
+import com.github.manosbatsis.scrudbeans.util.ClassUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.Assert;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
@@ -31,36 +37,21 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
-import com.github.manosbatsis.scrudbeans.api.specification.IPredicateFactory;
-import com.github.manosbatsis.scrudbeans.util.ClassUtils;
-import com.github.manosbatsis.scrudbeans.specification.factory.BooleanPredicateFactory;
-import com.github.manosbatsis.scrudbeans.specification.factory.DatePredicateFactory;
-import com.github.manosbatsis.scrudbeans.specification.factory.EnumStringPredicateFactory;
-import com.github.manosbatsis.scrudbeans.specification.factory.LocalDatePredicateFactory;
-import com.github.manosbatsis.scrudbeans.specification.factory.LocalDateTimePredicateFactory;
-import com.github.manosbatsis.scrudbeans.specification.factory.NumberPredicateFactory;
-import com.github.manosbatsis.scrudbeans.specification.factory.StringPredicateFactory;
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.util.Assert;
-
 /**
- * A generic specifications class that builds predicates for any implementation
- * of org.springframework.data.domain.Persistable
+ * A generic specifications class that builds model predicates
  */
 @Slf4j
-public class SpecificationUtils<T extends Persistable<PK>, PK extends Serializable> {
+public class SpecificationUtils<T, PK extends Serializable> {
 
-    private static final HashMap<String, Class> FIELD_TYPE_CACHE = new HashMap<String, Class>();
+	private static final HashMap<String, Class> FIELD_TYPE_CACHE = new HashMap<String, Class>();
 
-    private static final HashMap<String, Field> FIELD_CACHE = new HashMap<String, Field>();
+	private static final HashMap<String, Field> FIELD_CACHE = new HashMap<String, Field>();
 
-    protected static final HashMap<Class, List<Field>> SIMPLE_SEARCH_FIELDs_CACHE = new HashMap<Class, List<Field>>();
+	protected static final HashMap<Class, List<Field>> SIMPLE_SEARCH_FIELDs_CACHE = new HashMap<Class, List<Field>>();
 
-    protected static final String SIMPLE_SEARCH_PARAM_NAME = "_all";
+	protected static final String SIMPLE_SEARCH_PARAM_NAME = "_all";
 
-    protected static final String SEARCH_MODE = "_searchmode";
+	protected static final String SEARCH_MODE = "_searchmode";
 
 	protected static final StringPredicateFactory stringPredicateFactory = new StringPredicateFactory();
 

@@ -20,10 +20,15 @@
  */
 package com.github.manosbatsis.scrudbeans.validation;
 
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
+import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry;
+import com.github.manosbatsis.scrudbeans.util.EntityUtil;
+import com.github.manosbatsis.scrudbeans.util.ValidatorUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.beanutils.PropertyUtils;
+import org.hibernate.proxy.HibernateProxyHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.FlushModeType;
@@ -34,16 +39,9 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
-import com.github.manosbatsis.scrudbeans.util.EntityUtil;
-import com.github.manosbatsis.scrudbeans.util.ValidatorUtil;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.beanutils.PropertyUtils;
-import org.hibernate.proxy.HibernateProxyHelper;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides meaningful constraint validation messages
@@ -51,7 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @see Unique
  */
 @Slf4j
-public class UniqueValidator implements ConstraintValidator<Unique, Persistable> {
+public class UniqueValidator implements ConstraintValidator<Unique, Object> {
 
     private EntityManager entityManager;
 
@@ -65,7 +63,7 @@ public class UniqueValidator implements ConstraintValidator<Unique, Persistable>
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isValid(Persistable value, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(Object value, ConstraintValidatorContext constraintValidatorContext) {
         log.debug("isValid pathFragment: {}", value);
         boolean valid = true;
         // skip validation if null
@@ -73,13 +71,14 @@ public class UniqueValidator implements ConstraintValidator<Unique, Persistable>
 
             // get the entity class being proxied by <code>pathFragment</code> if any, or the actual <code>pathFragment</code> class otherwise
             Class domainClass = HibernateProxyHelper.getClassWithoutInitializingProxy(value);
-
+            IdentifierAdapter identifierAdapter = IdentifierAdaptersRegistry.getAdapterForClass(domainClass);
+            Object valueId = identifierAdapter.readId(value);
             try {
                 // get unique field names
                 List<String> uniqueFieldNames = ValidatorUtil.getUniqueFieldNames(domainClass);
                 log.debug("isValid uniqueFieldNames: {}", uniqueFieldNames);
                 // get records matching the unique field values
-                List<Persistable> resultSet = getViolatingRecords(value, domainClass, uniqueFieldNames);
+                List<Object> resultSet = getViolatingRecords(value, domainClass, uniqueFieldNames);
 
                 log.debug("isValid violating records: {}", resultSet.size());
                 // process violating records
@@ -89,10 +88,10 @@ public class UniqueValidator implements ConstraintValidator<Unique, Persistable>
                     // as it will point to the object instead of the property
                     constraintValidatorContext.disableDefaultConstraintViolation();
 
-                    for (Persistable match : resultSet) {
+                    for (Object match : resultSet) {
 
                         // If value is new or otherwise different than the violating record
-                        if (value.isNew() || !value.getScrudBeanId().equals(match.getScrudBeanId())) {
+                        if (valueId == null || !valueId.equals(identifierAdapter.readId(match))) {
                             for (String propertyName : uniqueFieldNames) {
                                 Object newValue = PropertyUtils.getProperty(value, propertyName);
                                 Object existingValue = PropertyUtils.getProperty(match, propertyName);
@@ -126,12 +125,12 @@ public class UniqueValidator implements ConstraintValidator<Unique, Persistable>
 
     }
 
-    private List<Persistable> getViolatingRecords(Persistable value, Class domainClass, List<String> uniqueFieldNames) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private List<Object> getViolatingRecords(Object value, Class domainClass, List<String> uniqueFieldNames) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
         log.debug("getViolatingRecords, for pathFragment: {}, uniqueFieldNames: {}", value, uniqueFieldNames);
         CriteriaBuilder criteriaBuilder = this.entityManager.getCriteriaBuilder();
         CriteriaQuery criteriaQuery = criteriaBuilder.createQuery(domainClass);
-        Root<? extends Persistable<Serializable>> root = criteriaQuery.from(domainClass);
+        Root<?> root = criteriaQuery.from(domainClass);
         List<Predicate> predicates = new ArrayList<Predicate>(uniqueFieldNames.size());
         for (String propertyName : uniqueFieldNames) {
             log.debug("getViolatingRecords, adding predicate for field: {}", propertyName);
@@ -141,9 +140,9 @@ public class UniqueValidator implements ConstraintValidator<Unique, Persistable>
         }
 
         criteriaQuery.where(predicates.toArray(new Predicate[predicates.size()]));
-        TypedQuery<Persistable> typedQuery = this.entityManager.createQuery(criteriaQuery);
+        TypedQuery typedQuery = this.entityManager.createQuery(criteriaQuery);
 
-        // tell JPA not to flush just vbecause we want to check existing records
+        // tell JPA not to flush just because we want to check existing records
         typedQuery.setFlushMode(FlushModeType.COMMIT);
         return typedQuery.getResultList();
 	}
