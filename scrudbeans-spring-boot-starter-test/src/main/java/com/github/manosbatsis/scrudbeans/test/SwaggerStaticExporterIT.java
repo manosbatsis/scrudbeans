@@ -1,13 +1,6 @@
 package com.github.manosbatsis.scrudbeans.test;
 
 
-import static io.restassured.RestAssured.given;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import io.github.swagger2markup.GroupBy;
 import io.github.swagger2markup.Language;
 import io.github.swagger2markup.Swagger2MarkupConfig;
@@ -19,27 +12,47 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static io.restassured.RestAssured.given;
+
 /**
- * Generates static swagger docs in {@value SwaggerStaticExporterIT#GENERATED_ASCIIDOCS_PATH}
+ * Generates static swagger docs in ${getBuildDirName()}/{@value SwaggerStaticExporterIT#GENERATED_ASCIIDOCS_PATH}
  */
 @Slf4j
 public class SwaggerStaticExporterIT extends AbstractRestAssuredIT {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SwaggerStaticExporterIT.class);
 
-	protected static final String GENERATED_ASCIIDOCS_PATH = "target/swagger2asciidoc";
+	protected static final String GENERATED_ASCIIDOCS_PATH = "swagger2asciidoc";
 
-	protected static final String GENERATED_MARKDOWN_PATH = "target/swagger2md";
+	protected static final String GENERATED_MARKDOWN_PATH = "swagger2md";
 
-	protected static final String GENERATED_JSON_PATH = "target/swagger2json";
+	protected static final String GENERATED_JSON_PATH = "swagger2json";
 
+	/**
+	 * Override to change the Swagger JSON endpoint.
+	 */
+	protected String getSwaggerPath() {
+		return "/v2/api-docs";
+	}
+
+	/**
+	 * Override to change the build dir, e.g. to "build" for Gradle.
+	 */
+	protected String getBuildDirName() {
+		return "target";
+	}
 
 	@Test
 	public void testCreateStaticDocs() throws Exception {
 		try {
-
+			String buildDir = this.getBuildDirName() + '/';
 			// get swagger document
-			String swaggerPath = "/v2/api-docs";
+			String swaggerPath = getSwaggerPath();
 			String json = given()
 					.log().all()
 					.spec(defaultSpec())
@@ -47,23 +60,22 @@ public class SwaggerStaticExporterIT extends AbstractRestAssuredIT {
 					.then()
 					.log().all().statusCode(200).extract().asString();
 
-			Path targetFolder = Paths.get(SwaggerStaticExporterIT.GENERATED_JSON_PATH);
+			Path targetFolder = Paths.get(buildDir + SwaggerStaticExporterIT.GENERATED_JSON_PATH);
 			LOGGER.debug("Creating swagger JSON file in {}", targetFolder);
 			try {
 				Files.createDirectories(targetFolder);
 				Files.write(targetFolder.resolve("swagger.json"), json.getBytes());
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				log.error("Failed writing file", e);
 			}
 
 			// create asciidoc
-			targetFolder = Paths.get(SwaggerStaticExporterIT.GENERATED_ASCIIDOCS_PATH);
+			targetFolder = Paths.get(buildDir + SwaggerStaticExporterIT.GENERATED_ASCIIDOCS_PATH);
 			LOGGER.debug("Creating static docs at: {}", targetFolder);
 			this.makeDocs(json, targetFolder, MarkupLanguage.ASCIIDOC);
 
 			// create markdown
-			targetFolder = Paths.get(SwaggerStaticExporterIT.GENERATED_MARKDOWN_PATH);
+			targetFolder = Paths.get(buildDir + SwaggerStaticExporterIT.GENERATED_MARKDOWN_PATH);
 			LOGGER.debug("Creating static docs at: {}", targetFolder);
 			this.makeDocs(json, targetFolder, MarkupLanguage.MARKDOWN);
 
