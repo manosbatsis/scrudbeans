@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.manosbatsis.scrudbeans</groupId>
     <artifactId>scrudbeans</artifactId>
-    <version>0.16-SNAPSHOT</version>
+    <version>0.16</version>
     <packaging>pom</packaging>
     <inceptionYear>2016</inceptionYear>
     <name>scrudbeans</name>
@@ -88,8 +88,8 @@
         <rest-assured.version>3.1.1</rest-assured.version>
 
         <kotlin.version>1.2.71</kotlin.version>
-        <kotlinpoet.version>1.4.1</kotlinpoet.version>
-        <kotlin-utils.version>0.8</kotlin-utils.version>
+        <kotlinpoet.version>1.5.0</kotlinpoet.version>
+        <kotlin-utils.version>0.10</kotlin-utils.version>
         <kotlin.compiler.jvmTarget>${java.version}</kotlin.compiler.jvmTarget>
         <kotlin.apiVersion>1.2</kotlin.apiVersion>
         <kotlin.languageVersion>1.2</kotlin.languageVersion>
@@ -101,8 +101,8 @@
         <maven-failsafe-plugin.version>3.0.0-M3</maven-failsafe-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M3</maven-surefire-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
-        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
-        <spring.version>5.2.2.RELEASE</spring.version>
+        <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
+        <spring.version>5.2.4.RELEASE</spring.version>
         <swagger.version>2.1.0</swagger.version>
         <thin.version>1.0.11.RELEASE</thin.version>
 
@@ -121,7 +121,6 @@
 		<module>scrudbeans-spring-boot-autoconfigure</module>
 		<module>scrudbeans-spring-boot-starter</module>
 		<module>scrudbeans-spring-boot-starter-test</module>
-		<module>scrudbeans-swagger-codegen</module>
 	</modules>
 
 	<dependencyManagement>

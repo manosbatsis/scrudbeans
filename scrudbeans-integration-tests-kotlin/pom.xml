@@ -7,7 +7,7 @@
 	<parent>
         <groupId>com.github.manosbatsis.scrudbeans</groupId>
         <artifactId>scrudbeans</artifactId>
-        <version>0.16-SNAPSHOT</version>
+        <version>0.16</version>
     </parent>
 
 	<properties>
@@ -128,6 +128,13 @@
 	</reporting>
 	<build>
         <plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>

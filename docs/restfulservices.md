@@ -21,7 +21,6 @@ PATCH  | /api/rest/orders/{id} | Partially update the order matching the id
 DELETE | /api/rest/orders/{id} | Delete the order matching the id
 <!--- GET    | /api/rest/orders/jsonschema | Get the JSONSchema for orders -->
 
-Most endpoints support `application/json`, `application/hal+json` and `application/vnd.api+json`.
 If you are using the scrudbeans-template, you can inspect the endpoints by starting Spring Boot 
 with `./mvnw spring-boot:run` and pointing your browser to http://localhost:8080/swagger-ui.html
 

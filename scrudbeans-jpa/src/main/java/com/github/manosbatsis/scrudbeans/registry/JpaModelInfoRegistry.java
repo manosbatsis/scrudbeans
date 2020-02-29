@@ -45,7 +45,6 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
-import org.springframework.util.StopWatch;
 
 import java.io.Serializable;
 import java.lang.reflect.Modifier;
@@ -89,43 +88,20 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
         return entries;
     }
 
-    public void print(StopWatch.TaskInfo task) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("; [").append(task.getTaskName()).append("] took ").append(task.getTimeMillis());
-        log.debug(task.toString());
-    }
-
     protected void scanPackages(Iterable<String> basePackages) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.setKeepTaskList(true);
         // scan for models
         for (String basePackage : basePackages) {
-
-            log.debug("scanPackages " + basePackage);
-            stopWatch.start("scanPackages " + basePackage);
+            log.trace("scanPackages " + basePackage);
             Set<BeanDefinition> entityBeanDefs = EntityUtil.findAllModels(basePackage);
             for (BeanDefinition beanDef : entityBeanDefs) {
                 Class<?> modelType = ClassUtils.getClass(beanDef.getBeanClassName());
 				this.addEntryFor(modelType);
             }
-            stopWatch.stop();
-            print(stopWatch.getLastTaskInfo());
         }
-
-        stopWatch.prettyPrint();
-
-        // field > model ref
-        stopWatch.start("scanPackages set related");
-        log.debug("scanPackages set related");
         for (ModelInfo modelInfo : this.getEntries()) {
 			setRelatedFieldsModelInfo(modelInfo, modelInfo.getToOneFieldNames());
 			setRelatedFieldsModelInfo(modelInfo, modelInfo.getToManyFieldNames());
 		}
-		stopWatch.stop();
-		print(stopWatch.getLastTaskInfo());
-
-		stopWatch.prettyPrint();
-
 	}
 
 	protected void scanForHelpers(Iterable<String> basePackages) {

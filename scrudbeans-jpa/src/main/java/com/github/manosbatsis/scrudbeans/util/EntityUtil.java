@@ -39,7 +39,6 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StopWatch;
 
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
@@ -102,12 +101,6 @@ public class EntityUtil {
         return entities;
     }
 
-    public static void print(StopWatch.TaskInfo task) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("; [").append(task.getTaskName()).append("] took ").append(task.getTimeMillis());
-        LOGGER.debug(task.toString());
-    }
-
     public static Set<BeanDefinition> findAllHelpers(String... basePackages) {
         createComponentScanner(EntityPredicateFactory.class, IdentifierAdapterBean.class);
         Set<BeanDefinition> predicateFactories = new HashSet<>();
@@ -118,21 +111,11 @@ public class EntityUtil {
     }
 
     public static Set<BeanDefinition> findAllModels(String... basePackages) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.setKeepTaskList(true);
-        stopWatch.start("findAllModels init");
         createComponentScanner(Entity.class, ScrudBean.class, ScrudRelatedBean.class);
-
-        stopWatch.stop();
-        print(stopWatch.getLastTaskInfo());
         Set<BeanDefinition> entities = new HashSet<>();
         for (String basePackage : basePackages) {
-            stopWatch.start("findAllModels in " + basePackage);
             entities.addAll(provider.findCandidateComponents(basePackage));
-            stopWatch.stop();
-            print(stopWatch.getLastTaskInfo());
         }
-        stopWatch.prettyPrint();
         return entities;
     }
 

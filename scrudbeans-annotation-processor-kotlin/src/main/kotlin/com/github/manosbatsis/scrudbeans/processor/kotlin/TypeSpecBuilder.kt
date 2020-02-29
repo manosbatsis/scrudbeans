@@ -33,7 +33,7 @@ import com.squareup.kotlinpoet.KModifier.PUBLIC
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
-import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.apache.commons.lang3.StringUtils
 import org.atteo.evo.inflector.English
 import org.mapstruct.Mapper
@@ -120,8 +120,9 @@ internal class TypeSpecBuilder(
                         AnnotationSpec.builder(RestController::class.java)
                                 . addMember("value = %S", beanName).build())
                 .addAnnotation(
-                        AnnotationSpec.builder(OpenAPIDefinition::class.java)
-                                .addMember("tags = [io.swagger.v3.oas.annotations.tags.Tag(name=%S, description=%S)]", apiName, apiDescription).build())
+                        AnnotationSpec.builder(Tag::class.java)
+                                .addMember("name=%S", apiName)
+                                .addMember("description=%S", apiDescription).build())
                 .addAnnotation(
                         AnnotationSpec.builder(RequestMapping::class.java)
                                 . addMember("value = %S", getRequestMappingPattern(descriptor)).build())

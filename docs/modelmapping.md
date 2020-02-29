@@ -13,13 +13,10 @@ Model driven services are enabled per entity provided two conditions are met:
  
  - It must be annotated with `@ScrudBean`.
  - It must have a non-primitive id.
- - It must implement `com.github.manosbatsis.scrudbeans.api.domain.Persistable` or simply extend one of the abstract 
- entities from the `com.github.manosbatsis.scrudbeans.jpa.model` package.
-
-> The last requirement will be removed in upcpming versions.
-
-To make this easier, ScrudBeans provides a set of mapped superclasses you can extend to create your
-entities, see [Base Models](#base-models) for more details.
+ - It must implement either `org.springframework.data.domain.Persistable` or `com.github.manosbatsis.scrudbeans.api.domain.KPersistable` for Java and Kotlin respectively.
+ 
+For Java developers only, a set of mapped superclasses can be extended to create your
+entities, see [Java Base Models](#java-base-models) for more details.
 
 ## Mapping Examples
  
@@ -65,8 +62,7 @@ data class Order(
         // other constructor params...
 
 
-) : Persistable<String> {
-        override fun getScrudBeanId() = id!!
+) : KPersistable<String> {
         override fun isNew(): Boolean = id == null
 }
 ```
@@ -117,21 +113,15 @@ example, or create your own.
 
 ### Documentation
 
-Annotating your models and their fields properly with `io.swagger.v3.oas.annotations.media.Schema` and 
-`io.swagger.v3.oas.annotations.media.SchemaProperty` respectively will increase the quality of the generated Springfox/Swagger 
+Annotating your models and their fields properly with [SpringDoc/OpenAPI]  will increase the quality of the generated Springfox/Swagger 
 documentation.
 
 
-## Base Models
+## Java Base Models
 
-Model driven services are enabled per entity provided two conditions are met:
- 
- - It must be annotated with `@ScrudBean`.
- - It must implement `PersistableModel` or simply extend one of the abstract entities from the 
-`com.github.manosbatsis.scrudbeans.jpa.model` package. 
-
-To make this easier, ScrudBeans provides the `com.github.manosbatsis.scrudbeans.jpa.model` package, 
-a set of mapped superclasses you can extend to create your entities.
+__Java only__: As an alternative to implementing `PersistableModel`, you may instead extend the  
+`@MappedSuperclass`annotated type within the `com.github.manosbatsis.scrudbeans.jpa.model` package 
+that matches the target `@Id` type, see bellow. 
 
 ### UUID
 

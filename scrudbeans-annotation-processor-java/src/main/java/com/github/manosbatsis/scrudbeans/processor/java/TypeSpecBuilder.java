@@ -19,7 +19,7 @@ import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicate
 import com.github.manosbatsis.scrudbeans.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils;
 import com.squareup.javapoet.*;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -117,8 +117,9 @@ class TypeSpecBuilder {
 						AnnotationSpec.builder(RestController.class)
 								.addMember("value", "\"" + beanName + "\"").build())
 				.addAnnotation(
-                        AnnotationSpec.builder(OpenAPIDefinition.class)
-                                .addMember("tags", "@io.swagger.v3.oas.annotations.tags.Tag(name=\"" + apiName + "\", description=\"" + apiDescription + "\")")
+                        AnnotationSpec.builder(Tag.class)
+								.addMember("name", "\"" + apiName + "\"")
+								.addMember("description", "\"" + apiDescription + "\"")
                                 .build())
 				.addAnnotation(
 						AnnotationSpec.builder(RequestMapping.class)
