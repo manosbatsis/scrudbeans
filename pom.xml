@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.manosbatsis.scrudbeans</groupId>
     <artifactId>scrudbeans</artifactId>
-    <version>0.16</version>
+    <version>0.17</version>
     <packaging>pom</packaging>
     <inceptionYear>2016</inceptionYear>
     <name>scrudbeans</name>
@@ -103,7 +103,6 @@
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
         <spring-boot.version>2.2.5.RELEASE</spring-boot.version>
         <spring.version>5.2.4.RELEASE</spring.version>
-        <swagger.version>2.1.0</swagger.version>
         <thin.version>1.0.11.RELEASE</thin.version>
 
     </properties>
@@ -138,11 +137,11 @@
                 <artifactId>springdoc-openapi-ui</artifactId>
                 <version>1.2.17</version>
             </dependency>
-            <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>io.swagger.core.v3</groupId>
+				<artifactId>swagger-annotations</artifactId>
+				<version>2.0.1</version>
+			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>

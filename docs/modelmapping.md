@@ -97,8 +97,7 @@ About the annotation members:
 
 - `pathFragment` is the path fragment appended to the API base path (by default `api/rest/`), thus forming the base 
 `RequestMapping` path for this entity's REST controller.
-- `apiName` is equivalent to `io.swagger.annotations.Api#tags` and serves as a name and logical grouping of 
-operations/endpoints for this entity's REST controller .
+- `apiName` and `apiDescription` is used to annotate generated controllers with `io.swagger.v3.oas.annotations.tags.Tag`.
 - `apiDescription` is equivalent to `io.swagger.annotations.Api#description`.
 - `dtoTypes` an array of DTO classes to generate mappers for.
 - `dtoTypeNames` an array of DTO (canonical) class names to generate mappers for.
@@ -113,8 +112,7 @@ example, or create your own.
 
 ### Documentation
 
-Annotating your models and their fields properly with [SpringDoc/OpenAPI]  will increase the quality of the generated Springfox/Swagger 
-documentation.
+Annotating your classes properly per [SpringDoc](https://springdoc.github.io/springdoc-openapi-demos/)  will increase the quality of the generated documentation.
 
 
 ## Java Base Models
