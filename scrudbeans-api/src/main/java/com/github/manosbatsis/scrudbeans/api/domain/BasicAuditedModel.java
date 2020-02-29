@@ -20,6 +20,8 @@
  */
 package com.github.manosbatsis.scrudbeans.api.domain;
 
+import org.springframework.data.domain.Persistable;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 

@@ -4,9 +4,11 @@ import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.DtoMapper
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.EntityModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
+import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.WildcardTypeName
@@ -114,6 +116,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
                         // Mappers for manual DTOs
                         generateDtoMappers(descriptor)
                         generateDto(descriptor)
+                        createIdAdapters(descriptor)
                         createRepository(descriptor)
                         createService(descriptor)
                         createController(descriptor)
@@ -247,6 +250,19 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     private fun createRepository(descriptor: ScrudModelDescriptor): FileSpec? {
         val typeSpec = typeSpecBuilder.createRepository(descriptor)
         return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".repository")
+    }
+
+    /**
+     * Create an [IdentifierAdapter] implementation
+     * @param descriptor The target model descriptor
+     * @return the written file
+     */
+    private fun createIdAdapters(descriptor: ScrudModelDescriptor): List<FileSpec> {
+        return listOf(ClassName(descriptor.packageName, descriptor.simpleName),
+                ClassName(descriptor.packageName, descriptor.simpleName + "Dto"))
+                .mapNotNull {
+                    writeKotlinFile(descriptor, typeSpecBuilder.createIdAdapter(it, descriptor), descriptor.packageName)
+                }
     }
 
     /**

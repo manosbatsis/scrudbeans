@@ -20,10 +20,9 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.registry;
 
-import java.util.Optional;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Optional;
 
 /**
  * Contains metadata for a specific model field
@@ -45,10 +44,10 @@ public interface FieldInfo {
 	 */
 	FieldMappingType getFieldMappingType();
 
-    /**
-     * Get the member model type for example <code>Book</code> for a book entity or entity collection
-     */
-    Class<? extends Persistable> getFieldModelType();
+	/**
+	 * Get the member model type for example <code>Book</code> for a book entity or entity collection
+	 */
+	Class<?> getFieldModelType();
 
 	/**
 	 * Get the reverse relationship path if any

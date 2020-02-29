@@ -1,6 +1,8 @@
 package mykotlinpackage.test
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
+import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry
 import com.github.manosbatsis.scrudbeans.test.AbstractRestAssuredIT
 import com.github.manosbatsis.scrudbeans.test.TestableParamsAwarePage
 import io.restassured.RestAssured
@@ -45,7 +47,7 @@ class RestServicesIT : AbstractRestAssuredIT() {
 
     @Test
     fun testScrud() {
-
+        val orderIdAdapter = IdentifierAdaptersRegistry.getAdapterForClass(Order::class.java)
         // Test Search
         //============================
         // Get the lord of the rings trilogy as a page of results
@@ -90,7 +92,7 @@ class RestServicesIT : AbstractRestAssuredIT() {
         order = RestAssured.given()
                 .spec(defaultSpec())
                 .body(orderMap)
-                .put("/api/rest/orders/" + order.getScrudBeanId())
+                .put("/api/rest/orders/" + orderIdAdapter.readId(order))
                 .then()
                 .statusCode(200).extract().`as`(Order::class.java)
         assertEquals(email + "_updated_patched", order.email)
@@ -98,7 +100,7 @@ class RestServicesIT : AbstractRestAssuredIT() {
         //============================
         // verify order was created and can be retrieved
         order = RestAssured.given()
-                .spec(defaultSpec())["/api/rest/orders/" + order.getScrudBeanId()]
+                .spec(defaultSpec())["/api/rest/orders/" + orderIdAdapter.readId(order)]
                 .then()
                 .statusCode(200).extract().`as`(Order::class.java)
         assertEquals(email + "_updated_patched", order.email)
@@ -150,6 +152,8 @@ class RestServicesIT : AbstractRestAssuredIT() {
                 .then()
                 .statusCode(200).extract().`as`(ProductsPage::class.java)
         // Create ProductRelationship for each combination
+        val relIdAdapter: IdentifierAdapter<ProductRelationship, *> =
+                IdentifierAdaptersRegistry.getAdapterForClass(ProductRelationship::class.java)!!
         for (leftProduct in products) {
             for (rightProduct in products) {
                 if (!leftProduct!!.equals(rightProduct)) { // Test Create
@@ -157,9 +161,7 @@ class RestServicesIT : AbstractRestAssuredIT() {
                     id.setLeft(leftProduct)
                     id.setRight(rightProduct)
                     val description = "Part of LOTR trilogy"
-                    var relationship = ProductRelationship()
-                    relationship.id = id
-                    relationship.description = description
+                    var relationship = ProductRelationship(id = id, description = description)
 
                     relationship = RestAssured.given()
                             .spec(defaultSpec())
@@ -172,7 +174,7 @@ class RestServicesIT : AbstractRestAssuredIT() {
                     relationship = RestAssured.given()
                             .spec(defaultSpec())
                             .body(relationship)
-                            .put("/api/rest/productRelationships" + '/' + relationship.getScrudBeanId())
+                            .put("/api/rest/productRelationships" + '/' + relIdAdapter.readId(relationship))
                             .then()
                             .statusCode(200).extract().`as`(ProductRelationship::class.java)
                     // Test Patch
@@ -181,12 +183,12 @@ class RestServicesIT : AbstractRestAssuredIT() {
                     relationship = RestAssured.given()
                             .spec(defaultSpec())
                             .body(patch)
-                            .put("/api/rest/productRelationships" + '/' + relationship.getScrudBeanId())
+                            .put("/api/rest/productRelationships" + '/' + relIdAdapter.readId(relationship))
                             .then()
                             .statusCode(200).extract().`as`(ProductRelationship::class.java)
                     // Test Read
                     relationship = RestAssured.given()
-                            .spec(defaultSpec())["/api/rest/productRelationships" + '/' + relationship.getScrudBeanId()]
+                            .spec(defaultSpec())["/api/rest/productRelationships" + '/' + relIdAdapter.readId(relationship)]
                             .then()
                             .statusCode(200).extract().`as`(ProductRelationship::class.java)
                     assertEquals(description + "_updated_patched", relationship.description)

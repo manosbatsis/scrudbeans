@@ -20,17 +20,16 @@
  */
 package com.github.manosbatsis.scrudbeans.model;
 
-import java.io.Serializable;
-
-import javax.persistence.MappedSuperclass;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.validation.Unique;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.springframework.data.domain.Persistable;
+
+import javax.persistence.MappedSuperclass;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 /**
  * Abstract entity class with basic auditing and unique constraints validation
@@ -67,7 +66,7 @@ public abstract class AbstractPersistableModel<PK extends Serializable> implemen
 		}
 		AbstractPersistableModel other = (AbstractPersistableModel) obj;
 		return new EqualsBuilder()
-				.append(this.getScrudBeanId(), this.getScrudBeanId())
+				.append(this.getId(), this.getId())
 				.isEquals();
 	}
 
@@ -77,7 +76,7 @@ public abstract class AbstractPersistableModel<PK extends Serializable> implemen
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder()
-				.append(this.getScrudBeanId())
+				.append(this.getId())
 				.toHashCode();
 	}
 

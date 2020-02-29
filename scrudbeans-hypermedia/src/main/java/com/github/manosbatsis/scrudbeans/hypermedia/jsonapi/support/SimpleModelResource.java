@@ -20,17 +20,12 @@
  */
 package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support;
 
-import java.io.Serializable;
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
+import com.fasterxml.jackson.annotation.*;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
 import lombok.NonNull;
+
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * A model wrapper that allows serializing as a EntityModel according to JSON API  1.1
@@ -41,7 +36,7 @@ import lombok.NonNull;
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonPropertyOrder({"id", "type", "attributes", "relationships", "links", "meta"})
-public class SimpleModelResource<T extends Persistable<PK>, PK extends Serializable> extends SimpleModelResourceIdentifier<T, PK> implements JsonApiModelResource<T, PK> {
+public class SimpleModelResource<T, PK extends Serializable> extends SimpleModelResourceIdentifier<T, PK> implements JsonApiModelResource<T, PK> {
 
     private T attributes;
 

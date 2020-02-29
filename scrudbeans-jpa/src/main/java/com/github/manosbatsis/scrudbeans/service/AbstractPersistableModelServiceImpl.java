@@ -22,7 +22,6 @@ package com.github.manosbatsis.scrudbeans.service;
 
 import com.github.manosbatsis.kotlin.utils.api.Dto;
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.domain.event.EntityCreatedEvent;
 import com.github.manosbatsis.scrudbeans.api.domain.event.EntityDeletedEvent;
@@ -56,24 +55,24 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 /**
- * SCRUD service handling a specific type of {@link Persistable} using a {@link ModelRepository}
+ * SCRUD service handling a specific type using a {@link ModelRepository}
  *
  * @param <T>  Your resource class to manage, usually an entity class
  * @param <PK> EntityModel id type, usually Long or String
  * @param <R>  The repository class to automatically inject
  */
 @Slf4j
-public class AbstractPersistableModelServiceImpl<T extends Persistable<PK>, PK extends Serializable, R extends ModelRepository<T, PK>>
-        extends AbstractBaseServiceImpl
-        implements PersistableModelService<T, PK> {
+public class AbstractPersistableModelServiceImpl<T, PK extends Serializable, R extends ModelRepository<T, PK>>
+		extends AbstractBaseServiceImpl
+		implements PersistableModelService<T, PK> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelServiceImpl.class);
 
-    protected R repository;
+	protected R repository;
 
-    @SuppressWarnings("SpringJavaAutowiringInspection")
+	@SuppressWarnings("SpringJavaAutowiringInspection")
 
-    @Autowired
+	@Autowired
 	public void setRepository(R repository) {
 		this.repository = repository;
 	}
@@ -289,32 +288,32 @@ public class AbstractPersistableModelServiceImpl<T extends Persistable<PK>, PK e
         return repository.findAllById(ids);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Persistable findRelatedSingle(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
-        // throw error if not valid or linkable relationship
-        if (!fieldInfo.isLinkableResource() || !fieldInfo.isToOne()) {
-            throw new IllegalArgumentException("Related must be linkable and *ToOne");
-        }
-        return repository.findRelatedEntityByOwnId(id, fieldInfo);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Object findRelatedSingle(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
+		// throw error if not valid or linkable relationship
+		if (!fieldInfo.isLinkableResource() || !fieldInfo.isToOne()) {
+			throw new IllegalArgumentException("Related must be linkable and *ToOne");
+		}
+		return repository.findRelatedEntityByOwnId(id, fieldInfo);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public <M extends Persistable<MID>, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable) {
-        ModelRepository<M, MID> repo = (ModelRepository) this.repositoryRegistryService.getRepositoryFor(entityType);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public <M, MID extends Serializable> Page<M> findRelatedPaginated(Class<M> entityType, Specification<M> spec, @NonNull Pageable pageable) {
+		ModelRepository<M, MID> repo = (ModelRepository) this.repositoryRegistryService.getRepositoryFor(entityType);
 
-        if (repo == null) {
-            throw new IllegalArgumentException("Could not find a repository for model type: " + entityType);
-        }
+		if (repo == null) {
+			throw new IllegalArgumentException("Could not find a repository for model type: " + entityType);
+		}
 
-        if (spec != null) {
-            return repo.findAll(spec, pageable);
-        } else {
+		if (spec != null) {
+			return repo.findAll(spec, pageable);
+		} else {
 			return repo.findAll(pageable);
 		}
 	}
@@ -333,13 +332,14 @@ public class AbstractPersistableModelServiceImpl<T extends Persistable<PK>, PK e
 	@Override
 	public Page<T> findPaginated(Specification<T> spec, @NonNull Pageable pageable) {
 		log.debug("findPaginated, pageable: {}", pageable);
-
+		Page<T> page = null;
 		if (spec != null) {
-			return this.repository.findAll(spec, pageable);
+			page = this.repository.findAll(spec, pageable);
+		} else {
+			page = this.repository.findAll(pageable);
 		}
-		else {
-			return this.repository.findAll(pageable);
-		}
+		log.debug("findPaginated, page result count: {}", page.getTotalElements());
+		return page;
 	}
 
 

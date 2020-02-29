@@ -21,17 +21,8 @@
 package com.github.manosbatsis.scrudbeans.model;
 
 
-import java.io.Serializable;
-
-import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableCompositeIdentifier;
 import com.github.manosbatsis.scrudbeans.binding.EmbeddableCompositeIdDeserializer;
 import com.github.manosbatsis.scrudbeans.binding.EmbeddableCompositeIdSerializer;
@@ -42,6 +33,13 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * A base class for {@link Embeddable}s used as composite IDs in model based on a many-to-many table.
@@ -106,11 +104,11 @@ import org.slf4j.LoggerFactory;
 @JsonSerialize(using = EmbeddableCompositeIdSerializer.class)
 @JsonDeserialize(using = EmbeddableCompositeIdDeserializer.class)
 public abstract class AbstractEmbeddableQuintupleIdentifier<
-        L extends Persistable<LPK>, LPK extends Serializable,
-        IL extends Persistable<ILPK>, ILPK extends Serializable,
-        M extends Persistable<MPK>, MPK extends Serializable,
-        IR extends Persistable<IRPK>, IRPK extends Serializable,
-        R extends Persistable<RPK>, RPK extends Serializable>
+        L, LPK extends Serializable,
+        IL, ILPK extends Serializable,
+        M, MPK extends Serializable,
+        IR, IRPK extends Serializable,
+        R, RPK extends Serializable>
 		implements Serializable, EmbeddableCompositeIdentifier {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEmbeddableQuintupleIdentifier.class);
@@ -168,12 +166,12 @@ public abstract class AbstractEmbeddableQuintupleIdentifier<
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-				.append(EntityUtil.idOrNull(this.getLeft()))
-				.append(EntityUtil.idOrNull(this.getInnerLeft()))
-				.append(EntityUtil.idOrNull(this.getMiddle()))
-				.append(EntityUtil.idOrNull(this.getInnerRight()))
-				.append(EntityUtil.idOrNull(this.getRight())).toHashCode();
+        return new HashCodeBuilder()
+                .append(EntityUtil.idOrNEmpty(this.getLeft()))
+                .append(EntityUtil.idOrNEmpty(this.getInnerLeft()))
+                .append(EntityUtil.idOrNEmpty(this.getMiddle()))
+                .append(EntityUtil.idOrNEmpty(this.getInnerRight()))
+                .append(EntityUtil.idOrNEmpty(this.getRight())).toHashCode();
 	}
 
 	@Override
@@ -183,12 +181,12 @@ public abstract class AbstractEmbeddableQuintupleIdentifier<
 		}
 		if (AbstractEmbeddableQuintupleIdentifier.class.isAssignableFrom(obj.getClass())) {
 			final AbstractEmbeddableQuintupleIdentifier other = (AbstractEmbeddableQuintupleIdentifier) obj;
-			return new EqualsBuilder()
-					.append(EntityUtil.idOrNull(this.getLeft()), EntityUtil.idOrNull(other.getLeft()))
-					.append(EntityUtil.idOrNull(this.getInnerLeft()), EntityUtil.idOrNull(other.getInnerLeft()))
-					.append(EntityUtil.idOrNull(this.getMiddle()), EntityUtil.idOrNull(other.getMiddle()))
-					.append(EntityUtil.idOrNull(this.getInnerRight()), EntityUtil.idOrNull(other.getInnerRight()))
-					.append(EntityUtil.idOrNull(this.getRight()), EntityUtil.idOrNull(other.getRight())).isEquals();
+            return new EqualsBuilder()
+                    .append(EntityUtil.idOrNEmpty(this.getLeft()), EntityUtil.idOrNull(other.getLeft()))
+                    .append(EntityUtil.idOrNEmpty(this.getInnerLeft()), EntityUtil.idOrNull(other.getInnerLeft()))
+                    .append(EntityUtil.idOrNEmpty(this.getMiddle()), EntityUtil.idOrNull(other.getMiddle()))
+                    .append(EntityUtil.idOrNEmpty(this.getInnerRight()), EntityUtil.idOrNull(other.getInnerRight()))
+                    .append(EntityUtil.idOrNEmpty(this.getRight()), EntityUtil.idOrNull(other.getRight())).isEquals();
 		}
 		else {
 			return false;

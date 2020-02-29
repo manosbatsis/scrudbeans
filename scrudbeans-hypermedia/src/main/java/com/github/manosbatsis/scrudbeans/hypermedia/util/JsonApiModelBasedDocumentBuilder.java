@@ -20,20 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.hypermedia.util;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiDocument;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiLink;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceCollectionDocument;
-import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceDocument;
+import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.*;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelResource;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelResourceCollectionDocument;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelResourceDocument;
@@ -41,9 +28,11 @@ import lombok.NonNull;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * The concrete implementation build and returned using this class is either a  {@link SimpleModelResourceDocument} or {@link SimpleModelResourceCollectionDocument}
@@ -72,7 +61,7 @@ import org.springframework.data.domain.Sort;
  *
  *
  */
-public class JsonApiModelBasedDocumentBuilder<T extends Persistable<PK>, PK extends Serializable> {
+public class JsonApiModelBasedDocumentBuilder<T, PK extends Serializable> {
 
 
     private String jsonType;

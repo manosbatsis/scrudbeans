@@ -24,10 +24,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Formula;
 
-import java.io.Serializable;
-
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
 
 /**
  * Abstract base class for persistent model with assigned id
@@ -60,17 +59,9 @@ public abstract class AbstractAssignedPersistable<PK extends Serializable> exten
 		return persisted;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public PK getScrudBeanId() {
-		return getId();
-	}
-
-	/**
-	 *{@inheritDoc}
-	 */
+    /**
+     * {@inheritDoc}
+     */
 	public PK getId() {
 		return id;
 	}

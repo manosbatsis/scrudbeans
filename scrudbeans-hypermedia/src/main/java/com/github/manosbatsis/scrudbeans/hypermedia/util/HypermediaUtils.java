@@ -20,13 +20,9 @@
  */
 package com.github.manosbatsis.scrudbeans.hypermedia.util;
 
-import java.io.Serializable;
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
+import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
 import com.github.manosbatsis.scrudbeans.api.util.ParamsAwarePage;
@@ -37,12 +33,15 @@ import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.server.mvc.BasicLinkBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Provides utilities for working with JSON API
@@ -51,8 +50,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class HypermediaUtils {
 
 
-	public static List<Link> buileHateoasLinks(@NonNull ParamsAwarePage page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName) {
-		List<Link> links = new LinkedList<>();
+    public static List<Link> buileHateoasLinks(@NonNull ParamsAwarePage page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName) {
+        List<Link> links = new LinkedList<>();
 		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(request.getRequestURL() + "?" + request.getQueryString());
 		// add first
 		if (!page.isFirst()) {
@@ -83,19 +82,20 @@ public class HypermediaUtils {
         return links;
     }
 
-    public static List<Link> buileHateoasLinks(@NonNull Persistable model, ModelInfo modelInfo) {
+    public static List<Link> buileHateoasLinks(@NonNull Object model, ModelInfo modelInfo) {
         List<Link> links = null;
-        if (model.getScrudBeanId() != null && modelInfo != null) {
+        IdentifierAdapter identifierAdapter = IdentifierAdaptersRegistry.getAdapterForClass(model.getClass());
+        if (identifierAdapter.readId(model) != null && modelInfo != null) {
 
             links = new LinkedList<>();
 
             // add link to self
             links.add(BasicLinkBuilder.linkToCurrentMapping()
                     .slash(modelInfo.getRequestMapping())
-                    .slash(model.getScrudBeanId()).withSelfRel());
+                    .slash(identifierAdapter.readId(model)).withSelfRel());
 
-			// add links to linkable relationships
-			Set<String> relationshipFields = new HashSet<>();
+            // add links to linkable relationships
+            Set<String> relationshipFields = new HashSet<>();
 			relationshipFields.addAll(modelInfo.getToOneFieldNames());
 			relationshipFields.addAll(modelInfo.getToManyFieldNames());
 			for (String fieldName : relationshipFields) {
@@ -104,7 +104,7 @@ public class HypermediaUtils {
 				if (fieldInfo.isLinkableResource()) {
 					links.add(BasicLinkBuilder.linkToCurrentMapping()
                             .slash(modelInfo.getRequestMapping())
-                            .slash(model.getScrudBeanId())
+                            .slash(identifierAdapter.readId(model))
                             .slash("relationships")
                             .slash(fieldName).withRel(fieldName));
                 }
@@ -113,7 +113,7 @@ public class HypermediaUtils {
         return links;
     }
 
-    public static <RT extends Persistable<RID>, RID extends Serializable> ModelResource<RT> toHateoasResource(RT model, ModelInfo<RT, RID> modelInfo) {
+    public static <RT, RID extends Serializable> ModelResource<RT> toHateoasResource(RT model, ModelInfo<RT, RID> modelInfo) {
         Class<RT> modelType = (modelInfo != null) ? modelInfo.getModelType() : (Class<RT>) model.getClass();
         ModelResource<RT> resource = new ModelResource<>(modelInfo.getUriComponent(), model);
         List<Link> links = HypermediaUtils.buileHateoasLinks(model, modelInfo);
@@ -129,7 +129,7 @@ public class HypermediaUtils {
      *
      * @param models
      */
-    public static <RT extends Persistable> ModelResources<RT> toHateoasResources(@NonNull Iterable<RT> models, Class<RT> modelType, ModelInfoRegistry modelInfoRegistry) {
+    public static <RT> ModelResources<RT> toHateoasResources(@NonNull Iterable<RT> models, Class<RT> modelType, ModelInfoRegistry modelInfoRegistry) {
         log.debug("toHateoasResources");
         LinkedList<ModelResource<RT>> wrapped = new LinkedList<>();
         ModelInfo modelInfo;
@@ -147,7 +147,7 @@ public class HypermediaUtils {
      * @param model the model to wrap
      * @return
      */
-    public static <RT extends Persistable<RID>, RID extends Serializable> JsonApiModelResourceDocument<RT, RID> toDocument(RT model, ModelInfo<RT, RID> modelInfo) {
+    public static <RT, RID extends Serializable> JsonApiModelResourceDocument<RT, RID> toDocument(RT model, ModelInfo<RT, RID> modelInfo) {
         log.debug("toDocument");
 
         JsonApiModelResourceDocument<RT, RID> doc = new JsonApiModelBasedDocumentBuilder<RT, RID>(modelInfo.getUriComponent())
@@ -162,7 +162,7 @@ public class HypermediaUtils {
         return doc;
     }
 
-    public static <M extends Persistable> PagedModelResources<M> toHateoasPagedResources(@NonNull ParamsAwarePage<M> page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName, ModelInfoRegistry modelInfoRegistry) {
+    public static <M> PagedModelResources<M> toHateoasPagedResources(@NonNull ParamsAwarePage<M> page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName, ModelInfoRegistry modelInfoRegistry) {
 
         PagedModel.PageMetadata paginationInfo = new PagedModel.PageMetadata(page.getSize(), page.getNumber(), page.getTotalElements(), page.getTotalPages());
         List<Link> links = HypermediaUtils.buileHateoasLinks(page, request, pageNumberParamName);
@@ -172,7 +172,7 @@ public class HypermediaUtils {
         for (M model : page.getContent()) {
             modelInfo = modelInfoRegistry.getEntryFor(model.getClass());
             wrapped.add(new ModelResource<M>(modelInfo.getUriComponent(), model));
-		}
+        }
 
 		return new PagedModelResources(wrapped, paginationInfo, page.getParameters(), links);
 

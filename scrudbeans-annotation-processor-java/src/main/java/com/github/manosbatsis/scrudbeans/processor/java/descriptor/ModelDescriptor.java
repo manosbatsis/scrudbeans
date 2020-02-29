@@ -22,25 +22,27 @@ import java.util.Map;
  */
 public abstract class ModelDescriptor {
 
-	private static final org.slf4j.Logger log = LoggerFactory.getLogger(ModelDescriptor.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(ModelDescriptor.class);
 
-	public static final String STACK_JPA = "jpa";
+    public static final String STACK_JPA = "jpa";
 
-	private TypeElement typeElement;
+    private TypeElement typeElement;
 
-	private final Boolean jpaEntity;
+    private final Boolean jpaEntity;
 
-	private String idType;
+    private String idType;
 
-	private final String qualifiedName;
+    private String idName;
 
-	private final String simpleName;
+    private final String qualifiedName;
 
-	private final String packageName;
+    private final String simpleName;
 
-	private final String parentPackageName;
+    private final String packageName;
 
-	private Map<String, String> genericParamTypes = new HashMap<>();
+    private final String parentPackageName;
+
+    private Map<String, String> genericParamTypes = new HashMap<>();
 
 	public ModelDescriptor(ProcessingEnvironment processingEnv, TypeElement typeElement) throws ScrudModelProcessorException {
 		this.typeElement = typeElement;
@@ -67,8 +69,13 @@ public abstract class ModelDescriptor {
 
 	protected void checkIfMemberIsId(Types types, Element e) throws ScrudModelProcessorException {
 		if (e.getAnnotation(Id.class) != null || e.getAnnotation(EmbeddedId.class) != null) {
-			idType = getMemberType(types, e);
-		}
+            // Only support singular ID types
+            if (idType != null) {
+                throw new ScrudModelProcessorException("Only singular IDs are supported");
+            }
+            idType = getMemberType(types, e);
+            idName = e.getSimpleName().toString();
+        }
 	}
 
 	/**
@@ -129,25 +136,29 @@ public abstract class ModelDescriptor {
 
 	public String getStack() {
 		return this.getJpaEntity() ? STACK_JPA : "";
-	}
+    }
 
-	public Boolean getJpaEntity() {
-		return jpaEntity;
-	}
+    public Boolean getJpaEntity() {
+        return jpaEntity;
+    }
 
-	public String getIdType() {
-		return idType;
-	}
+    public String getIdType() {
+        return idType;
+    }
 
-	public void setIdType(String idType) {
-		this.idType = idType;
-	}
+    public String getIdName() {
+        return idName;
+    }
 
-	public String getQualifiedName() {
-		return qualifiedName;
-	}
+    public void setIdType(String idType) {
+        this.idType = idType;
+    }
 
-	public String getSimpleName() {
+    public String getQualifiedName() {
+        return qualifiedName;
+    }
+
+    public String getSimpleName() {
 		return simpleName;
 	}
 

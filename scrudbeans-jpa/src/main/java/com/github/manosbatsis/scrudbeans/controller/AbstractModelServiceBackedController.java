@@ -24,7 +24,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.manosbatsis.kotlin.utils.api.Dto;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
@@ -72,10 +71,10 @@ import java.util.Set;
  * @param <S>  The service class
  */
 public class AbstractModelServiceBackedController<
-		T extends Persistable<PK>,
-		PK extends Serializable,
-		S extends ModelService<T, PK>,
-		DTO extends Dto<T>> implements InitializingBean {
+        T,
+        PK extends Serializable,
+        S extends ModelService<T, PK>,
+        DTO extends Dto<T>> implements InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractModelServiceBackedController.class);
 

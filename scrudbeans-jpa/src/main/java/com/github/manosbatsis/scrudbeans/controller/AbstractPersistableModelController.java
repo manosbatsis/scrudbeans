@@ -22,7 +22,6 @@ package com.github.manosbatsis.scrudbeans.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.manosbatsis.kotlin.utils.api.Dto;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.exception.NotFoundException;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
@@ -76,17 +75,17 @@ import java.util.*;
  * @param <PK> EntityModel id type, usually Long or String
  * @param <S>  The service class
  */
-public class AbstractPersistableModelController<T extends Persistable<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
-		extends AbstractModelServiceBackedController<T, PK, S, Dto<T>> {
+public class AbstractPersistableModelController<T, PK extends Serializable, S extends PersistableModelService<T, PK>>
+        extends AbstractModelServiceBackedController<T, PK, S, Dto<T>> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelController.class);
 
-	private SpecificationsBuilder<T, PK> specificationsBuilder;
+    private SpecificationsBuilder<T, PK> specificationsBuilder;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		super.afterPropertiesSet();
-		this.specificationsBuilder = new SpecificationsBuilder<T, PK>(this.modelType, this.service.getConversionService());
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        super.afterPropertiesSet();
+        this.specificationsBuilder = new SpecificationsBuilder<T, PK>(this.modelType, this.service.getConversionService());
 	}
 
 	// Create
@@ -197,7 +196,7 @@ public class AbstractPersistableModelController<T extends Persistable<PK>, PK ex
 
 		// if ToOne
 		if (fieldInfo.isToOne()) {
-            Persistable related = this.findRelatedSingle(id, fieldInfo);
+            Object related = this.findRelatedSingle(id, fieldInfo);
             // if found
 			EntityModel res = HypermediaUtils.toHateoasResource(related, fieldInfo.getRelatedModelInfo());
             responseEntity = new ResponseEntity(res, HttpStatus.OK);
@@ -240,7 +239,6 @@ public class AbstractPersistableModelController<T extends Persistable<PK>, PK ex
 	}
 
 
-
     /**
      * Find the other end of a ToOne relationship
      *
@@ -249,9 +247,8 @@ public class AbstractPersistableModelController<T extends Persistable<PK>, PK ex
      * @return the single related entity, if any
      * @see PersistableModelService#findRelatedSingle(Serializable, FieldInfo)
      */
-    protected Persistable findRelatedSingle(PK id, FieldInfo fieldInfo) {
-        Persistable resource = this.service.findRelatedSingle(id, fieldInfo);
-        return resource;
+    protected Object findRelatedSingle(PK id, FieldInfo fieldInfo) {
+        return this.service.findRelatedSingle(id, fieldInfo);
     }
 
 
@@ -264,7 +261,7 @@ public class AbstractPersistableModelController<T extends Persistable<PK>, PK ex
      * @return the page of results, may be <code>null</code>
      * @see PersistableModelService#findRelatedPaginated(java.lang.Class, org.springframework.data.jpa.domain.Specification, org.springframework.data.domain.Pageable)
      */
-    protected <M extends Persistable> ParamsAwarePageImpl<M> findRelatedPaginated(PK id, Pageable pageable, FieldInfo fieldInfo) {
+    protected <M> ParamsAwarePageImpl<M> findRelatedPaginated(PK id, Pageable pageable, FieldInfo fieldInfo) {
         ParamsAwarePageImpl<M> page = null;
         Optional<String> reverseFieldName = fieldInfo.getReverseFieldName();
         if (reverseFieldName.isPresent()) {

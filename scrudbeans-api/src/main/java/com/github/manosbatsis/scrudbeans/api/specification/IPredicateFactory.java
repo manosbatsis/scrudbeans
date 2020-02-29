@@ -20,22 +20,20 @@
  */
 package com.github.manosbatsis.scrudbeans.api.specification;
 
-import java.io.Serializable;
-import java.util.List;
+import org.springframework.core.convert.ConversionService;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-
-import org.springframework.core.convert.ConversionService;
+import java.util.List;
 
 /**
  * Builds a predicate for the type T
  *
  * @param <T>
  */
-public interface IPredicateFactory<T extends Serializable> {
-	Class<?> getValueType();
+public interface IPredicateFactory<T> {
+    Class<?> getValueType();
 
-	Predicate buildPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<T> fieldType, ConversionService conversionService, PredicateOperator operator, List<String> propertyValues);
+    Predicate buildPredicate(Root<?> root, CriteriaBuilder cb, String propertyName, Class<T> fieldType, ConversionService conversionService, PredicateOperator operator, List<String> propertyValues);
 }

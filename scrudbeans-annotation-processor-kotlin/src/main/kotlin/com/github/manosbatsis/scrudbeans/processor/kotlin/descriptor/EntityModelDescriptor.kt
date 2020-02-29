@@ -22,6 +22,7 @@ open class EntityModelDescriptor(
     }
 
     lateinit var idClassName: ClassName
+    lateinit var idName: String
 
     protected fun checkIfMemberIsId(types: Types, e: VariableElement) {
         for(annotationClass in idAnnotations) if (e.getAnnotation(annotationClass) != null) {
@@ -29,6 +30,7 @@ open class EntityModelDescriptor(
             val simpleName = className.substring(className.lastIndexOf('.') + 1)
             val packageName = className.substring(0, className.lastIndexOf('.'))
             idClassName = ClassName(packageName, simpleName)
+            idName = e.simpleName.toString()
             break
         }
 

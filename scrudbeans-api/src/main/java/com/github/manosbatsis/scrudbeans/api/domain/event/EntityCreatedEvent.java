@@ -21,14 +21,12 @@
 package com.github.manosbatsis.scrudbeans.api.domain.event;
 
 
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
-
 /**
- * Fired when a new {@link Persistable} instance has been persisted
+ * Fired when a new instance has been persisted
  */
-public class EntityCreatedEvent<T extends Persistable> extends EntityEvent<T> {
+public class EntityCreatedEvent<T> extends EntityEvent<T> {
 
-	public EntityCreatedEvent(T source) {
-		super(source);
-	}
+    public EntityCreatedEvent(T source) {
+        super(source);
+    }
 }

@@ -20,11 +20,11 @@
  */
 package com.github.manosbatsis.scrudbeans.model;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-
-import org.hibernate.annotations.GenericGenerator;
 
 /**
  * Abstract base class for persistent model with a System UUID primary key
@@ -38,14 +38,6 @@ public abstract class AbstractSystemUuidPersistableModel extends AbstractPersist
 	@GeneratedValue(generator = "system-uuid")
 	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
     private String id;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getScrudBeanId() {
-        return getId();
-    }
 
     /**
      * {@inheritDoc}

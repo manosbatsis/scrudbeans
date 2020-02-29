@@ -20,19 +20,20 @@
  */
 package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
+import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiLink;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiResourceIdentifier;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * A model wrapper that allows serializing as a EntityModel according to JSON API  1.1
@@ -42,7 +43,7 @@ import lombok.Setter;
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonPropertyOrder({"id", "type", "meta"})
-public class SimpleModelResourceIdentifier<T extends Persistable<PK>, PK extends Serializable> implements JsonApiResourceIdentifier<PK> {
+public class SimpleModelResourceIdentifier<T, PK extends Serializable> implements JsonApiResourceIdentifier<PK> {
 
     @JsonProperty("id")
     private PK identifier;
@@ -59,9 +60,11 @@ public class SimpleModelResourceIdentifier<T extends Persistable<PK>, PK extends
 	}
 
 	public SimpleModelResourceIdentifier(@NonNull T attributesModel, @NonNull String type) {
-		this.identifier = attributesModel.getScrudBeanId();
-		this.type = type;
-	}
+        IdentifierAdapter<T, PK> idAdapter =
+                (IdentifierAdapter<T, PK>) IdentifierAdaptersRegistry.getAdapterForClass(attributesModel.getClass());
+        this.identifier = idAdapter.readId(attributesModel);
+        this.type = type;
+    }
 
 	@JsonCreator
 	public SimpleModelResourceIdentifier(

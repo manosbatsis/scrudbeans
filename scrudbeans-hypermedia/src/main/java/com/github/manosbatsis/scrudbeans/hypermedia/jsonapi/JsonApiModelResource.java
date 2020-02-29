@@ -20,10 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelResource;
 
 /**
@@ -34,6 +31,6 @@ import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelR
  * @see <a href="http://jsonapi.org/format/#document-resource-objects">JSON API CollectionModel</a>
  */
 @JsonDeserialize(as = SimpleModelResource.class)
-public interface JsonApiModelResource<T extends Persistable<PK>, PK extends Serializable> extends JsonApiResourceIdentifier<PK>, JsonApiResource<T, PK> {
+public interface JsonApiModelResource<T, PK> extends JsonApiResourceIdentifier<PK>, JsonApiResource<T, PK> {
 
 }

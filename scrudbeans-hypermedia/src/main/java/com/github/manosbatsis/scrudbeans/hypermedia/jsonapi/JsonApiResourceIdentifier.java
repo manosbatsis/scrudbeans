@@ -20,12 +20,12 @@
  */
 package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi;
 
-import java.io.Serializable;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelResource;
+
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * A EntityModel as defined in JSON API 1.1. Deserialized as a @link SimpleModelResource} by default
@@ -33,17 +33,17 @@ import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support.SimpleModelR
  * @param <RID> the JSON API EntityModel model key type
  */
 @JsonDeserialize(as = SimpleModelResource.class)
-public interface JsonApiResourceIdentifier<RID extends Serializable> extends JsonApiLinksContainer {
+public interface JsonApiResourceIdentifier<RID> extends JsonApiLinksContainer {
 
-	@JsonGetter("id")
-	RID getIdentifier();
+    @JsonGetter("id")
+    RID getIdentifier();
 
-	@JsonGetter("type")
-	String getType();
+    @JsonGetter("type")
+    String getType();
 
-	/**
-	 * Get the associated metadata
-	 * @return
+    /**
+     * Get the associated metadata
+     * @return
 	 */
 	Map<String, Serializable> getMeta();
 

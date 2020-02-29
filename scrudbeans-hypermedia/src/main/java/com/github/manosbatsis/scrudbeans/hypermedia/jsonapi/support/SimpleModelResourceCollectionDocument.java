@@ -21,14 +21,13 @@
 package com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.support;
 
 
-import java.io.Serializable;
-import java.util.Collection;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResource;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiModelResourceCollectionDocument;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * {@value #CLASS_DESCRIPTION}
@@ -40,7 +39,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(name = "Collection Document (JSON-API)", description = SimpleModelResourceDocument.CLASS_DESCRIPTION)
-public class SimpleModelResourceCollectionDocument<T extends Persistable<PK>, PK extends Serializable>
+public class SimpleModelResourceCollectionDocument<T, PK extends Serializable>
         extends AbstractJsonApiDocument<Collection<JsonApiModelResource<T, PK>>>
         implements JsonApiModelResourceCollectionDocument<T, PK> {
 

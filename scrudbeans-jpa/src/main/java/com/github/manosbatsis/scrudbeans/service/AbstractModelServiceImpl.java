@@ -20,7 +20,6 @@
  */
 package com.github.manosbatsis.scrudbeans.service;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
-public abstract class AbstractModelServiceImpl<T extends Persistable<PK>, PK extends Serializable>
+public abstract class AbstractModelServiceImpl<T, PK extends Serializable>
         extends AbstractBaseServiceImpl
         implements ModelService<T, PK> {
 

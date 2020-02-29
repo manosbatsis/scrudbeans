@@ -7,7 +7,7 @@
 	<parent>
         <groupId>com.github.manosbatsis.scrudbeans</groupId>
         <artifactId>scrudbeans</artifactId>
-        <version>0.16-SNAPSHOT</version>
+        <version>0.17</version>
     </parent>
 
 	<dependencies>
@@ -111,14 +111,41 @@
 		</plugins>
 	</reporting>
 	<build>
-
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-                <version>2.7</version>
-            </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<!-- ... replace with nexus staging -->
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<extensions>true</extensions>
+				<configuration>
+					<skipLocalStaging>true</skipLocalStaging>
+					<skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+					<skipRemoteStaging>true</skipRemoteStaging>
+					<skipStaging>true</skipStaging>
+					<skipStagingRepositoryClose>true</skipStagingRepositoryClose>
+				</configuration>
+			</plugin>
+			<!-- sign artifacts -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
 
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>2.7</version>
+			</plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

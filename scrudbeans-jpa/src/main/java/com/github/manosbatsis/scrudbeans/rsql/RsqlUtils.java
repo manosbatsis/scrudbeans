@@ -20,15 +20,6 @@
  */
 package com.github.manosbatsis.scrudbeans.rsql;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.specification.PredicateOperator;
 import cz.jirutka.rsql.parser.RSQLParser;
@@ -39,9 +30,11 @@ import lombok.NonNull;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Created by manos on 2/3/2017.
@@ -81,27 +74,27 @@ public class RsqlUtils {
 
 	/**
 	 * Parse  the given (request URL) parameters map into RSQL (NOTE that if RSQL is present under the "filter" key,
-     * all other <code>paramsMap</code> entries will be ignored
-     * @param modelInfo the root model info
-     * @param conversionService the conversion service to use for values
-     * @param paramsMap the (request URL) parameters map
-     * @param implicitCriteria
-     * @param <M>
-     * @param <MID>
-     * @param ignoreNamesForSpecification the URL parameter names to ignore if no <code>filter</code>> param is present
-     * @return the resulting specification
-     */
-    public static <M extends Persistable<MID>, MID extends Serializable> Specification<M>
-    buildSpecification(
-            ModelInfo<M, MID> modelInfo,
-            ConversionService conversionService,
-            Map<String, String[]> paramsMap,
-            Map<String, String[]> implicitCriteria,
-            String[] ignoreNamesForSpecification) {
+	 * all other <code>paramsMap</code> entries will be ignored
+	 * @param modelInfo the root model info
+	 * @param conversionService the conversion service to use for values
+	 * @param paramsMap the (request URL) parameters map
+	 * @param implicitCriteria
+	 * @param <M>
+	 * @param <MID>
+	 * @param ignoreNamesForSpecification the URL parameter names to ignore if no <code>filter</code>> param is present
+	 * @return the resulting specification
+	 */
+	public static <M, MID extends Serializable> Specification<M>
+	buildSpecification(
+			ModelInfo<M, MID> modelInfo,
+			ConversionService conversionService,
+			Map<String, String[]> paramsMap,
+			Map<String, String[]> implicitCriteria,
+			String[] ignoreNamesForSpecification) {
 
-        Specification<M> spec = null;
+		Specification<M> spec = null;
 
-        // check for RSQL in JSON API "filter" parameter,
+		// check for RSQL in JSON API "filter" parameter,
 		// convert simple URL params to RSQL if missing
 		String rsql = ArrayUtils.isNotEmpty(paramsMap.get("filter")) ? paramsMap.get("filter")[0] : RsqlUtils.toRsql(paramsMap, ignoreNamesForSpecification);
 

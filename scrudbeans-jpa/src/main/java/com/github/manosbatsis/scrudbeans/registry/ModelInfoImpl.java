@@ -20,16 +20,6 @@
  */
 package com.github.manosbatsis.scrudbeans.registry;
 
-import java.beans.BeanInfo;
-import java.beans.PropertyDescriptor;
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.persistence.Entity;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
@@ -42,20 +32,28 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import javax.persistence.Entity;
+import java.beans.BeanInfo;
+import java.beans.PropertyDescriptor;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Contains metadata for a specific Model class.
  */
 @Slf4j
-public class ModelInfoImpl<T extends Persistable<PK>, PK extends Serializable> implements ModelInfo<T, PK> {
+public class ModelInfoImpl<T, PK extends Serializable> implements ModelInfo<T, PK> {
 
-    @Getter
-    private final Class<T> modelType;
+	@Getter
+	private final Class<T> modelType;
 
-    @Getter
-    private final ScrudBean scrudBean;
+	@Getter
+	private final ScrudBean scrudBean;
 
-    @Getter
-    private final String packageName;
+	@Getter
+	private final String packageName;
 
     @Getter
     private final String beansBasePackage;

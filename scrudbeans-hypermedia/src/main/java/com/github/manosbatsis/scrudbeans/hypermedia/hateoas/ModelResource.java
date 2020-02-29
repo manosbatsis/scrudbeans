@@ -21,19 +21,17 @@
 package com.github.manosbatsis.scrudbeans.hypermedia.hateoas;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
-
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 
 /**
  * Created by manos on 20/2/2017.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class ModelResource<T extends Persistable> extends EntityModel<T> {
+public class ModelResource<T> extends EntityModel<T> {
 
     /**
      * Equivalent to JSON API document type

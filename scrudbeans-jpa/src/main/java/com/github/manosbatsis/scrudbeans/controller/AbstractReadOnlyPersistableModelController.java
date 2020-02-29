@@ -20,18 +20,17 @@
  */
 package com.github.manosbatsis.scrudbeans.controller;
 
-import java.io.Serializable;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.exception.NotImplementedException;
 import com.github.manosbatsis.scrudbeans.service.PersistableModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
+
 /**
  * Base class for read-only model controllers, i.e. with no support for HTTP PUT, PATCH or DELETE.
  */
-public abstract class AbstractReadOnlyPersistableModelController<T extends Persistable<PK>, PK extends Serializable, S extends PersistableModelService<T, PK>>
+public abstract class AbstractReadOnlyPersistableModelController<T, PK extends Serializable, S extends PersistableModelService<T, PK>>
         extends AbstractNoDeletePersistableModelController<T, PK, S> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractReadOnlyPersistableModelController.class);

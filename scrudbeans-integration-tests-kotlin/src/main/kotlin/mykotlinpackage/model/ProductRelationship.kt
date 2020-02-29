@@ -1,6 +1,6 @@
 package mykotlinpackage.model
 
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable
+import com.github.manosbatsis.scrudbeans.api.domain.KPersistable
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.validation.Unique
 import io.swagger.v3.oas.annotations.media.Schema
@@ -24,13 +24,12 @@ data class ProductRelationship(
         @field:NotNull
         @field:Schema(required = true)
         @field:EmbeddedId
-        var id: ProductRelationshipIdentifier? = null,
+        override var id: ProductRelationshipIdentifier,
 
         @field:NotNull
         @field:Column(nullable = false, length = 512)
         @field:Schema(title = "The relationship short description (max 512 chars)", required = true)
         var description: String? = null
-) : Persistable<ProductRelationshipIdentifier?> {
-    override fun getScrudBeanId() = id!!
-    override fun isNew(): Boolean = id == null
+) : KPersistable<ProductRelationshipIdentifier> {
+        override fun isNew(): Boolean = id == null
 }

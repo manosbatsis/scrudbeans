@@ -20,7 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.repository;
 
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
+import com.github.manosbatsis.scrudbeans.api.domain.KPersistable;
 import com.github.manosbatsis.scrudbeans.util.EntityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,8 +90,10 @@ public class ModelRepositoryFactoryBean<R extends Repository<T, PK>, T, PK>
             Assert.notNull(domainClass, "Domain class must not be null!");
             Assert.notNull(entityManager, "EntityManager must not be null!");
             JpaEntityInformation<T, PK> entityInfo;
-            if (Persistable.class.isAssignableFrom(domainClass)) {
-                entityInfo = new ModelEntityInformation(domainClass, entityManager.getMetamodel());
+            // Support a custom KPersistable as a Kotlin-specific alternative to Spring Data's Persistable,
+            // mostly due to issues like https://youtrack.jetbrains.com/issue/KT-6653
+            if (KPersistable.class.isAssignableFrom(domainClass)) {
+                entityInfo = new KPersistableModelEntityInformation(domainClass, entityManager.getMetamodel());
             } else {
                 entityInfo = super.getEntityInformation(domainClass);
             }

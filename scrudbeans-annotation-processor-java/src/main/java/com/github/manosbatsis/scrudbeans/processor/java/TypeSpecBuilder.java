@@ -1,37 +1,25 @@
 package com.github.manosbatsis.scrudbeans.processor.java;
 
-import static com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATIOM_JSON_VALUE;
-import static com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATION_VND_API_PLUS_JSON_VALUE;
-import static com.github.manosbatsis.scrudbeans.api.util.Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
-import javax.lang.model.element.Modifier;
-import javax.persistence.Entity;
-
 import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
-import com.github.manosbatsis.scrudbeans.repository.ModelRepository;
-import com.github.manosbatsis.scrudbeans.service.PersistableModelService;
-import com.github.manosbatsis.scrudbeans.util.ClassUtils;
-import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils;
 import com.github.manosbatsis.scrudbeans.controller.AbstractModelServiceBackedController;
 import com.github.manosbatsis.scrudbeans.controller.AbstractPersistableModelController;
-import com.github.manosbatsis.scrudbeans.service.AbstractModelServiceImpl;
-import com.github.manosbatsis.scrudbeans.service.AbstractPersistableModelServiceImpl;
-import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.EntityModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ScrudModelDescriptor;
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.ParameterizedTypeName;
-import com.squareup.javapoet.TypeSpec;
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import com.github.manosbatsis.scrudbeans.repository.ModelRepository;
+import com.github.manosbatsis.scrudbeans.service.AbstractModelServiceImpl;
+import com.github.manosbatsis.scrudbeans.service.AbstractPersistableModelServiceImpl;
+import com.github.manosbatsis.scrudbeans.service.PersistableModelService;
+import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory;
+import com.github.manosbatsis.scrudbeans.util.ClassUtils;
+import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils;
+import com.squareup.javapoet.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -39,48 +27,58 @@ import org.atteo.evo.inflector.English;
 import org.mapstruct.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.lang.model.element.Modifier;
+import javax.persistence.Entity;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+import static com.github.manosbatsis.scrudbeans.api.util.Mimes.*;
+
 /**
  * Utility methods creating {@link TypeSpec} instances for target SCRUD component types
  */
 class TypeSpecBuilder {
 
-	private static final Logger log = LoggerFactory.getLogger(TypeSpecBuilder.class);
+    private static final Logger log = LoggerFactory.getLogger(TypeSpecBuilder.class);
 
-	private static final String MIMES_PRODUCED =
-			APPLICATIOM_JSON_VALUE + ", " +
-					MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE + ", " +
-					APPLICATION_VND_API_PLUS_JSON_VALUE;
+    private static final String MIMES_PRODUCED =
+            APPLICATIOM_JSON_VALUE + ", " +
+                    MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE + ", " +
+                    APPLICATION_VND_API_PLUS_JSON_VALUE;
 
-	public static final String CLASSNAME_KEY_REPOSITORY = "repository";
+    public static final String CLASSNAME_KEY_REPOSITORY = "repository";
 
-	public static final String CLASSNAME_KEY_SERVICE_INTERFACE = "service";
+    public static final String CLASSNAME_KEY_SERVICE_INTERFACE = "service";
 
-	public static final String CLASSNAME_KEY_SERVICE_IMPL = "serviceImpl";
+    public static final String CLASSNAME_KEY_SERVICE_IMPL = "serviceImpl";
 
-	public static final String CLASSNAME_KEY_CONTROLLER = "controller";
+    public static final String CLASSNAME_KEY_CONTROLLER = "controller";
+    public static final String CLASSNAME_KEY_IDADAPTER = "idadapter";
 
-	protected static Map<String, String> componentSuperClassnames = new HashMap<>();
+    protected static Map<String, String> componentSuperClassnames = new HashMap<>();
 
-	static {
-		// Default repos
-		componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_REPOSITORY, ModelRepository.class.getCanonicalName());
-		// Default service interface per stack
-		componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_INTERFACE, ModelService.class.getCanonicalName());
-		componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_INTERFACE, PersistableModelService.class.getCanonicalName());
-		// Default service interface per stack
-		componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_IMPL, AbstractModelServiceImpl.class.getCanonicalName());
-		componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL, AbstractPersistableModelServiceImpl.class.getCanonicalName());
-		// Default service controller per stack
-		componentSuperClassnames.put(CLASSNAME_KEY_CONTROLLER, AbstractModelServiceBackedController.class.getCanonicalName());
-		componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER, AbstractPersistableModelController.class.getCanonicalName());
-	}
+    static {
+        // Default repos
+        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_REPOSITORY, ModelRepository.class.getCanonicalName());
+        // Default service interface per stack
+        componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_INTERFACE, ModelService.class.getCanonicalName());
+        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_INTERFACE, PersistableModelService.class.getCanonicalName());
+        // Default service interface per stack
+        componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_IMPL, AbstractModelServiceImpl.class.getCanonicalName());
+        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL, AbstractPersistableModelServiceImpl.class.getCanonicalName());
+        // Default service controller per stack
+        componentSuperClassnames.put(CLASSNAME_KEY_CONTROLLER, AbstractModelServiceBackedController.class.getCanonicalName());
+        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER, AbstractPersistableModelController.class.getCanonicalName());
+        // Default ID accessor
+        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_IDADAPTER, IdentifierAdapter.class.getCanonicalName());
+    }
 	/**
 	 * Create a subclass {@link TypeSpec} of {@link AbstractPersistableModelController}
 	 * or {@link AbstractModelServiceBackedController} depending on whether
@@ -119,8 +117,9 @@ class TypeSpecBuilder {
 						AnnotationSpec.builder(RestController.class)
 								.addMember("value", "\"" + beanName + "\"").build())
 				.addAnnotation(
-                        AnnotationSpec.builder(OpenAPIDefinition.class)
-                                .addMember("tags", "@io.swagger.v3.oas.annotations.tags.Tag(name=\"" + apiName + "\", description=\"" + apiDescription + "\")")
+                        AnnotationSpec.builder(Tag.class)
+								.addMember("name", "\"" + apiName + "\"")
+								.addMember("description", "\"" + apiDescription + "\"")
                                 .build())
 				.addAnnotation(
 						AnnotationSpec.builder(RequestMapping.class)
@@ -201,25 +200,85 @@ class TypeSpecBuilder {
 		Pair<String, String> pkgAndName = ClassUtils.getPackageAndSimpleName(
 				getSuperclassName(descriptor, CLASSNAME_KEY_REPOSITORY));
 		return TypeSpec.interfaceBuilder(className)
-				.addAnnotation(Repository.class)
-				.addSuperinterface(
-						ParameterizedTypeName.get(
-								ClassName.get(pkgAndName.getLeft(), pkgAndName.getRight()),
-								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
-								ClassName.bestGuess(descriptor.getIdType())))
-				.addModifiers(Modifier.PUBLIC)
-				.build();
-	}
+                .addAnnotation(Repository.class)
+                .addSuperinterface(
+                        ParameterizedTypeName.get(
+                                ClassName.get(pkgAndName.getLeft(), pkgAndName.getRight()),
+                                ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
+                                ClassName.bestGuess(descriptor.getIdType())))
+                .addModifiers(Modifier.PUBLIC)
+                .build();
+    }
 
-	/**
-	 * Create a subclass or {@link AnyToOnePredicateFactory} for the target {@link Entity} model
-	 *
-	 * @param descriptor The target model descriptor
-	 * @return the resulting type spec
-	 */
-	static TypeSpec createPredicateFactory(EntityModelDescriptor descriptor) {
-		String className = "AnyToOne" + descriptor.getSimpleName() + "PredicateFactory";
-		log.debug("createPredicateFactory, id: {}", descriptor.getIdType());
+    /**
+     * Create an implementation of {@link IdentifierAdapter}
+     *
+     * @param descriptor The target model descriptor
+     * @return the resulting type spec
+     */
+    static TypeSpec createIdAccessor(ScrudModelDescriptor descriptor) {
+        String className = descriptor.getSimpleName() + "IdentifierAdapterBean";
+        Pair<String, String> pkgAndName = ClassUtils.getPackageAndSimpleName(
+                getSuperclassName(descriptor, CLASSNAME_KEY_IDADAPTER));
+        ClassName modelClassName = ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName());
+        ClassName idClassName = ClassName.bestGuess(descriptor.getIdType());
+        return TypeSpec.classBuilder(className)
+                .addSuperinterface(
+                        ParameterizedTypeName.get(
+                                ClassName.get(pkgAndName.getLeft(), pkgAndName.getRight()),
+                                modelClassName,
+                                idClassName))
+                .addAnnotation(AnnotationSpec.builder(IdentifierAdapterBean.class)
+                        .addMember("className", "$S", modelClassName.toString())
+                        .build())
+                .addModifiers(Modifier.PUBLIC)
+                .addMethod(MethodSpec.methodBuilder("getIdName")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(Override.class)
+                        .returns(String.class)
+                        .addParameter(ParameterSpec.builder(modelClassName, "resource", Modifier.FINAL).build())
+                        .addStatement("return $S", descriptor.getIdName())
+                        .build())
+                .addMethod(MethodSpec.methodBuilder("readId")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(Override.class)
+                        .returns(idClassName)
+                        .addParameter(ParameterSpec.builder(modelClassName, "resource", Modifier.FINAL).build())
+                        .addStatement("return resource.$L()", toGetterName(descriptor.getIdName()))
+                        .build())
+                .addMethod(MethodSpec.methodBuilder("writeId")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addAnnotation(Override.class)
+                        .returns(void.class)
+                        .addParameter(ParameterSpec.builder(modelClassName, "resource", Modifier.FINAL).build())
+                        .addParameter(ParameterSpec.builder(idClassName, "id", Modifier.FINAL).build())
+                        .addStatement("resource.$L(id)", toSetterName(descriptor.getIdName()))
+                        .build())
+                .build();
+    }
+
+    private static String toGetterName(String fieldName) {
+        return toAccessorMethodName(fieldName, "get");
+    }
+
+    private static String toSetterName(String fieldName) {
+        return toAccessorMethodName(fieldName, "set");
+    }
+
+    private static String toAccessorMethodName(String fieldName, String prefix) {
+        if (fieldName.startsWith(prefix)) return fieldName;
+        else return prefix + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
+    }
+
+    /**
+     * Create a subclass or {@link AnyToOnePredicateFactory} for the target {@link Entity} model
+     *
+     * @param descriptor The target model descriptor
+     * @return the resulting type spec
+     */
+    static TypeSpec createPredicateFactory(EntityModelDescriptor descriptor) {
+        String className = "AnyToOne" + descriptor.getSimpleName() + "PredicateFactory";
+        log.debug("createPredicateFactory, id: {}", descriptor.getIdType());
 		//AnyToOnePredicateFactory
 		return TypeSpec.classBuilder(className)
 				.addAnnotation(

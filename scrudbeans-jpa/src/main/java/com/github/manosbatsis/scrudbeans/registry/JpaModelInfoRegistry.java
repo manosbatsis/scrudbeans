@@ -20,28 +20,19 @@
  */
 package com.github.manosbatsis.scrudbeans.registry;
 
-import java.io.Serializable;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
+import com.github.manosbatsis.scrudbeans.ScrudBeansProperties;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
+import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
-import com.github.manosbatsis.scrudbeans.ScrudBeansProperties;
 import com.github.manosbatsis.scrudbeans.specification.SpecificationUtils;
 import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory;
 import com.github.manosbatsis.scrudbeans.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.util.EntityUtil;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -54,13 +45,15 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
-import org.springframework.util.StopWatch;
+
+import java.io.Serializable;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 /**
  * Provides metadata for all JPA entity types and generates missing model-based components
- *  i.e. <code>Repository</code>, <code>Service</code> and
+ * i.e. <code>Repository</code>, <code>Service</code> and
  * <code>Controller</code> mdd
- *
  */
 @Slf4j
 public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor, EnvironmentAware, ModelInfoRegistry {
@@ -95,60 +88,49 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
         return entries;
     }
 
-    public void print(StopWatch.TaskInfo task) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("; [").append(task.getTaskName()).append("] took ").append(task.getTimeMillis());
-        log.debug(task.toString());
-    }
-
     protected void scanPackages(Iterable<String> basePackages) {
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.setKeepTaskList(true);
         // scan for models
         for (String basePackage : basePackages) {
-
-            log.debug("scanPackages " + basePackage);
-            stopWatch.start("scanPackages " + basePackage);
+            log.trace("scanPackages " + basePackage);
             Set<BeanDefinition> entityBeanDefs = EntityUtil.findAllModels(basePackage);
             for (BeanDefinition beanDef : entityBeanDefs) {
-                Class<? extends Persistable> modelType = (Class<? extends Persistable>) ClassUtils.getClass(beanDef.getBeanClassName());
-                this.addEntryFor(modelType);
+                Class<?> modelType = ClassUtils.getClass(beanDef.getBeanClassName());
+				this.addEntryFor(modelType);
             }
-            stopWatch.stop();
-            print(stopWatch.getLastTaskInfo());
         }
-
-        stopWatch.prettyPrint();
-
-        // field > model ref
-        stopWatch.start("scanPackages set related");
-        log.debug("scanPackages set related");
         for (ModelInfo modelInfo : this.getEntries()) {
-            setRelatedFieldsModelInfo(modelInfo, modelInfo.getToOneFieldNames());
-            setRelatedFieldsModelInfo(modelInfo, modelInfo.getToManyFieldNames());
-        }
-        stopWatch.stop();
-        print(stopWatch.getLastTaskInfo());
+			setRelatedFieldsModelInfo(modelInfo, modelInfo.getToOneFieldNames());
+			setRelatedFieldsModelInfo(modelInfo, modelInfo.getToManyFieldNames());
+		}
+	}
 
-        stopWatch.prettyPrint();
-
-    }
-
-	protected void scanForEntityPredicateFactories(Iterable<String> basePackages) {
+	protected void scanForHelpers(Iterable<String> basePackages) {
 		// scan for models
 		for (String basePackage : basePackages) {
-			Set<BeanDefinition> entityBeanDefs = EntityUtil.findAllPredicateFactories(basePackage);
+			Set<BeanDefinition> entityBeanDefs = EntityUtil.findAllHelpers(basePackage);
 			for (BeanDefinition beanDef : entityBeanDefs) {
-				Class<? extends AnyToOnePredicateFactory> predicateFactoryType =
-						(Class<? extends AnyToOnePredicateFactory>) ClassUtils.getClass(beanDef.getBeanClassName());
-				EntityPredicateFactory annotation = predicateFactoryType.getAnnotation(EntityPredicateFactory.class);
-				try {
-					Class entityClass = Class.forName(annotation.entityClass());
-					SpecificationUtils.addFactoryForClass(entityClass, ClassUtils.newInstance(predicateFactoryType));
+				Class<?> beanType = ClassUtils.getClass(beanDef.getBeanClassName());
+				EntityPredicateFactory predicateFactoryAnnotation = beanType.getAnnotation(EntityPredicateFactory.class);
+				if (predicateFactoryAnnotation != null) {
+					try {
+						Class entityClass = Class.forName(predicateFactoryAnnotation.entityClass());
+						SpecificationUtils.addFactoryForClass(entityClass, (AnyToOnePredicateFactory) ClassUtils.newInstance(beanType));
+					} catch (ClassNotFoundException e) {
+						log.error("Failed registering AnyToOnePredicateFactory type {}, target class not found: {}",
+								beanType, predicateFactoryAnnotation.entityClass());
+					}
 				}
-				catch (ClassNotFoundException e) {
-					log.error("Failed registering AnyToOnePredicateFactory type {}, target class not found: {}",
-							predicateFactoryType, annotation.entityClass());
+				IdentifierAdapterBean identifierAdapterAnnotation = beanType.getAnnotation(IdentifierAdapterBean.class);
+				if (identifierAdapterAnnotation != null) {
+					String className = identifierAdapterAnnotation.className();
+					try {
+						Class modelClass = Class.forName(className);
+						IdentifierAdaptersRegistry.addAdapterForClass(modelClass,
+								(com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter) ClassUtils.newInstance(beanType));
+					} catch (ClassNotFoundException e) {
+						log.error("Failed registering IdentifierAdapterBean type {}, target class not found: {}",
+								beanType, className);
+					}
 				}
 			}
 		}
@@ -172,22 +154,22 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
         }
     }
 
-    protected <T extends Persistable<PK>, PK extends Serializable> void addEntryFor(Class<T> modelClass) {
-        Assert.notNull(modelClass, "Parameter modelClass cannot be null");
+    protected <T, PK extends Serializable> void addEntryFor(Class<T> modelClass) {
+		Assert.notNull(modelClass, "Parameter modelClass cannot be null");
 
-        // ignore abstract classes
-        if (Modifier.isAbstract(modelClass.getModifiers())) {
-            log.warn("addEntryFor, given model class is abstract: {}", modelClass);
-        }
+		// ignore abstract classes
+		if (Modifier.isAbstract(modelClass.getModifiers())) {
+			log.warn("addEntryFor, given model class is abstract: {}", modelClass);
+		}
 
-        log.debug("addEntryFor model class {}", modelClass.getCanonicalName());
-        // check for existing
-        if (this.modelEntries.containsKey(modelClass)) {
+		log.debug("addEntryFor model class {}", modelClass.getCanonicalName());
+		// check for existing
+		if (this.modelEntries.containsKey(modelClass)) {
 			throw new RuntimeException("ModelInfoRegistry entry already exists, failed to add model type: " + modelClass.getCanonicalName());
 		}
 
 		// create entry
-		ModelInfo<T, PK> entry = new ModelInfoImpl<>(modelClass);
+		ModelInfo entry = new ModelInfoImpl(modelClass);
 
 		// add entry
 		this.modelEntries.put(modelClass, entry);
@@ -203,7 +185,7 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
 		log.debug("postProcessBeanDefinitionRegistry, ScrudBeansProperties: {}", this.scrudBeansProperties);
 		Set<String> packagesToScan = scrudBeansProperties.getPackagesToScanAsSet();
 		// register predicate factories
-		this.scanForEntityPredicateFactories(packagesToScan);
+		this.scanForHelpers(packagesToScan);
 		// scan for and create the rest
 		this.scanPackages(packagesToScan);
 

@@ -1,7 +1,7 @@
 package mykotlinpackage.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable
+import com.github.manosbatsis.scrudbeans.api.domain.KPersistable
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.validation.Unique
 import io.swagger.v3.oas.annotations.media.Schema
@@ -33,7 +33,7 @@ data class Order(
         @field:Id
         @field:GeneratedValue(generator = "system-uuid")
         @field:GenericGenerator(name = "system-uuid", strategy = "uuid2")
-        var id: String? = null,
+        override var id: String? = null,
 
         @field:NotNull
         @field:Column(nullable = false)
@@ -61,7 +61,6 @@ data class Order(
         var lastModifiedDate: LocalDateTime? = null
 
 
-) : Persistable<String> {
-        override fun getScrudBeanId() = id!!
+) : KPersistable<String> {
         override fun isNew(): Boolean = id == null
 }

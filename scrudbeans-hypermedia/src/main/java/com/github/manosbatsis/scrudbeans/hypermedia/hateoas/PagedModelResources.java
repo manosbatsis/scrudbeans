@@ -20,21 +20,19 @@
  */
 package com.github.manosbatsis.scrudbeans.hypermedia.hateoas;
 
-import java.util.Collection;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import lombok.Getter;
-
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
+
+import java.util.Collection;
+import java.util.Map;
 
 /**
  * Created by manos on 21/2/2017.
  */
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PagedModelResources<M extends Persistable> extends PagedModel<ModelResource<M>> {
+public class PagedModelResources<M> extends PagedModel<ModelResource<M>> {
 
 
     @Getter

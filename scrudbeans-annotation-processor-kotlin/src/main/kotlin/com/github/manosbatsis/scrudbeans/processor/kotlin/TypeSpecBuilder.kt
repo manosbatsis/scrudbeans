@@ -4,7 +4,9 @@ import com.github.manosbatsis.kotlin.utils.DtoInfo
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.DtoMapper
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService
 import com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATIOM_JSON_VALUE
 import com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATION_VND_API_PLUS_JSON_VALUE
@@ -24,10 +26,14 @@ import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
 import com.squareup.kotlinpoet.AnnotationSpec
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.KModifier.OVERRIDE
+import com.squareup.kotlinpoet.KModifier.PUBLIC
+import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.TypeSpec
-import io.swagger.v3.oas.annotations.OpenAPIDefinition
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.apache.commons.lang3.StringUtils
 import org.atteo.evo.inflector.English
 import org.mapstruct.Mapper
@@ -58,6 +64,7 @@ internal class TypeSpecBuilder(
         val CLASSNAME_KEY_SERVICE_INTERFACE = "service"
         val CLASSNAME_KEY_SERVICE_IMPL = "serviceImpl"
         val CLASSNAME_KEY_CONTROLLER = "controller"
+        val CLASSNAME_KEY_IDADAPTER = "idadapter"
         val componentSuperClassnames: Map<String, String> = mapOf(
                 // Default repos
                 ModelDescriptor.STACK_JPA + CLASSNAME_KEY_REPOSITORY to ModelRepository::class.java.canonicalName,
@@ -69,7 +76,9 @@ internal class TypeSpecBuilder(
                 ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL to AbstractPersistableModelServiceImpl::class.java.canonicalName,
                 // Default service controller per stack
                 CLASSNAME_KEY_CONTROLLER to AbstractModelServiceBackedController::class.java.canonicalName,
-                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER to AbstractDtoModelController::class.java.canonicalName
+                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER to AbstractDtoModelController::class.java.canonicalName,
+                // Default ID accessor
+                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_IDADAPTER to IdentifierAdapter::class.java.canonicalName
         )
     }
 
@@ -111,8 +120,9 @@ internal class TypeSpecBuilder(
                         AnnotationSpec.builder(RestController::class.java)
                                 . addMember("value = %S", beanName).build())
                 .addAnnotation(
-                        AnnotationSpec.builder(OpenAPIDefinition::class.java)
-                                .addMember("tags = [io.swagger.v3.oas.annotations.tags.Tag(name=%S, description=%S)]", apiName, apiDescription).build())
+                        AnnotationSpec.builder(Tag::class.java)
+                                .addMember("name=%S", apiName)
+                                .addMember("description=%S", apiDescription).build())
                 .addAnnotation(
                         AnnotationSpec.builder(RequestMapping::class.java)
                                 . addMember("value = %S", getRequestMappingPattern(descriptor)).build())
@@ -126,6 +136,46 @@ internal class TypeSpecBuilder(
                                 ClassName(descriptor.parentPackageName + ".service", descriptor.simpleName + "Service"),
                                 ClassName(descriptor.packageName, descriptor.simpleName + "Dto")))
                 .addModifiers(KModifier.PUBLIC)
+                .build()
+    }
+
+
+    /**
+     * Create an implementation of [IdentifierAdapter]
+     *
+     * @param descriptor The target model descriptor
+     * @return the resulting type spec
+     */
+    fun createIdAdapter(modelClassName: ClassName, descriptor: ScrudModelDescriptor): TypeSpec {
+        val className: String = modelClassName.simpleName + "IdentifierAdapter"
+        val pkgAndName = ClassUtils.getPackageAndSimpleName(
+                getSuperclassName(descriptor, TypeSpecBuilder.CLASSNAME_KEY_IDADAPTER))
+        return TypeSpec.classBuilder(className)
+                .addAnnotation(AnnotationSpec.builder(IdentifierAdapterBean::class.java)
+                        .addMember("className = %S", modelClassName)
+                        .build())
+                .addModifiers(PUBLIC)
+                .addSuperinterface(
+                        ClassName(pkgAndName.left, pkgAndName.right)
+                                .parameterizedBy(modelClassName, descriptor.idClassName)).addFunction(FunSpec.builder("getIdName")
+                        .addModifiers(PUBLIC, OVERRIDE)
+                        .returns(String::class)
+                        .addParameter(ParameterSpec.builder("resource", modelClassName).build())
+                        .addStatement("return %S", descriptor.idName)
+                        .build())
+                .addFunction(FunSpec.builder("readId")
+                        .addModifiers(PUBLIC, OVERRIDE)
+                        .returns(descriptor.idClassName.copy(nullable = true))
+                        .addParameter(ParameterSpec.builder("resource", modelClassName).build())
+                        .addStatement("return resource.%L", descriptor.idName)
+                        .build())
+                .addFunction(FunSpec.builder("writeId")
+                        .addModifiers(PUBLIC, OVERRIDE)
+                        .returns(Void.TYPE)
+                        .addParameter(ParameterSpec.builder("resource", modelClassName).build())
+                        .addParameter(ParameterSpec.builder("id", descriptor.idClassName).build())
+                        .addStatement("resource.%L = id", descriptor.idName)
+                        .build())
                 .build()
     }
 

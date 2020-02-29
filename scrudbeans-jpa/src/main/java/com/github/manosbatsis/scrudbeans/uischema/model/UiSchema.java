@@ -21,7 +21,6 @@
 package com.github.manosbatsis.scrudbeans.uischema.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.uischema.serializer.UiSchemaSerializer;
 
 /**
@@ -43,7 +42,7 @@ public class UiSchema {
     public UiSchema() {
     }
 
-    public Class<? extends Persistable> getDomainClass() {
+    public Class<?> getDomainClass() {
         return domainClass;
     }
 

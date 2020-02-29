@@ -1,30 +1,9 @@
 package com.github.manosbatsis.scrudbeans.processor.java;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.TypeElement;
-import javax.persistence.Entity;
-import javax.tools.FileObject;
-import javax.tools.StandardLocation;
-
 import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.EntityModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ScrudModelDescriptor;
@@ -33,6 +12,17 @@ import com.squareup.javapoet.TypeSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.processing.*;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.Name;
+import javax.lang.model.element.TypeElement;
+import javax.persistence.Entity;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
+import java.io.IOException;
+import java.util.*;
+
 /**
  * Annotation processor that generates SCRUD components
  * for model annotated with @{@link ScrudBean}
@@ -40,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * annotated with @{@link Entity}
  */
 @SupportedAnnotationTypes({
-		"com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean"
+        "com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean"
 })
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class ScrudModelAnnotationProcessor extends AbstractProcessor {
@@ -90,15 +80,16 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 			for (final Element element : annotatedModels) {
 				try {
 					if (element instanceof TypeElement) {
-						final TypeElement typeElement = (TypeElement) element;
-						// Parse model to something more convenient
-						ScrudModelDescriptor descriptor = new ScrudModelDescriptor(processingEnv, typeElement, configProps);
-						// Generate components for model
-						generateDtoMappers(descriptor);
-						createRepository(descriptor);
-						createService(descriptor);
-						createController(descriptor);
-					}
+                        final TypeElement typeElement = (TypeElement) element;
+                        // Parse model to something more convenient
+                        ScrudModelDescriptor descriptor = new ScrudModelDescriptor(processingEnv, typeElement, configProps);
+                        // Generate components for model
+                        generateDtoMappers(descriptor);
+                        createIdAdapter(descriptor);
+                        createRepository(descriptor);
+                        createService(descriptor);
+                        createController(descriptor);
+                    }
 					else {
 						log.warn("Not an instance of TypeElement but annotated with ScrudBean: {}", element.getSimpleName());
 					}
@@ -127,25 +118,36 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 					}
 					else {
 						log.warn("Not an instance of TypeElement but annotated with ScrudBean: {}", element.getSimpleName());
-					}
-				}
-			}
-			catch (RuntimeException | ScrudModelProcessorException e) {
-				log.error("Error generating components for {}: " + e.getMessage(),
-						element.getSimpleName(), e);
-			}
-		}
-	}
+                    }
+                }
+            } catch (RuntimeException | ScrudModelProcessorException e) {
+                log.error("Error generating components for {}: " + e.getMessage(),
+                        element.getSimpleName(), e);
+            }
+        }
+    }
 
-	/**
-	 * Create a SCRUD REST controller source file
-	 * @param descriptor The target model descriptor
-	 * @return the written file
-	 */
-	private JavaFile createController(ScrudModelDescriptor descriptor) {
-		// Skip controller generation if controllerSuperClass is set to NONE
-		if (!ScrudBean.NONE.equals(descriptor.getScrudBean().controllerSuperClass())) {
-			TypeSpec typeSpec = TypeSpecBuilder.createController(descriptor);
+    /**
+     * Create an {@link IdentifierAdapter} implementation
+     *
+     * @param descriptor The target model descriptor
+     * @return the written file
+     */
+    private JavaFile createIdAdapter(ScrudModelDescriptor descriptor) {
+        TypeSpec typeSpec = TypeSpecBuilder.createIdAccessor(descriptor);
+        return writeJavaFile(descriptor, typeSpec, descriptor.getPackageName());
+    }
+
+    /**
+     * Create a SCRUD REST controller source file
+     *
+     * @param descriptor The target model descriptor
+     * @return the written file
+     */
+    private JavaFile createController(ScrudModelDescriptor descriptor) {
+        // Skip controller generation if controllerSuperClass is set to NONE
+        if (!ScrudBean.NONE.equals(descriptor.getScrudBean().controllerSuperClass())) {
+            TypeSpec typeSpec = TypeSpecBuilder.createController(descriptor);
 			return writeJavaFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".controller");
 		}
 		return null;

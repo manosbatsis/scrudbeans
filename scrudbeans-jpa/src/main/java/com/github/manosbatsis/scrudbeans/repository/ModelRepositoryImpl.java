@@ -22,9 +22,10 @@ package com.github.manosbatsis.scrudbeans.repository;
 
 import com.github.manosbatsis.kotlin.utils.api.Dto;
 import com.github.manosbatsis.scrudbeans.api.domain.DisableableModel;
-import com.github.manosbatsis.scrudbeans.api.domain.Persistable;
 import com.github.manosbatsis.scrudbeans.api.exception.BeanValidationException;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
+import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry;
 import com.github.manosbatsis.scrudbeans.util.EntityUtil;
 import lombok.NonNull;
 import org.apache.commons.beanutils.PropertyUtils;
@@ -187,8 +188,17 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	@Override
 	public T patch(@NonNull @P("resource") T delta) {
 		// update it by copying all non-null properties from the given transient instance
-		List<String> ignoredList = Arrays.asList(EntityUtil.getNullPropertyNames(delta));
-		ignoredList.add(this.entityInformation.getIdAttribute().getName());
+		List<String> ignoredList = new LinkedList<>();
+		ignoredList.addAll(Arrays.asList(EntityUtil.getNullPropertyNames(delta)));
+		LOGGER.debug("patch, ignored list: {}", ignoredList);
+		ignoredList.add("scrudBeanId");
+		Iterable<String> idAttributeNames = this.entityInformation.getIdAttributeNames();
+		LOGGER.debug("patch, id attributes: {}", idAttributeNames);
+		if (idAttributeNames != null) {
+			for (String name : idAttributeNames) {
+				ignoredList.add(name);
+			}
+		}
 		return patch(delta, ignoredList.toArray(new String[ignoredList.size()]));
 	}
 
@@ -295,26 +305,26 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 
 	}
 
-    /**
-     * Used to validate relations
-     *
-     * @param id        the id of the root model
-     * @param fieldInfo the attribute name of the relationship
-     * @param <RT>
-     * @return
-     */
-    @Override
-    public <RT extends Persistable> RT findRelatedEntityByOwnId(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
-        if (!fieldInfo.getFieldMappingType().isToOne()) {
-            throw new IllegalArgumentException("Field " + fieldInfo.getFieldName() + " is not a relation to a single entity");
-        }
+	/**
+	 * Used to validate relations
+	 *
+	 * @param id        the id of the root model
+	 * @param fieldInfo the attribute name of the relationship
+	 * @param <RT>
+	 * @return
+	 */
+	@Override
+	public <RT> RT findRelatedEntityByOwnId(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
+		if (!fieldInfo.getFieldMappingType().isToOne()) {
+			throw new IllegalArgumentException("Field " + fieldInfo.getFieldName() + " is not a relation to a single entity");
+		}
 
-        CriteriaBuilder cb = this.em.getCriteriaBuilder();
-        CriteriaQuery query = cb.createQuery(fieldInfo.getFieldType());
+		CriteriaBuilder cb = this.em.getCriteriaBuilder();
+		CriteriaQuery query = cb.createQuery(fieldInfo.getFieldType());
 
-        // if we can match by reverse
-        Optional<String> reverseName = fieldInfo.getReverseFieldName();
-        if (fieldInfo.isOneToOne() && reverseName.isPresent()) {
+		// if we can match by reverse
+		Optional<String> reverseName = fieldInfo.getReverseFieldName();
+		if (fieldInfo.isOneToOne() && reverseName.isPresent()) {
 
 			Root root = query.from(fieldInfo.getFieldModelType());
 			query.where(cb.equal(root.<T>get(reverseName.get()).get("id"), id));
@@ -409,8 +419,10 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	@Transactional
 	public void deleteAll(@NotNull Iterable<? extends T> entities) {
 		if (this.disableableDomainClass) {
+			IdentifierAdapter<T, PK> idAdapter =
+					(IdentifierAdapter<T, PK>) IdentifierAdaptersRegistry.getAdapterForClass(getDomainClass());
 			for (T entity : entities) {
-				this.softDelete(((Persistable<PK>) entity).getScrudBeanId());
+				this.softDelete(idAdapter.readId(entity));
 			}
 		}
 		else super.deleteAll(entities);
