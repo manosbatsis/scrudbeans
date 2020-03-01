@@ -121,6 +121,26 @@ __Java only__: As an alternative to implementing `PersistableModel`, you may ins
 `@MappedSuperclass`annotated type within the `com.github.manosbatsis.scrudbeans.jpa.model` package 
 that matches the target `@Id` type, see bellow. 
 
+### Hibernate 
+
+Extending `AbstractHibernateModel` with your Java entity is the simplest way 
+for Hibernate users to implement Spring's `Persistable`. 
+
+```java
+@Entity
+@Table(name = "product_orders")
+@ScrudBean
+public class Order extends AbstractHibernateModel<String> {
+
+    @Id
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+    private String id;
+
+    //...
+}
+```
+
 ### UUID
 
 To use automatically generated UUIDs as a primary key you can extend `AbstractSystemUuidPersistableModel`:
