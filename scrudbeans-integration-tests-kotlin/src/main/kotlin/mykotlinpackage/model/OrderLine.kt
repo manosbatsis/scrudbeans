@@ -2,11 +2,10 @@ package mykotlinpackage.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY
-import com.github.manosbatsis.scrudbeans.api.domain.KPersistable
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
+import com.github.manosbatsis.scrudbeans.model.AbstractHibernateKPersistable
 import com.github.manosbatsis.scrudbeans.validation.Unique
 import io.swagger.v3.oas.annotations.media.Schema
-
 import org.hibernate.annotations.Formula
 import org.hibernate.annotations.GenericGenerator
 import java.math.BigDecimal
@@ -54,6 +53,5 @@ data class OrderLine(
         @field:JoinColumn(referencedColumnName = "id", nullable = false, updatable = false)
         @field:Schema(title = "The parent order", required = true)
         var order: Order? = null
-) : KPersistable<String> {
-        override fun isNew(): Boolean = id == null
+) : AbstractHibernateKPersistable<String>() {
 }

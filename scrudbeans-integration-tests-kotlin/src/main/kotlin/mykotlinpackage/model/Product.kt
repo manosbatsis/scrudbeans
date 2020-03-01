@@ -1,10 +1,9 @@
 package mykotlinpackage.model
 
-import com.github.manosbatsis.scrudbeans.api.domain.KPersistable
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
+import com.github.manosbatsis.scrudbeans.model.AbstractHibernateKPersistable
 import com.github.manosbatsis.scrudbeans.validation.Unique
 import io.swagger.v3.oas.annotations.media.Schema
-
 import org.hibernate.annotations.GenericGenerator
 import java.math.BigDecimal
 import javax.persistence.Column
@@ -39,6 +38,5 @@ data class Product(
         @field:Column(nullable = false)
         @field:Schema(type = "float", description = "The product price", required = true, example = "3.05")
         var price: BigDecimal? = null
-) : KPersistable<String> {
-        override fun isNew(): Boolean = id == null
+) : AbstractHibernateKPersistable<String>() {
 }

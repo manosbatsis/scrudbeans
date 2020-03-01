@@ -90,7 +90,7 @@ public class ModelRepositoryFactoryBean<R extends Repository<T, PK>, T, PK>
             Assert.notNull(domainClass, "Domain class must not be null!");
             Assert.notNull(entityManager, "EntityManager must not be null!");
             JpaEntityInformation<T, PK> entityInfo;
-            // Support a custom KPersistable as a Kotlin-specific alternative to Spring Data's Persistable,
+            // Provide support for KPersistable as a Kotlin alternative to Spring Data's Persistable,
             // mostly due to issues like https://youtrack.jetbrains.com/issue/KT-6653
             if (KPersistable.class.isAssignableFrom(domainClass)) {
                 entityInfo = new KPersistableModelEntityInformation(domainClass, entityManager.getMetamodel());
@@ -112,7 +112,7 @@ public class ModelRepositoryFactoryBean<R extends Repository<T, PK>, T, PK>
             Class<?> domainType = information.getDomainType();
             JpaRepositoryImplementation result;
             if (EntityUtil.isScrudBean(domainType)) {
-                ModelRepositoryImpl repository = new ModelRepositoryImpl(domainType, entityManager);
+                ModelRepositoryImpl repository = new ModelRepositoryImpl(getEntityInformation(domainType), entityManager);
                 repository.setValidator(this.validator);
                 result = repository;
             } else {

@@ -22,6 +22,7 @@ package com.github.manosbatsis.scrudbeans.repository;
 
 import com.github.manosbatsis.kotlin.utils.api.Dto;
 import com.github.manosbatsis.scrudbeans.api.domain.DisableableModel;
+import com.github.manosbatsis.scrudbeans.api.domain.KPersistable;
 import com.github.manosbatsis.scrudbeans.api.exception.BeanValidationException;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
@@ -63,6 +64,15 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ModelRepositoryImpl.class);
 
+	protected static <ST, SPK> JpaEntityInformation<ST, SPK> buildEntityInformation(Class<ST> domainClass, EntityManager em){
+		if (KPersistable.class.isAssignableFrom(domainClass)){
+			return new KPersistableModelEntityInformation(domainClass, em.getMetamodel());
+		}
+		else  {
+			return (JpaEntityInformation<ST, SPK>) JpaEntityInformationSupport.getEntityInformation(domainClass, em);
+		}
+	}
+
 	private boolean skipValidation = false;
 
 	private EntityManager em;
@@ -80,9 +90,9 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 *
      * @param domainClass must not be {@literal null}.
      * @param em          must not be {@literal null}.
-     */
-    public ModelRepositoryImpl(Class<T> domainClass, EntityManager em) {
-		this((JpaEntityInformation<T, PK>) JpaEntityInformationSupport.getEntityInformation(domainClass, em), em);
+	 */
+    public ModelRepositoryImpl(@NonNull Class<T> domainClass, @NonNull EntityManager em) {
+		this(buildEntityInformation(domainClass, em), em);
     }
 
 	/**
@@ -91,20 +101,25 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * @param entityInformation must not be {@literal null}.
 	 * @param entityManager     must not be {@literal null}.
 	 */
-	public ModelRepositoryImpl(JpaEntityInformation<T, PK> entityInformation,
-							   EntityManager entityManager) {
+	public ModelRepositoryImpl(@NonNull JpaEntityInformation<T, PK> entityInformation,
+							   @NonNull EntityManager entityManager) {
 		super(entityInformation, entityManager);
 		LOGGER.debug("new ModelRepositoryImpl, entityInformation: {}, entityManager: {}, validator: {}",
 				entityInformation, entityManager, validator);
-		Assert.notNull(entityInformation, "ModelRepositoryImpl requires a non-null entityInformation constructor parameter");
-		Assert.notNull(entityManager, "ModelRepositoryImpl requires a non-null entityManager constructor parameter");
 		this.em = entityManager;
 		this.entityInformation = entityInformation;
 		this.domainClass = entityInformation.getJavaType();
 		this.disableableDomainClass = DisableableModel.class.isAssignableFrom(this.domainClass);
-		//Configuration config = ConfigurationFactory.getConfiguration();
-		String[] validatorExcludeClasses = {};//TODO config.getStringArray(ConfigurationFactory.VALIDATOR_EXCLUDES_CLASSESS);
-		// TODO this.skipValidation = Arrays.asList(validatorExcludeClasses).contains(domainClass.getCanonicalName());
+		selfValidate();
+		// TODO  Configuration config = ConfigurationFactory.getConfiguration();
+		//String[] validatorExcludeClasses = config.getStringArray(ConfigurationFactory.VALIDATOR_EXCLUDES_CLASSESS);
+		//this.skipValidation = Arrays.asList(validatorExcludeClasses).contains(domainClass.getCanonicalName());
+	}
+
+	private void selfValidate() {
+		Assert.isTrue(!KPersistable.class.isAssignableFrom(domainClass) || KPersistableModelEntityInformation.class.isAssignableFrom(entityInformation.getClass()),
+				"ModelRepositoryImpl requires a KPersistableModelEntityInformation for KPersistableModel implementation entiry " + domainClass.getCanonicalName() + ", but provided instance type was " + entityInformation.getClass().getCanonicalName());
+
 	}
 
 
@@ -145,6 +160,8 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	@Override
 	public <S extends T> S save(@NonNull S entity) {
 		this.validate(entity);
+		boolean isNew = this.entityInformation.isNew(entity);
+		LOGGER.debug("ModelRepositoryImpl.save: entity {} as {}, is new: {}", entity, getDomainClass().getSimpleName(), isNew);
 		return super.save(entity);
 	}
 
@@ -153,8 +170,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 */
 	@Override
 	public T create(@NonNull T entity) {
-		this.validate(entity);
-		return super.save(entity);
+		return this.save(entity);
 	}
 
 	/***
@@ -162,7 +178,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 */
 	@Override
 	public T create(@NonNull Dto<T> dto) {
-		return this.create(dto.toTargetType());
+		return this.save(dto.toTargetType());
 	}
 
 	/***

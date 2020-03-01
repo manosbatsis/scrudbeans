@@ -89,9 +89,10 @@ public class UniqueValidator implements ConstraintValidator<Unique, Object> {
                     constraintValidatorContext.disableDefaultConstraintViolation();
 
                     for (Object match : resultSet) {
-
+                        Object matchId = identifierAdapter.readId(match);
+                        log.debug("isValid violating matchId: {}, recordsValid violating matchId: {}, record: {}", matchId, match);
                         // If value is new or otherwise different than the violating record
-                        if (valueId == null || !valueId.equals(identifierAdapter.readId(match))) {
+                        if (valueId == null || !valueId.equals(matchId)) {
                             for (String propertyName : uniqueFieldNames) {
                                 Object newValue = PropertyUtils.getProperty(value, propertyName);
                                 Object existingValue = PropertyUtils.getProperty(match, propertyName);
