@@ -13,10 +13,12 @@ Model driven services are enabled per entity provided two conditions are met:
  
  - It must be annotated with `@ScrudBean`.
  - It must have a non-primitive id.
- - It must implement either `org.springframework.data.domain.Persistable` or `com.github.manosbatsis.scrudbeans.api.domain.KPersistable` for Java and Kotlin respectively.
- 
-For Java developers only, a set of mapped superclasses can be extended to create your
-entities, see [Java Base Models](#java-base-models) for more details.
+ - Java entities must either implement `org.springframework.data.domain.Persistable` or 
+ subclass one of the mapped superclasses available, see [Java Base Models](#java-base-models)
+ - Kotlin entities must implement `com.github.manosbatsis.scrudbeans.api.domain.KPersistable`, 
+ an custom equivalent of Spring's `Persistable`. For Kotlin users of Hibernate JPA, 
+extending `com.github.manosbatsis.scrudbeans.model.AbstractHibernateKPersistable`just works, 
+even for `data` classes.
 
 ## Mapping Examples
  
@@ -61,10 +63,7 @@ data class Order(
 
         // other constructor params...
 
-
-) : KPersistable<String> {
-        override fun isNew(): Boolean = id == null
-}
+) : AbstractHibernateKPersistable<String>()
 ```
 
 That is enough for ScrudBeans to create the appropriate components and expose RESTful services for 
@@ -112,7 +111,8 @@ example, or create your own.
 
 ### Documentation
 
-Annotating your classes properly per [SpringDoc](https://springdoc.github.io/springdoc-openapi-demos/)  will increase the quality of the generated documentation.
+Annotating your classes properly per [SpringDoc](https://springdoc.github.io/springdoc-openapi-demos/) and Swagger 3  
+will increase the quality of documentation, e.g. for Swagger UI.
 
 
 ## Java Base Models

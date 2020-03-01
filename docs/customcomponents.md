@@ -69,16 +69,29 @@ the default base classes globally in your __application.properties__:
 | scrudbeans.processor.jpa.serviceImpl 	| com.github.manosbatsis.scrudbeans.jpa.service.AbstractPersistableModelServiceImpl   	|
 | scrudbeans.processor.jpa.controller  	| com.github.manosbatsis.scrudbeans.jpa.controller.AbstractPersistableModelController 	|
 
+### Generated Sources 
+
+| Source   	| Build   	| Path                                        	|
+|--------	|---------	|---------------------------------------------	|
+| Java   	| Maven   	| target/generated-sources/annotations        	|
+| Kotlin 	| Maven   	| target/generated-sources/kaptKotlin/compile 	|
+| Kotlin 	| Grtadle 	| build/generated/source/kapt/main            	|
+
 ## Custom Components
 
 ScrudBeans uses a 3-tier architecture with controllers, services and repositories to provide SCRUD services 
 around each entity model. The following sections introduce the base components used by ScrudBeans and 
 explain how those can be extended to make your own custom components if needed.
 
+You can __override any generated component__ by adding a custom implementation to your main sources, 
+using the same package and classname. 
+
+Moving generated components to main sources is the natural way to create a custom component, 
+as most tend to be thin generic types with no other code. 
 
 ### Repositories
 
-To use your custom repository, all you have to do is create them e.g. like the `OrderLineRepository` bellow.
+To override th a custom repository, all you have to do is create them e.g. like the `OrderLineRepository` bellow.
 
 ```
 └── mypackage

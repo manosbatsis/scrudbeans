@@ -35,5 +35,4 @@ data class DiscountCode(
         @field:Column(nullable = false)
         @field:Schema(title = "The discount percentage", required = true)
         var percentage: Int? = null
-) : AbstractHibernateKPersistable<Long>() {
-}
+) : AbstractHibernateKPersistable<Long>()

@@ -45,7 +45,7 @@ A `null` value will result in the following response:
 
 ```json
 {
-    "title": "Validation failed",
+    "message": "Validation failed",
     "httpStatusCode": 400,
     "requestMethod": "POST",
     "requestUrl": "/api/rest/discountCodes",
@@ -65,7 +65,7 @@ Similarly, a non-unique value will result in the following response:
 
 ```json
 {
-    "title": "Validation failed",
+    "message": "Validation failed",
     "httpStatusCode": 400,
     "requestMethod": "POST",
     "requestUrl": "/api/rest/discountCodes",
