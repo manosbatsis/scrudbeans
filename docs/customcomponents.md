@@ -71,11 +71,15 @@ the default base classes globally in your __application.properties__:
 
 ### Generated Sources 
 
+ScrudBeans will generate sources to the following folders, 
+depending on the language and build tool used.
+
 | Source   	| Build   	| Path                                        	|
 |--------	|---------	|---------------------------------------------	|
 | Java   	| Maven   	| target/generated-sources/annotations        	|
+| Java   	| Gradle   	| build/generated/source/apt/main        	|
 | Kotlin 	| Maven   	| target/generated-sources/kaptKotlin/compile 	|
-| Kotlin 	| Grtadle 	| build/generated/source/kapt/main            	|
+| Kotlin 	| Gradle 	| build/generated/source/kapt/main            	|
 
 ## Custom Components
 
