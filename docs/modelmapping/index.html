@@ -48,14 +48,13 @@ create SCRUD components and services everytime your build runs.</p>
 <ul>
 <li>It must be annotated with <code>@ScrudBean</code>.</li>
 <li>It must have a non-primitive id.</li>
-<li>It must implement <code>com.github.manosbatsis.scrudbeans.api.domain.Persistable</code> or simply extend one of the abstract
-entities from the <code>com.github.manosbatsis.scrudbeans.jpa.model</code> package.</li>
+<li>Java entities must either implement <code>org.springframework.data.domain.Persistable</code> or
+subclass one of the mapped superclasses available, see <a href="#java-base-models">Java Base Models</a></li>
+<li>Kotlin entities must implement <code>com.github.manosbatsis.scrudbeans.api.domain.KPersistable</code>,
+an custom equivalent of Spring's <code>Persistable</code>. For Kotlin users of Hibernate JPA,
+extending <code>com.github.manosbatsis.scrudbeans.model.AbstractHibernateKPersistable</code>just works,
+even for <code>data</code> classes.</li>
 </ul>
-<blockquote>
-<p>The last requirement will be removed in upcpming versions.</p>
-</blockquote>
-<p>To make this easier, ScrudBeans provides a set of mapped superclasses you can extend to create your
-entities, see <a href="#base-models">Base Models</a> for more details.</p>
 <h2><a class="anchor" aria-hidden="true" id="mapping-examples"></a><a href="#mapping-examples" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Mapping Examples</h2>
 <p>As an example, consider an <code>Order</code> entity in
 <a href="https://github.com/manosbatsis/scrudbeans-template-java/blob/master/src/main/java/myjavapackage/model/Order.java">Java</a> or
@@ -88,16 +87,12 @@ entities, see <a href="#base-models">Base Models</a> for more details.</p>
 
        <span class="hljs-meta">@field:NotNull</span>
        <span class="hljs-meta">@field:Column</span>(nullable = <span class="hljs-literal">false</span>)
-       <span class="hljs-meta">@field:ApiModelProperty</span>(value = <span class="hljs-string">"The client's email"</span>, required = <span class="hljs-literal">true</span>)
+       <span class="hljs-meta">@field:Schema</span>(title = <span class="hljs-string">"The client's email"</span>, required = <span class="hljs-literal">true</span>)
        <span class="hljs-keyword">var</span> email: String? = <span class="hljs-literal">null</span>,
 
        <span class="hljs-comment">// other constructor params...</span>
 
-
-) : Persistable&lt;String&gt; {
-       <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">getScrudBeanId</span><span class="hljs-params">()</span></span> = id!!
-       <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">isNew</span><span class="hljs-params">()</span></span>: <span class="hljs-built_in">Boolean</span> = id == <span class="hljs-literal">null</span>
-}
+) : AbstractHibernateKPersistable&lt;String&gt;()
 </code></pre>
 <p>That is enough for ScrudBeans to create the appropriate components and expose RESTful services for
 SCRUD, meaning <em>Search, Create, Update and Delete</em> operations for the entity type. This is explained
@@ -121,8 +116,7 @@ for example:</p>
 <ul>
 <li><code>pathFragment</code> is the path fragment appended to the API base path (by default <code>api/rest/</code>), thus forming the base
 <code>RequestMapping</code> path for this entity's REST controller.</li>
-<li><code>apiName</code> is equivalent to <code>io.swagger.annotations.Api#tags</code> and serves as a name and logical grouping of
-operations/endpoints for this entity's REST controller .</li>
+<li><code>apiName</code> and <code>apiDescription</code> is used to annotate generated controllers with <code>io.swagger.v3.oas.annotations.tags.Tag</code>.</li>
 <li><code>apiDescription</code> is equivalent to <code>io.swagger.annotations.Api#description</code>.</li>
 <li><code>dtoTypes</code> an array of DTO classes to generate mappers for.</li>
 <li><code>dtoTypeNames</code> an array of DTO (canonical) class names to generate mappers for.</li>
@@ -131,22 +125,32 @@ operations/endpoints for this entity's REST controller .</li>
 <ul>
 <li><code>javax.persistence.Column</code> for not-null and unique values</li>
 <li><code>javax.validation.constraints</code> annotations</li>
-<li>Any custom Java Bean Validation annotation. See <code>com.github.manosbatsis.scrudbeans.jpa.validation.Unique</code> for an
+<li>Any custom Java Bean Validation annotation. See <code>Unique</code> for an
 example, or create your own.</li>
 </ul>
 <h3><a class="anchor" aria-hidden="true" id="documentation"></a><a href="#documentation" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Documentation</h3>
-<p>Annotating your models and their fields properly with <code>io.swagger.annotations.ApiModel</code> and
-<code>io.swagger.annotations.ApiModelProperty</code> respectively will increase the quality of the generated Springfox/Swagger
-documentation.</p>
-<h2><a class="anchor" aria-hidden="true" id="base-models"></a><a href="#base-models" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Base Models</h2>
-<p>Model driven services are enabled per entity provided two conditions are met:</p>
-<ul>
-<li>It must be annotated with <code>@ScrudBean</code>.</li>
-<li>It must implement <code>PersistableModel</code> or simply extend one of the abstract entities from the
-<code>com.github.manosbatsis.scrudbeans.jpa.model</code> package.</li>
-</ul>
-<p>To make this easier, ScrudBeans provides the <code>com.github.manosbatsis.scrudbeans.jpa.model</code> package,
-a set of mapped superclasses you can extend to create your entities.</p>
+<p>Annotating your classes properly per <a href="https://springdoc.github.io/springdoc-openapi-demos/">SpringDoc</a> and Swagger 3<br>
+will increase the quality of documentation, e.g. for Swagger UI.</p>
+<h2><a class="anchor" aria-hidden="true" id="java-base-models"></a><a href="#java-base-models" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Java Base Models</h2>
+<p><strong>Java only</strong>: As an alternative to implementing <code>PersistableModel</code>, you may instead extend the<br>
+<code>@MappedSuperclass</code>annotated type within the <code>com.github.manosbatsis.scrudbeans.jpa.model</code> package
+that matches the target <code>@Id</code> type, see bellow.</p>
+<h3><a class="anchor" aria-hidden="true" id="hibernate"></a><a href="#hibernate" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Hibernate</h3>
+<p>Extending <code>AbstractHibernateModel</code> with your Java entity is the simplest way
+for Hibernate users to implement Spring's <code>Persistable</code>.</p>
+<pre><code class="hljs css language-java"><span class="hljs-meta">@Entity</span>
+<span class="hljs-meta">@Table</span>(name = <span class="hljs-string">"product_orders"</span>)
+<span class="hljs-meta">@ScrudBean</span>
+<span class="hljs-keyword">public</span> <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Order</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">AbstractHibernateModel</span>&lt;<span class="hljs-title">String</span>&gt; </span>{
+
+    <span class="hljs-meta">@Id</span>
+    <span class="hljs-meta">@GeneratedValue</span>(generator = <span class="hljs-string">"system-uuid"</span>)
+    <span class="hljs-meta">@GenericGenerator</span>(name = <span class="hljs-string">"system-uuid"</span>, strategy = <span class="hljs-string">"uuid2"</span>)
+    <span class="hljs-keyword">private</span> String id;
+
+    <span class="hljs-comment">//...</span>
+}
+</code></pre>
 <h3><a class="anchor" aria-hidden="true" id="uuid"></a><a href="#uuid" aria-hidden="true" class="hash-link"><svg class="hash-link-icon" aria-hidden="true" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>UUID</h3>
 <p>To use automatically generated UUIDs as a primary key you can extend <code>AbstractSystemUuidPersistableModel</code>:</p>
 <pre><code class="hljs css language-java"><span class="hljs-meta">@Entity</span>
@@ -234,4 +238,4 @@ to create a new <code>@Embeddable</code> ID type:</p>
     
 }
 </code></pre>
-</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/scrudbeans/docs/installation"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/scrudbeans/docs/restfulservices"><span>RESTful Services</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#mapping-prerequisites">Mapping Prerequisites</a></li><li><a href="#mapping-examples">Mapping Examples</a></li><li><a href="#relevant-annotations">Relevant Annotations</a><ul class="toc-headings"><li><a href="#scrudbean">ScrudBean</a></li><li><a href="#validation">Validation</a></li><li><a href="#documentation">Documentation</a></li></ul></li><li><a href="#base-models">Base Models</a><ul class="toc-headings"><li><a href="#uuid">UUID</a></li><li><a href="#auto-increment">Auto Increment</a></li><li><a href="#assigned-ids">Assigned IDs</a></li><li><a href="#composite-ids">Composite IDs</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="copyright"><a href="http://manosbatsis.github.io/">Copyright © 2019 Manos Batsis</a>.<span> Got a remote contract? Contact me by<a href="mailto:manosbatsis@gmail.com?subject=Remote Contract"> email</a> or<a href="https://www.linkedin.com/in/manosbatsis"> linkedin</a></span></section></footer></div></body></html>
+</span></div></article></div><div class="docs-prevnext"><a class="docs-prev button" href="/scrudbeans/docs/installation"><span class="arrow-prev">← </span><span>Installation</span></a><a class="docs-next button" href="/scrudbeans/docs/restfulservices"><span>RESTful Services</span><span class="arrow-next"> →</span></a></div></div></div><nav class="onPageNav"><ul class="toc-headings"><li><a href="#mapping-prerequisites">Mapping Prerequisites</a></li><li><a href="#mapping-examples">Mapping Examples</a></li><li><a href="#relevant-annotations">Relevant Annotations</a><ul class="toc-headings"><li><a href="#scrudbean">ScrudBean</a></li><li><a href="#validation">Validation</a></li><li><a href="#documentation">Documentation</a></li></ul></li><li><a href="#java-base-models">Java Base Models</a><ul class="toc-headings"><li><a href="#hibernate">Hibernate</a></li><li><a href="#uuid">UUID</a></li><li><a href="#auto-increment">Auto Increment</a></li><li><a href="#assigned-ids">Assigned IDs</a></li><li><a href="#composite-ids">Composite IDs</a></li></ul></li></ul></nav></div><footer class="nav-footer" id="footer"><section class="copyright"><a href="http://manosbatsis.github.io/">Copyright © 2020 Manos Batsis</a>.<span> Got a remote contract? Contact me by<a href="mailto:manosbatsis@gmail.com?subject=Remote Contract"> email</a> or<a href="https://www.linkedin.com/in/manosbatsis"> linkedin</a></span></section></footer></div></body></html>
