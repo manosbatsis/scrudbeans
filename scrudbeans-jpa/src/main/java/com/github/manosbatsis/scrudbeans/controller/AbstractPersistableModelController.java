@@ -34,6 +34,7 @@ import com.github.manosbatsis.scrudbeans.uischema.model.UiSchema;
 import com.github.manosbatsis.scrudbeans.util.ParamsAwarePageImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -42,7 +43,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
@@ -91,17 +91,30 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 	// Create
 	// =====================
 	@RequestMapping(method = RequestMethod.POST)
-	@ResponseStatus(HttpStatus.CREATED)
-	@Operation(description = "Create a new resource")
-	public T create(@RequestBody T resource) {
-		return super.create(resource);
+	@Operation(description = "Create a new resource",
+			responses = {
+					@ApiResponse(responseCode = "201", description = "Created"),
+					@ApiResponse(responseCode = "500", description = "Error"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "409", description = "Conflicted")
+			})
+	public ResponseEntity<T> createForEntiry(@RequestBody T resource) {
+		return new ResponseEntity(super.create(resource), HttpStatus.CREATED);
 	}
 
 
 	// Update
 	// =====================
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
-	@Operation(description = "Update a resource")
+	@Operation(description = "Update a resource",
+			responses = {
+					@ApiResponse(responseCode = "200", description = "OK"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "404", description = "Not found"),
+					@ApiResponse(responseCode = "409", description = "Conflicted")
+			})
 	public T update(
 			@Parameter(name = "id", required = true)
 			@PathVariable PK id, @RequestBody T model) {
@@ -113,7 +126,14 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 	@RequestMapping(value = "{id}", method = RequestMethod.PATCH)
 	@Operation(
 			summary = "Patch (partially update) a resource",
-			description = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.")
+			description = "Partial updates will apply all given properties (ignoring null values) to the persisted entity.",
+			responses = {
+					@ApiResponse(responseCode = "200", description = "OK"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "404", description = "Not found"),
+					@ApiResponse(responseCode = "409", description = "Conflicted")
+			})
 	public T patch(
 			@Parameter(name = "id", required = true)
 			@PathVariable PK id, @RequestBody T model) {
@@ -126,7 +146,13 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 	@RequestMapping(method = RequestMethod.GET, params = "page=no")
 	@Operation(
 			summary = "Get the full collection of resources (no paging or criteria)",
-			description = "Find all resources, and return the full collection (i.e. VS a page of the total results)")
+			description = "Find all resources, and return the full collection (i.e. VS a page of the total results)",
+			responses = {
+					@ApiResponse(responseCode = "200", description = "OK"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "404", description = "Not found")
+			})
 	public Iterable<T> findAll() {
 		return super.findAll();
 	}
@@ -139,7 +165,13 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 	@RequestMapping(method = RequestMethod.GET)
 	@Operation(summary = "Search for resources (paginated).", description = "Find all resources matching the given criteria and return a paginated collection."
 			+ "Predefined paging properties are _pn (page number), _ps (page size) and sort. All serialized member names "
-			+ "of the resource are supported as search criteria in the form of HTTP URL parameters.")
+			+ "of the resource are supported as search criteria in the form of HTTP URL parameters.",
+			responses = {
+					@ApiResponse(responseCode = "200", description = "OK"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "404", description = "Not found")
+			})
 	public ParamsAwarePageImpl<T> findPaginated(
 			@Parameter(name = SpecificationsBuilder.PARAM_FILTER, description = "The RSQL/FIQL query to use. Simply URL param based search will be used if missing.")
 			@RequestParam(value = SpecificationsBuilder.PARAM_FILTER, required = false) String filter,
@@ -157,7 +189,13 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 	// Read
 	// ==============
 	@RequestMapping(value = "{id}", method = RequestMethod.GET)
-	@Operation(summary = "Find by id", description = "Find a resource by it's identifier")
+	@Operation(summary = "Find by id", description = "Find a resource by it's identifier",
+			responses = {
+					@ApiResponse(responseCode = "200", description = "OK"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "404", description = "Not found")
+			})
 	public T findById(@Parameter(name = "id", required = true) @PathVariable PK id) {
 		T model = super.findById(id);
 		if (model == null) {
@@ -170,7 +208,13 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 	 * GET has the same effect to both member and relationship endpoints
 	 */
 	@RequestMapping(value = {"{id}/{relationName}", "{id}/relationships/{relationName}"}, method = RequestMethod.GET)
-	@Operation(summary = "Find related by root id", description = "Find the related resource for the given relation name and identifier")
+	@Operation(summary = "Find related by root id", description = "Find the related resource for the given relation name and identifier",
+			responses = {
+					@ApiResponse(responseCode = "200", description = "OK"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "404", description = "Not found")
+			})
 	public ResponseEntity getRelated(
 			@Parameter(name = SpecificationsBuilder.PARAM_PK, required = true) @PathVariable PK id,
 			@Parameter(name = SpecificationsBuilder.PARAM_RELATION_NAME, required = true) @PathVariable String relationName,
@@ -213,26 +257,50 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 	}
 
 	@RequestMapping(params = "ids", method = RequestMethod.GET)
-	@Operation(summary = "Search by ids", description = "Find the set of resources matching the given identifiers.")
+	@Operation(summary = "Search by ids", description = "Find the set of resources matching the given identifiers.",
+			responses = {
+					@ApiResponse(responseCode = "200", description = "OK"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "404", description = "Not found")
+			})
 	public Iterable<T> findByIds(@RequestParam(value = "ids[]") Set<PK> ids) {
 		return super.findByIds(ids);
 	}
 
 	@RequestMapping(value = "{id}", method = RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	@Operation(summary = "Delete a resource", description = "Delete a resource by its identifier. ", method = "DELETE")
+	@Operation(summary = "Delete a resource", description = "Delete a resource by its identifier. ", method = "DELETE",
+			responses = {
+					@ApiResponse(responseCode = "204", description = "OK"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "404", description = "Not found")
+			})
 	public void delete(@Parameter(name = "id", required = true) @PathVariable PK id) {
 		super.delete(id);
 	}
 
-	@RequestMapping(value = "jsonschema", method = RequestMethod.GET, consumes = MimeTypeUtils.APPLICATION_JSON_VALUE, produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
-	@Operation(summary = "Get JSON Schema", description = "Get the JSON Schema for the controller entity type")
+	@RequestMapping(value = "jsonschema", method = RequestMethod.GET)
+	@Operation(summary = "Get JSON Schema", description = "Get the JSON Schema for the controller entity type",
+			responses = {
+					@ApiResponse(responseCode = "200", description = "OK"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "404", description = "Not found")
+			})
 	public RawJson getJsonSchema() throws JsonProcessingException {
 		return super.getJsonSchema();
 	}
 
-	@RequestMapping(value = "uischema", method = RequestMethod.GET, consumes = MimeTypeUtils.APPLICATION_JSON_VALUE, produces = MimeTypeUtils.APPLICATION_JSON_VALUE)
-	@Operation(summary = "Get UI schema", description = "Get the UI achema for the controller entity type, including fields, use-cases etc.")
+	@RequestMapping(value = "uischema", method = RequestMethod.GET)
+	@Operation(summary = "Get UI schema", description = "Get the UI achema for the controller entity type, including fields, use-cases etc.",
+			responses = {
+					@ApiResponse(responseCode = "200", description = "OK"),
+					@ApiResponse(responseCode = "400", description = "Invalid"),
+					@ApiResponse(responseCode = "401", description = "Unauthorized"),
+					@ApiResponse(responseCode = "404", description = "Not found")
+			})
 	@Deprecated
 	public UiSchema getUiSchema() {
 		return super.getUiSchema();

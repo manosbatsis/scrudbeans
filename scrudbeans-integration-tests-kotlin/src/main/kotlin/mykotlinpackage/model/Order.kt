@@ -1,11 +1,10 @@
 package mykotlinpackage.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.github.manosbatsis.scrudbeans.api.domain.KPersistable
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
+import com.github.manosbatsis.scrudbeans.model.AbstractHibernateKPersistable
 import com.github.manosbatsis.scrudbeans.validation.Unique
 import io.swagger.v3.oas.annotations.media.Schema
-
 import mykotlinpackage.dto.OrderUpdateEmailDTO
 import org.hibernate.annotations.GenericGenerator
 import org.javers.core.metamodel.annotation.DiffIgnore
@@ -61,6 +60,5 @@ data class Order(
         var lastModifiedDate: LocalDateTime? = null
 
 
-) : KPersistable<String> {
-        override fun isNew(): Boolean = id == null
+) : AbstractHibernateKPersistable<String>() {
 }

@@ -31,7 +31,6 @@ import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.ValidationException;
@@ -112,6 +111,8 @@ public class Util {
             // if  SystemException
             if (SystemException.class.isAssignableFrom(ex.getClass())) {
                 status = ((SystemException) ex).getStatus();
+            } else if (ex.getMessage().toLowerCase().contains("detached entity passed to persist")) {
+                status = HttpStatus.CONFLICT;
             } else {
                 status = getStandardExceptionHttpStatus(ex);
             }

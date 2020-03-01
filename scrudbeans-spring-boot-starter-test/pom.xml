@@ -7,7 +7,7 @@
 	<parent>
         <artifactId>scrudbeans</artifactId>
         <groupId>com.github.manosbatsis.scrudbeans</groupId>
-        <version>0.17</version>
+        <version>0.18</version>
     </parent>
 
 	<dependencies>
@@ -29,6 +29,11 @@
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.11</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hamcrest</groupId>
