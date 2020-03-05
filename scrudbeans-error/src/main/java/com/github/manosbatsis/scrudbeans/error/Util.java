@@ -111,7 +111,8 @@ public class Util {
             // if  SystemException
             if (SystemException.class.isAssignableFrom(ex.getClass())) {
                 status = ((SystemException) ex).getStatus();
-            } else if (ex.getMessage().toLowerCase().contains("detached entity passed to persist")) {
+            } else if (ex.getMessage().toLowerCase().contains("detached entity passed to persist")
+                    || ex.getMessage().toLowerCase().contains("A different object with the same identifier value")) {
                 status = HttpStatus.CONFLICT;
             } else {
                 status = getStandardExceptionHttpStatus(ex);
