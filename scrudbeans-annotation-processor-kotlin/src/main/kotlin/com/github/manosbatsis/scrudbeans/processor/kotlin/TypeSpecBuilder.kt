@@ -18,9 +18,9 @@ import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.EntityModel
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository
+import com.github.manosbatsis.scrudbeans.service.AbstractJpaPersistableModelServiceImpl
 import com.github.manosbatsis.scrudbeans.service.AbstractModelServiceImpl
-import com.github.manosbatsis.scrudbeans.service.AbstractPersistableModelServiceImpl
-import com.github.manosbatsis.scrudbeans.service.PersistableModelService
+import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
 import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory
 import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
@@ -70,10 +70,10 @@ internal class TypeSpecBuilder(
                 ModelDescriptor.STACK_JPA + CLASSNAME_KEY_REPOSITORY to ModelRepository::class.java.canonicalName,
                 // Default service interface per stack
                 CLASSNAME_KEY_SERVICE_INTERFACE to ModelService::class.java.canonicalName,
-                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_INTERFACE to PersistableModelService::class.java.canonicalName,
+                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_INTERFACE to JpaPersistableModelService::class.java.canonicalName,
                 // Default service interface per stack
                 CLASSNAME_KEY_SERVICE_IMPL to AbstractModelServiceImpl::class.java.canonicalName,
-                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL to AbstractPersistableModelServiceImpl::class.java.canonicalName,
+                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL to AbstractJpaPersistableModelServiceImpl::class.java.canonicalName,
                 // Default service controller per stack
                 CLASSNAME_KEY_CONTROLLER to AbstractModelServiceBackedController::class.java.canonicalName,
                 ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER to AbstractDtoModelController::class.java.canonicalName,
@@ -180,7 +180,7 @@ internal class TypeSpecBuilder(
     }
 
     /**
-     * Create a sub-interface [TypeSpec] of [PersistableModelService]
+     * Create a sub-interface [TypeSpec] of [JpaPersistableModelService]
      * or [ModelService] depending on whether
      * the mndel is an [Entity]
      *
@@ -201,7 +201,7 @@ internal class TypeSpecBuilder(
     }
 
     /**
-     * Create a subclass [TypeSpec] of [AbstractPersistableModelServiceImpl] or
+     * Create a subclass [TypeSpec] of [AbstractJpaPersistableModelServiceImpl] or
      * or [AbstractModelServiceImpl]depending on whether
      * the mndel is an [Entity]
      *

@@ -12,9 +12,9 @@ import com.github.manosbatsis.scrudbeans.processor.java.descriptor.EntityModelDe
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ScrudModelDescriptor;
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository;
+import com.github.manosbatsis.scrudbeans.service.AbstractJpaPersistableModelServiceImpl;
 import com.github.manosbatsis.scrudbeans.service.AbstractModelServiceImpl;
-import com.github.manosbatsis.scrudbeans.service.AbstractPersistableModelServiceImpl;
-import com.github.manosbatsis.scrudbeans.service.PersistableModelService;
+import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService;
 import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory;
 import com.github.manosbatsis.scrudbeans.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils;
@@ -69,10 +69,10 @@ class TypeSpecBuilder {
         componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_REPOSITORY, ModelRepository.class.getCanonicalName());
         // Default service interface per stack
         componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_INTERFACE, ModelService.class.getCanonicalName());
-        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_INTERFACE, PersistableModelService.class.getCanonicalName());
+        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_INTERFACE, JpaPersistableModelService.class.getCanonicalName());
         // Default service interface per stack
         componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_IMPL, AbstractModelServiceImpl.class.getCanonicalName());
-        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL, AbstractPersistableModelServiceImpl.class.getCanonicalName());
+        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL, AbstractJpaPersistableModelServiceImpl.class.getCanonicalName());
         // Default service controller per stack
         componentSuperClassnames.put(CLASSNAME_KEY_CONTROLLER, AbstractModelServiceBackedController.class.getCanonicalName());
         componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER, AbstractPersistableModelController.class.getCanonicalName());
@@ -138,7 +138,7 @@ class TypeSpecBuilder {
 	}
 
 	/**
-	 * Create a sub-interface {@link TypeSpec} of {@link PersistableModelService}
+	 * Create a sub-interface {@link TypeSpec} of {@link JpaPersistableModelService}
 	 * or {@link ModelService} depending on whether
 	 * the mndel is an {@link Entity}
 	 *
@@ -160,7 +160,7 @@ class TypeSpecBuilder {
 	}
 
 	/**
-	 * Create a subclass {@link TypeSpec} of {@link AbstractPersistableModelServiceImpl} or
+	 * Create a subclass {@link TypeSpec} of {@link AbstractJpaPersistableModelServiceImpl} or
 	 * or {@link AbstractModelServiceImpl}depending on whether
 	 * the mndel is an {@link Entity}
 	 *
