@@ -169,13 +169,6 @@ internal class TypeSpecBuilder(
                         .addParameter(ParameterSpec.builder("resource", modelClassName).build())
                         .addStatement("return resource.%L", descriptor.idName)
                         .build())
-                .addFunction(FunSpec.builder("writeId")
-                        .addModifiers(PUBLIC, OVERRIDE)
-                        .returns(Void.TYPE)
-                        .addParameter(ParameterSpec.builder("resource", modelClassName).build())
-                        .addParameter(ParameterSpec.builder("id", descriptor.idClassName).build())
-                        .addStatement("resource.%L = id", descriptor.idName)
-                        .build())
                 .build()
     }
 

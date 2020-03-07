@@ -7,6 +7,4 @@ public interface IdentifierAdapter<T, ID> {
     String getIdName(T resource);
 
     ID readId(T resource);
-
-    void writeId(T resource, ID id);
 }

@@ -42,9 +42,10 @@ public class AbstractJpaPersistableModelServiceImpl<T, PK extends Serializable, 
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractJpaPersistableModelServiceImpl.class);
 
+	/** Obtain the EntityManager of the underlying Repository */
 	@Override
 	public EntityManager getEntityManager() {
-		return null;
+		return this.repository.getEntityManager();
 	}
 
 }

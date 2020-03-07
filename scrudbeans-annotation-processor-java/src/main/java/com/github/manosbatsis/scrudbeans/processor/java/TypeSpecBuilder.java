@@ -246,14 +246,6 @@ class TypeSpecBuilder {
                         .addParameter(ParameterSpec.builder(modelClassName, "resource", Modifier.FINAL).build())
                         .addStatement("return resource.$L()", toGetterName(descriptor.getIdName()))
                         .build())
-                .addMethod(MethodSpec.methodBuilder("writeId")
-                        .addModifiers(Modifier.PUBLIC)
-                        .addAnnotation(Override.class)
-                        .returns(void.class)
-                        .addParameter(ParameterSpec.builder(modelClassName, "resource", Modifier.FINAL).build())
-                        .addParameter(ParameterSpec.builder(idClassName, "id", Modifier.FINAL).build())
-                        .addStatement("resource.$L(id)", toSetterName(descriptor.getIdName()))
-                        .build())
                 .build();
     }
 
