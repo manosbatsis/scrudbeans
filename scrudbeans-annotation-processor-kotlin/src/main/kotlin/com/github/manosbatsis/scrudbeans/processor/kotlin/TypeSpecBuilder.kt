@@ -286,7 +286,8 @@ internal class TypeSpecBuilder(
         return dtoSpecBuilder(DtoInfo(
                 stateInfo.typeElement,
                 stateInfo.typeElement.accessibleConstructorParameterFields(),
-                stateInfo.packageName))
+                stateInfo.packageName,
+                listOf("io.swagger.v3.oas.annotations", "com.fasterxml.jackson.annotation")))
     }
 
     /** Create a mapstruct-based mapper for non-generated DTOs */

@@ -34,6 +34,7 @@ import com.github.manosbatsis.scrudbeans.uischema.model.UiSchema;
 import com.github.manosbatsis.scrudbeans.util.ParamsAwarePageImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +92,7 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 	// Create
 	// =====================
 	@RequestMapping(method = RequestMethod.POST)
-	@Operation(description = "Create a new resource",
+	@Operation(summary = "Create a new resource",
 			responses = {
 					@ApiResponse(responseCode = "201", description = "Created"),
 					@ApiResponse(responseCode = "500", description = "Error"),
@@ -99,7 +100,9 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 					@ApiResponse(responseCode = "401", description = "Unauthorized"),
 					@ApiResponse(responseCode = "409", description = "Conflicted")
 			})
-	public ResponseEntity<T> createForEntiry(@RequestBody T resource) {
+	public ResponseEntity<T> createForEntiry(
+			@io.swagger.v3.oas.annotations.parameters.RequestBody(required = true)
+			@RequestBody T resource) {
 		return new ResponseEntity(super.create(resource), HttpStatus.CREATED);
 	}
 
@@ -107,7 +110,7 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 	// Update
 	// =====================
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
-	@Operation(description = "Update a resource",
+	@Operation(summary = "Update a resource",
 			responses = {
 					@ApiResponse(responseCode = "200", description = "OK"),
 					@ApiResponse(responseCode = "400", description = "Invalid"),
@@ -117,7 +120,9 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 			})
 	public T update(
 			@Parameter(name = "id", required = true)
-			@PathVariable PK id, @RequestBody T model) {
+			@PathVariable PK id,
+			@io.swagger.v3.oas.annotations.parameters.RequestBody(required = true)
+			@RequestBody T model) {
 		return super.update(id, model);
 	}
 
@@ -136,7 +141,9 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 			})
 	public T patch(
 			@Parameter(name = "id", required = true)
-			@PathVariable PK id, @RequestBody T model) {
+			@PathVariable PK id,
+			@io.swagger.v3.oas.annotations.parameters.RequestBody(required = true)
+			@RequestBody T model) {
 		return super.patch(id, model);
 	}
 
@@ -264,7 +271,9 @@ public class AbstractPersistableModelController<T, PK extends Serializable, S ex
 					@ApiResponse(responseCode = "401", description = "Unauthorized"),
 					@ApiResponse(responseCode = "404", description = "Not found")
 			})
-	public Iterable<T> findByIds(@RequestParam(value = "ids[]") Set<PK> ids) {
+	public Iterable<T> findByIds(
+			@Parameter(name = "ids", required = true, in = ParameterIn.QUERY, description = "The IDs to match (multiple param occurrences)")
+			@RequestParam(value = "ids[]") Set<PK> ids) {
 		return super.findByIds(ids);
 	}
 

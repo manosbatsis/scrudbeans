@@ -33,6 +33,7 @@ import com.github.manosbatsis.scrudbeans.uischema.model.UiSchema;
 import com.github.manosbatsis.scrudbeans.util.ParamsAwarePageImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -95,9 +96,11 @@ public class AbstractDtoModelController<
 	// =====================
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseStatus(HttpStatus.CREATED)
-	@Operation(description = "Create a new resource")
+	@Operation(summary = "Create a new resource")
 	@Override
-	public T create(@RequestBody DTO resource) {
+	public T create(
+			@io.swagger.v3.oas.annotations.parameters.RequestBody(required = true)
+			@RequestBody DTO resource) {
 		return super.create(resource);
 	}
 
@@ -105,11 +108,13 @@ public class AbstractDtoModelController<
 	// Update
 	// =====================
 	@RequestMapping(value = "{id}", method = RequestMethod.PUT)
-	@Operation(description = "Update a resource")
+	@Operation(summary = "Update a resource")
 	@Override
 	public T update(
 			@Parameter(name = "id", required = true)
-			@PathVariable PK id, @RequestBody DTO model) {
+			@PathVariable PK id,
+			@io.swagger.v3.oas.annotations.parameters.RequestBody(required = true)
+			@RequestBody DTO model) {
 		return super.update(id, model);
 	}
 
@@ -122,7 +127,9 @@ public class AbstractDtoModelController<
 	@Override
 	public T patch(
 			@Parameter(name = "id", required = true)
-			@PathVariable PK id, @RequestBody DTO model) {
+			@PathVariable PK id,
+			@io.swagger.v3.oas.annotations.parameters.RequestBody(required = true)
+			@RequestBody DTO model) {
 		return super.patch(id, model);
 	}
 
@@ -219,7 +226,9 @@ public class AbstractDtoModelController<
 
 	@RequestMapping(params = "ids", method = RequestMethod.GET)
 	@Operation(summary = "Search by ids", description = "Find the set of resources matching the given identifiers.")
-	public Iterable<T> findByIds(@RequestParam(value = "ids[]") Set<PK> ids) {
+	public Iterable<T> findByIds(
+			@Parameter(name = "ids", required = true, in = ParameterIn.QUERY, description = "The IDs to match (multiple param occurrences)")
+			@RequestParam(value = "ids[]") Set<PK> ids) {
 		return super.findByIds(ids);
 	}
 
