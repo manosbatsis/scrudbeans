@@ -125,7 +125,7 @@ internal class TypeSpecBuilder(
                                 .addMember("description=%S", apiDescription).build())
                 .addAnnotation(
                         AnnotationSpec.builder(RequestMapping::class.java)
-                                . addMember("value = %S", getRequestMappingPattern(descriptor)).build())
+                                . addMember("value = [%S]", getRequestMappingPattern(descriptor)).build())
                 .addAnnotation(
                         AnnotationSpec.builder(ExposesResourceFor::class.java)
                                 . addMember("value = %L", descriptor.simpleName + "::class").build())
