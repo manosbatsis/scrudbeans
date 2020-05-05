@@ -26,6 +26,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
@@ -108,8 +109,12 @@ public class Util {
     public static HttpStatus getHttpStatus(Throwable ex) {
         HttpStatus status = null;
         if (ex != null) {
-            // if  SystemException
-            if (SystemException.class.isAssignableFrom(ex.getClass())) {
+            // if ResponseStatusException
+            if (ResponseStatusException.class.isAssignableFrom(ex.getClass())) {
+                status = ((ResponseStatusException) ex).getStatus();
+            }
+            // if SystemException
+            else if (SystemException.class.isAssignableFrom(ex.getClass())) {
                 status = ((SystemException) ex).getStatus();
             } else if (ex.getMessage().toLowerCase().contains("detached entity passed to persist")
                     || ex.getMessage().toLowerCase().contains("A different object with the same identifier value")) {

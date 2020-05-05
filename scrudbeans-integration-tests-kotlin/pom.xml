@@ -7,7 +7,7 @@
 	<parent>
         <groupId>com.github.manosbatsis.scrudbeans</groupId>
         <artifactId>scrudbeans</artifactId>
-        <version>0.23</version>
+        <version>0.24</version>
     </parent>
 
 	<properties>
