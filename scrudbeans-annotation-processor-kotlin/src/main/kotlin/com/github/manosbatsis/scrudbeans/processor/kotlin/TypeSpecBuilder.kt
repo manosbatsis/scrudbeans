@@ -1,6 +1,5 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin
 
-import com.github.manosbatsis.kotlin.utils.DtoInfo
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.DtoMapper
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory
@@ -8,9 +7,7 @@ import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBea
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService
-import com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATIOM_JSON_VALUE
-import com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATION_VND_API_PLUS_JSON_VALUE
-import com.github.manosbatsis.scrudbeans.api.util.Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE
+import com.github.manosbatsis.scrudbeans.api.util.Mimes.*
 import com.github.manosbatsis.scrudbeans.controller.AbstractDtoModelController
 import com.github.manosbatsis.scrudbeans.controller.AbstractModelServiceBackedController
 import com.github.manosbatsis.scrudbeans.controller.AbstractPersistableModelController
@@ -24,15 +21,11 @@ import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
 import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory
 import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
-import com.squareup.kotlinpoet.AnnotationSpec
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
+import com.github.manotbatsis.kotlin.utils.kapt.dto.DtoInputContext
+import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.KModifier.OVERRIDE
 import com.squareup.kotlinpoet.KModifier.PUBLIC
-import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.TypeSpec
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.apache.commons.lang3.StringUtils
 import org.atteo.evo.inflector.English
@@ -43,7 +36,7 @@ import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.Objects
+import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.persistence.Entity
 
@@ -282,12 +275,13 @@ internal class TypeSpecBuilder(
     }
 
     /** Create a DTO for the given model */
-    fun dtoSpecBuilder(stateInfo: ScrudModelDescriptor): TypeSpec.Builder {
-        return dtoSpecBuilder(DtoInfo(
-                stateInfo.typeElement,
-                stateInfo.typeElement.accessibleConstructorParameterFields(),
-                stateInfo.packageName,
-                listOf("io.swagger.v3.oas.annotations", "com.fasterxml.jackson.annotation")))
+    fun dtoSpecBuilder(stateInfo: ScrudModelDescriptor): TypeSpec {
+        return dtoSpec(DtoInputContext(
+                processingEnvironment = processingEnvironment,
+                originalTypeElement = stateInfo.typeElement,
+                fields = stateInfo.typeElement.accessibleConstructorParameterFields(),
+                //stateInfo.packageName,
+                copyAnnotationPackages = listOf("io.swagger.v3.oas.annotations", "com.fasterxml.jackson.annotation")))
     }
 
     /** Create a mapstruct-based mapper for non-generated DTOs */

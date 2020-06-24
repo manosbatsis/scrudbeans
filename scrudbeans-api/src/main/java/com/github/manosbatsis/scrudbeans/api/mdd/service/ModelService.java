@@ -20,11 +20,12 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.service;
 
-import com.github.manosbatsis.kotlin.utils.api.Dto;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
+
+import com.github.manotbatsis.kotlin.utils.api.Dto;
 
 /**
  * CRUD Service interface.

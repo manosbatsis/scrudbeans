@@ -20,16 +20,18 @@
  */
 package com.github.manosbatsis.scrudbeans.repository;
 
-import com.github.manosbatsis.kotlin.utils.api.Dto;
-import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.NoRepositoryBean;
+import java.io.Serializable;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.validation.ConstraintViolation;
-import java.io.Serializable;
-import java.util.Set;
+
+import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
+import com.github.manotbatsis.kotlin.utils.api.Dto;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.repository.NoRepositoryBean;
 
 /**
  * Generic repository that provides SCRUD and utility methods based on domain and id type variables.

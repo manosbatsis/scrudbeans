@@ -8,24 +8,12 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.EntityModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.WildcardTypeName
-import com.squareup.kotlinpoet.asTypeName
+import com.squareup.kotlinpoet.*
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
-import java.util.HashMap
-import java.util.LinkedList
-import java.util.Objects
-import java.util.Properties
-import javax.annotation.processing.AbstractProcessor
-import javax.annotation.processing.Filer
-import javax.annotation.processing.ProcessingEnvironment
-import javax.annotation.processing.RoundEnvironment
-import javax.annotation.processing.SupportedAnnotationTypes
-import javax.annotation.processing.SupportedSourceVersion
+import java.util.*
+import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Name
 import javax.lang.model.element.TypeElement
@@ -138,7 +126,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
      * @return the written file
      */
     private fun generateDto(descriptor: ScrudModelDescriptor): FileSpec? {
-        val typeSpec = typeSpecBuilder.dtoSpecBuilder(descriptor).build()
+        val typeSpec = typeSpecBuilder.dtoSpecBuilder(descriptor)
         return writeKotlinFile(descriptor, typeSpec, descriptor.packageName)
 
     }

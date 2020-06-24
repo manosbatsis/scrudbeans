@@ -20,7 +20,17 @@
  */
 package com.github.manosbatsis.scrudbeans.service;
 
-import com.github.manosbatsis.kotlin.utils.api.Dto;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.domain.event.EntityCreatedEvent;
@@ -30,11 +40,13 @@ import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistenc
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.specification.SpecificationUtils;
+import com.github.manotbatsis.kotlin.utils.api.Dto;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -47,12 +59,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.*;
 
 /**
  * SCRUD service handling a specific type using a {@link ModelRepository}
