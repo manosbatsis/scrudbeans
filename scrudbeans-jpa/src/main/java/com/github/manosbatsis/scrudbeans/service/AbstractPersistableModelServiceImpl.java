@@ -337,14 +337,14 @@ public class AbstractPersistableModelServiceImpl<T, PK extends Serializable, R e
 	 */
 	@Override
 	public Page<T> findPaginated(Specification<T> spec, @NonNull Pageable pageable) {
-		log.debug("findPaginated, pageable: {}", pageable);
+		LOGGER.debug("findPaginated, pageable: {}", pageable);
 		Page<T> page = null;
 		if (spec != null) {
 			page = this.repository.findAll(spec, pageable);
 		} else {
 			page = this.repository.findAll(pageable);
 		}
-		log.debug("findPaginated, page result count: {}", page.getTotalElements());
+		LOGGER.debug("findPaginated, page result count: {}", page.getTotalElements());
 		return page;
 	}
 
@@ -370,8 +370,8 @@ public class AbstractPersistableModelServiceImpl<T, PK extends Serializable, R e
 	 */
 	@Transactional(readOnly = false)
 	public void addMetadatum(PK subjectId, MetadatumModel dto) {
-		if (log.isDebugEnabled()) {
-			log.debug("addMetadatum subjectId: " + subjectId + ", metadatum: " + dto);
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("addMetadatum subjectId: " + subjectId + ", metadatum: " + dto);
 		}
 		//TODO
 		//this.repository.addMetadatum(subjectId, dto.getPredicate(),dto.getObject());
@@ -391,8 +391,8 @@ public class AbstractPersistableModelServiceImpl<T, PK extends Serializable, R e
 
 	@Transactional(readOnly = false)
 	public void removeMetadatum(PK subjectId, String predicate) {
-		if (log.isDebugEnabled()) {
-			log.debug("removeMetadatum subjectId: " + subjectId + ", predicate: "
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("removeMetadatum subjectId: " + subjectId + ", predicate: "
 					+ predicate);
 		}
 		// TODO
@@ -415,7 +415,7 @@ public class AbstractPersistableModelServiceImpl<T, PK extends Serializable, R e
 	@Transactional(readOnly = false)
 	public T updateFiles(@PathVariable PK id, MultipartHttpServletRequest request, HttpServletResponse response) {
 		T entity = this.findById(id);
-		log.debug("Entity before uploading files: {}", entity);
+		LOGGER.debug("Entity before uploading files: {}", entity);
 		try {
 			String basePath = new StringBuffer(this.getDomainClass().getSimpleName())
 					.append('/').append(id).append('/').toString();
@@ -441,7 +441,7 @@ public class AbstractPersistableModelServiceImpl<T, PK extends Serializable, R e
 		// return the updated entity
 		entity = this.update(entity);
 
-		log.debug("Entity after uploading files: {}", entity);
+		LOGGER.debug("Entity after uploading files: {}", entity);
 		return entity;
 	}
 

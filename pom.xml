@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.manosbatsis.scrudbeans</groupId>
     <artifactId>scrudbeans</artifactId>
-    <version>0.25</version><!--scrudbeans -->
+    <version>0.26-SNAPSHOT</version><!--scrudbeans -->
     <packaging>pom</packaging>
     <inceptionYear>2016</inceptionYear>
     <name>scrudbeans</name>
@@ -89,7 +89,7 @@
 
         <kotlin.version>1.2.71</kotlin.version>
         <kotlinpoet.version>1.5.0</kotlinpoet.version>
-        <kotlin-utils.version>0.19</kotlin-utils.version>
+        <kotlin-utils.version>0.20-SNAPSHOT</kotlin-utils.version>
         <kotlin.compiler.jvmTarget>${java.version}</kotlin.compiler.jvmTarget>
         <kotlin.apiVersion>1.2</kotlin.apiVersion>
         <kotlin.languageVersion>1.2</kotlin.languageVersion>

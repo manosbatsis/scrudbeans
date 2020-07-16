@@ -177,6 +177,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * {@inheritDoc}
 	 * @deprecated use {@link #create(T)}
 	 */
+	@Transactional
 	@Override
 	public <S extends T> S save(@NonNull S entity) {
 		this.validate(entity);
@@ -188,6 +189,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
+	@Transactional
 	@Override
 	public T create(@NonNull T entity) {
 		return this.save(entity);
@@ -196,6 +198,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
+	@Transactional
 	@Override
 	public T create(@NonNull Dto<T> dto) {
 		return this.save(dto.toTargetType());
@@ -204,6 +207,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
+	@Transactional
 	@Override
 	public T update(@NonNull T resource) {
 		String[] ignored = {this.entityInformation.getIdAttribute().getName()};
@@ -213,6 +217,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
+	@Transactional
 	@Override
 	public T update(@NonNull Dto<T> dto) {
 		return this.patch(dto);
@@ -221,6 +226,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
+	@Transactional
 	@Override
 	public T patch(@NonNull @P("resource") T delta) {
 		// update it by copying all non-null properties from the given transient instance
@@ -241,6 +247,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
+	@Transactional
 	@Override
 	public T patch(@NonNull @P("resource") Dto<T> delta) {
 
@@ -298,6 +305,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
+	@Transactional
 	@Override
 	public <S extends T> S saveAndFlush(S entity) {
 		this.validate(entity);
@@ -309,6 +317,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
+	@Transactional(readOnly = true)
 	@Override
 	public Set<ConstraintViolation<T>> validateConstraints(T resource) {
         LOGGER.debug("validateConstraints, validator: {}, resource: {}", validator, resource);
@@ -349,6 +358,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * @param <RT>
 	 * @return
 	 */
+	@Transactional(readOnly = true)
 	@Override
 	public <RT> RT findRelatedEntityByOwnId(@NonNull PK id, @NonNull FieldInfo fieldInfo) {
 		if (!fieldInfo.getFieldMappingType().isToOne()) {
@@ -442,6 +452,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 */
 	@Deprecated
 	@Override
+	@Transactional
 	public void delete(T entity) {
 		super.delete(entity);
 		throw new UnsupportedOperationException("Signature without explicit ID is not supported");

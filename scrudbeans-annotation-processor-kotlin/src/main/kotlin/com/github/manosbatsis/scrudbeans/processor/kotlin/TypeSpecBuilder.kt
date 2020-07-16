@@ -21,7 +21,7 @@ import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
 import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory
 import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
-import com.github.manotbatsis.kotlin.utils.kapt.dto.DtoInputContext
+import com.github.manotbatsis.kotlin.utils.kapt.processor.SimpleAnnotatedElementInfo
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.KModifier.OVERRIDE
 import com.squareup.kotlinpoet.KModifier.PUBLIC
@@ -36,6 +36,7 @@ import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.io.File
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.persistence.Entity
@@ -275,13 +276,35 @@ internal class TypeSpecBuilder(
     }
 
     /** Create a DTO for the given model */
-    fun dtoSpecBuilder(stateInfo: ScrudModelDescriptor): TypeSpec {
+    fun dtoSpecBuilder(stateInfo: ScrudModelDescriptor, sourceRootFile: File): TypeSpec {
+
+        val elementInfo = SimpleAnnotatedElementInfo(
+                processingEnvironment = processingEnvironment,
+                primaryTargetTypeElement = stateInfo.typeElement,
+                primaryTargetTypeElementFields = stateInfo.typeElement.accessibleConstructorParameterFields(),
+                annotation = stateInfo.typeElement.getAnnotationMirror(ScrudBean::class.java),
+                ignoreProperties = emptyList(),
+                copyAnnotationPackages = listOf("io.swagger.v3.oas.annotations", "com.fasterxml.jackson.annotation"),
+                sourceRoot = sourceRootFile,
+                generatedPackageName = stateInfo.packageName,
+                mixinTypeElement = null,
+                mixinTypeElementFields = emptyList(),
+                mixinTypeElementSimpleName = null,
+                secondaryTargetTypeElement = null,
+                secondaryTargetTypeElementFields = emptyList(),
+                secondaryTargetTypeElementSimpleName = null
+        )
+        val dtoStrategy = ScrudBeansDtoStrategy(elementInfo)
+        return dtoStrategy.dtoTypeSpec()
+        /*
         return dtoSpec(DtoInputContext(
                 processingEnvironment = processingEnvironment,
                 originalTypeElement = stateInfo.typeElement,
                 fields = stateInfo.typeElement.accessibleConstructorParameterFields(),
                 //stateInfo.packageName,
                 copyAnnotationPackages = listOf("io.swagger.v3.oas.annotations", "com.fasterxml.jackson.annotation")))
+
+         */
     }
 
     /** Create a mapstruct-based mapper for non-generated DTOs */

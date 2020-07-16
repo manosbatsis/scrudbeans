@@ -27,7 +27,8 @@ import org.hibernate.annotations.Formula
  */
 abstract class AbstractHibernateKPersistable<PK> : KPersistable<PK>{
 
+
     @Formula(" true ")
-    private var persisted: Boolean = false
+    var persisted: Boolean = false
     override fun isNew(): Boolean = !persisted
 }

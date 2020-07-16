@@ -126,7 +126,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
      * @return the written file
      */
     private fun generateDto(descriptor: ScrudModelDescriptor): FileSpec? {
-        val typeSpec = typeSpecBuilder.dtoSpecBuilder(descriptor)
+        val typeSpec = typeSpecBuilder.dtoSpecBuilder(descriptor, sourceRootFile)
         return writeKotlinFile(descriptor, typeSpec, descriptor.packageName)
 
     }
