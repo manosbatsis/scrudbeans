@@ -20,37 +20,6 @@
  */
 package com.github.manosbatsis.scrudbeans.repository;
 
-import static org.springframework.data.jpa.repository.query.QueryUtils.DELETE_ALL_QUERY_STRING;
-import static org.springframework.data.jpa.repository.query.QueryUtils.applyAndBind;
-import static org.springframework.data.jpa.repository.query.QueryUtils.getQueryString;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.persistence.EntityGraph;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Subgraph;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.CriteriaUpdate;
-import javax.persistence.criteria.JoinType;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.persistence.criteria.Selection;
-import javax.persistence.metamodel.SingularAttribute;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.NotNull;
-
 import com.github.manosbatsis.scrudbeans.api.domain.DisableableModel;
 import com.github.manosbatsis.scrudbeans.api.domain.KPersistable;
 import com.github.manosbatsis.scrudbeans.api.exception.BeanValidationException;
@@ -64,7 +33,6 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -77,6 +45,18 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import javax.persistence.*;
+import javax.persistence.criteria.*;
+import javax.persistence.metamodel.SingularAttribute;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static org.springframework.data.jpa.repository.query.QueryUtils.*;
 
 public class ModelRepositoryImpl<T, PK extends Serializable>
 		extends SimpleJpaRepository<T, PK>
@@ -177,7 +157,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * {@inheritDoc}
 	 * @deprecated use {@link #create(T)}
 	 */
-	@Transactional
+	@Transactional(readOnly = false)
 	@Override
 	public <S extends T> S save(@NonNull S entity) {
 		this.validate(entity);
@@ -189,7 +169,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
-	@Transactional
+	@Transactional(readOnly = false)
 	@Override
 	public T create(@NonNull T entity) {
 		return this.save(entity);
@@ -198,7 +178,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
-	@Transactional
+	@Transactional(readOnly = false)
 	@Override
 	public T create(@NonNull Dto<T> dto) {
 		return this.save(dto.toTargetType());
@@ -207,7 +187,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
-	@Transactional
+	@Transactional(readOnly = false)
 	@Override
 	public T update(@NonNull T resource) {
 		String[] ignored = {this.entityInformation.getIdAttribute().getName()};
@@ -217,7 +197,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
-	@Transactional
+	@Transactional(readOnly = false)
 	@Override
 	public T update(@NonNull Dto<T> dto) {
 		return this.patch(dto);
@@ -226,7 +206,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
-	@Transactional
+	@Transactional(readOnly = false)
 	@Override
 	public T patch(@NonNull @P("resource") T delta) {
 		// update it by copying all non-null properties from the given transient instance
@@ -247,7 +227,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
-	@Transactional
+	@Transactional(readOnly = false)
 	@Override
 	public T patch(@NonNull @P("resource") Dto<T> delta) {
 
@@ -305,7 +285,7 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	/***
 	 * {@inheritDoc}
 	 */
-	@Transactional
+	@Transactional(readOnly = false)
 	@Override
 	public <S extends T> S saveAndFlush(S entity) {
 		this.validate(entity);
@@ -436,8 +416,8 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * (non-Javadoc)
 	 * @see org.springframework.data.repository.CrudRepository#delete(java.io.Serializable)
 	 */
+	@Transactional(readOnly = false)
 	@Override
-	@Transactional
 	public void deleteById(PK id) {
 		if (this.disableableDomainClass) {
 			this.softDelete(id);
@@ -451,8 +431,8 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
      * @deprecated use #delete(java.io.Serializable, com.github.manosbatsis.scrudbeans.api.domain.Persistable)
 	 */
 	@Deprecated
+	@Transactional(readOnly = false)
 	@Override
-	@Transactional
 	public void delete(T entity) {
 		super.delete(entity);
 		throw new UnsupportedOperationException("Signature without explicit ID is not supported");
@@ -462,8 +442,8 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * (non-Javadoc)
 	 * @see org.springframework.data.repository.CrudRepository#delete(java.lang.Iterable)
 	 */
+	@Transactional(readOnly = false)
 	@Override
-	@Transactional
 	public void deleteAll(@NotNull Iterable<? extends T> entities) {
 		if (this.disableableDomainClass) {
 			IdentifierAdapter<T, PK> idAdapter =
@@ -479,8 +459,8 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * (non-Javadoc)
 	 * @see org.springframework.data.jpa.repository.JpaRepository#deleteInBatch(java.lang.Iterable)
 	 */
+	@Transactional(readOnly = false)
 	@Override
-	@Transactional
 	public void deleteInBatch(Iterable<T> entities) {
 		if (this.disableableDomainClass) {
             if (!entities.iterator().hasNext()) {
@@ -498,8 +478,8 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * (non-Javadoc)
 	 * @see org.springframework.data.repository.Repository#deleteAll()
 	 */
+	@Transactional(readOnly = false)
 	@Override
-	@Transactional
 	public void deleteAll() {
 		for (T element : findAll()) {
 			delete(element);
@@ -510,8 +490,8 @@ public class ModelRepositoryImpl<T, PK extends Serializable>
 	 * (non-Javadoc)
 	 * @see org.springframework.data.jpa.repository.JpaRepository#deleteAllInBatch()
      */
-    @Override
-    @Transactional
+	@Transactional(readOnly = false)
+	@Override
     public void deleteAllInBatch() {
         em.createQuery(
                 getQueryString(DELETE_ALL_QUERY_STRING, entityInformation.getEntityName()))
