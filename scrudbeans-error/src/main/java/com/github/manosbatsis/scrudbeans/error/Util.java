@@ -75,6 +75,7 @@ public class Util {
         exceptionStatuses.put(MissingServletRequestPartException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
         exceptionStatuses.put(BindException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
         exceptionStatuses.put(NoHandlerFoundException.class.getCanonicalName(), HttpServletResponse.SC_NOT_FOUND);
+        exceptionStatuses.put("com.github.manosbatsis.vaultaire.service.node.NotFoundException", HttpServletResponse.SC_NOT_FOUND);
         exceptionStatuses.put(AsyncRequestTimeoutException.class.getCanonicalName(), HttpServletResponse.SC_SERVICE_UNAVAILABLE);
         exceptionStatuses.put(RuntimeException.class.getCanonicalName(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         exceptionStatuses.put(Exception.class.getCanonicalName(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
