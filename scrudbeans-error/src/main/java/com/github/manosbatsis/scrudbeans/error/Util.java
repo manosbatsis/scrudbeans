@@ -29,6 +29,7 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
+import org.springframework.web.util.NestedServletException;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
@@ -110,6 +111,10 @@ public class Util {
     public static HttpStatus getHttpStatus(Throwable ex) {
         HttpStatus status = null;
         if (ex != null) {
+            // Unwrap if nested
+            if(NestedServletException.class.isAssignableFrom(ex.getClass())){
+                ex = ex.getCause();
+            }
             // if ResponseStatusException
             if (ResponseStatusException.class.isAssignableFrom(ex.getClass())) {
                 status = ((ResponseStatusException) ex).getStatus();
@@ -133,6 +138,8 @@ public class Util {
         Integer statusCode = null;
         while (statusCode == null) {
             statusCode = exceptionStatuses.get(exceptionClass.getCanonicalName());
+
+            LOGGER.debug("getStandardExceptionHttpStatus: {} for {}", statusCode, exceptionClass.getCanonicalName());
             if (statusCode == null) {
                 exceptionClass = exceptionClass.getSuperclass();
             }

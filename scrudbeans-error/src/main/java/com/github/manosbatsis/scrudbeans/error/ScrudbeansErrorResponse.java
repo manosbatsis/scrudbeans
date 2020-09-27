@@ -19,15 +19,6 @@
  */
 package com.github.manosbatsis.scrudbeans.error;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.security.Principal;
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.manosbatsis.scrudbeans.api.error.ConstraintViolationEntry;
@@ -39,7 +30,6 @@ import lombok.Data;
 import lombok.NonNull;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -48,6 +38,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.ServletWebRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.security.Principal;
+import java.util.*;
 
 
 @Schema(name = "Error", description = "Created exclusively by the system " +
@@ -107,7 +105,7 @@ public class ScrudbeansErrorResponse implements Error {
                 stackTrace.flush();
                 this.exceptionStacktrace = stackTrace.toString();
             }
-            if (Objects.isNull(status)) {
+            if (Objects.isNull(status) || status.equals(HttpStatus.INTERNAL_SERVER_ERROR)) {
                 status = Util.getHttpStatus(throwable);
             }
 

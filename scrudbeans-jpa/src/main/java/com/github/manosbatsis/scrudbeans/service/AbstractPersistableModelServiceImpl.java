@@ -20,17 +20,6 @@
  */
 package com.github.manosbatsis.scrudbeans.service;
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolation;
-
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.domain.event.EntityCreatedEvent;
@@ -40,13 +29,14 @@ import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.FilePersistenc
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.specification.SpecificationUtils;
+import com.github.manosbatsis.scrudbeans.specification.SpecificationsBuilder;
 import com.github.manotbatsis.kotlin.utils.api.Dto;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,6 +50,12 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.ConstraintViolation;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.*;
+
 /**
  * SCRUD service handling a specific type using a {@link ModelRepository}
  *
@@ -70,14 +66,20 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 @Slf4j
 public class AbstractPersistableModelServiceImpl<T, PK extends Serializable, R extends ModelRepository<T, PK>>
 		extends AbstractBaseServiceImpl
-		implements PersistableModelService<T, PK> {
+		implements PersistableModelService<T, PK>, InitializingBean {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractPersistableModelServiceImpl.class);
 
 	protected R repository;
+	private SpecificationsBuilder<T, PK> specificationsBuilder;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		this.specificationsBuilder = new SpecificationsBuilder<T, PK>(
+				this.getDomainClass(), this.getConversionService());
+	}
 
 	@SuppressWarnings("SpringJavaAutowiringInspection")
-
 	@Autowired
 	public void setRepository(R repository) {
 		this.repository = repository;
@@ -346,6 +348,14 @@ public class AbstractPersistableModelServiceImpl<T, PK extends Serializable, R e
 		}
 		LOGGER.debug("findPaginated, page result count: {}", page.getTotalElements());
 		return page;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Page<T> findPaginated(Map<String, String[]> searchTerms, @NonNull Pageable pageable) {
+		return findPaginated(this.specificationsBuilder.build(searchTerms), pageable);
 	}
 
 

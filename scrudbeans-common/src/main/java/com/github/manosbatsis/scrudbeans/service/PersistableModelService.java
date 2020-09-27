@@ -38,6 +38,7 @@ import javax.validation.ConstraintViolation;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 //import com.github.manosbatsis.scrudbeans.api.domain.users.model.User;
@@ -89,6 +90,15 @@ public interface PersistableModelService<T, PK extends Serializable>
 	 * @return resources
 	 */
 	Page<T> findPaginated(Specification<T> spec, Pageable pageRequest);
+
+	/**
+	 * Find resources page-by-page
+	 *
+	 * @param searchTerms the search terms to convert into a specification
+	 * @param pageRequest page request
+	 * @return resources
+	 */
+	Page<T> findPaginated(Map<String, String[]> searchTerms, Pageable pageRequest);
 
     /**
      * Find the other end of a ToOne relationship
