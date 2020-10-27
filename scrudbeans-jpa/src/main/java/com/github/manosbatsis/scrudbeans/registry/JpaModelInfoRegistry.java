@@ -33,6 +33,8 @@ import com.github.manosbatsis.scrudbeans.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.util.EntityUtil;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -59,6 +61,7 @@ import java.util.*;
 public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor, EnvironmentAware, ModelInfoRegistry {
 
 	public static final String BEAN_NAME = "modelInfoRegistry";
+	private static final Logger log = LoggerFactory.getLogger(JpaModelInfoRegistry.class);
 
 	//private ApplicationContext applicationContext;
 	private ScrudBeansProperties scrudBeansProperties;
@@ -283,6 +286,6 @@ public class JpaModelInfoRegistry implements BeanDefinitionRegistryPostProcessor
 	private ScrudBeansProperties buildScrudBeansProperties(ConfigurableEnvironment environment) {
 		Iterable<ConfigurationPropertySource> sources = ConfigurationPropertySources.from(environment.getPropertySources());
 		Binder binder = new Binder(sources);
-		return binder.bind("scrudbeans", ScrudBeansProperties.class).orElseCreate(ScrudBeansProperties.class);
+		return binder.bind("scrudbeans", ScrudBeansProperties.class).orElse(new ScrudBeansProperties());
 	}
 }

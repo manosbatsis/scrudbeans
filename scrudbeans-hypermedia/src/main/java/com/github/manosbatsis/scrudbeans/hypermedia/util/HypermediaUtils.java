@@ -37,6 +37,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.BasicLinkBuilder;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -53,31 +54,32 @@ public class HypermediaUtils {
     public static List<Link> buileHateoasLinks(@NonNull ParamsAwarePage page, @NonNull HttpServletRequest request, @NonNull String pageNumberParamName) {
         List<Link> links = new LinkedList<>();
 		UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(request.getRequestURL() + "?" + request.getQueryString());
+        UriComponents uriComponents = uriComponentsBuilder.build();
 		// add first
 		if (!page.isFirst()) {
             uriComponentsBuilder.replaceQueryParam(pageNumberParamName, 0);
             // create the link builder
-            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder, Collections.emptyList()).withRel("first"));
+            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponents, Collections.emptyList()).withRel("first"));
         }
 		// add previous
 		if (page.hasPrevious()) {
             uriComponentsBuilder.replaceQueryParam(pageNumberParamName, 1);
             // create the link builder
-            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder, Collections.emptyList()).withRel("previous"));
+            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponents, Collections.emptyList()).withRel("previous"));
         }
 
 		// add next
 		if (page.hasNext()) {
             uriComponentsBuilder.replaceQueryParam(pageNumberParamName, page.getNumber() + 1);
             // create the link builder
-            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder, Collections.emptyList()).withRel("next"));
+            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponents, Collections.emptyList()).withRel("next"));
         }
 
         // add last
         if (!page.isLast()) {
             uriComponentsBuilder.replaceQueryParam(pageNumberParamName, page.getTotalPages() - 1);
             // create the link builder
-            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponentsBuilder, Collections.emptyList()).withRel("last"));
+            links.add(new UriComponentsBuilderAdapterLinkBuilder(uriComponents, Collections.emptyList()).withRel("last"));
         }
         return links;
     }
@@ -117,7 +119,6 @@ public class HypermediaUtils {
         Class<RT> modelType = (modelInfo != null) ? modelInfo.getModelType() : (Class<RT>) model.getClass();
         ModelResource<RT> resource = new ModelResource<>(modelInfo.getUriComponent(), model);
         List<Link> links = HypermediaUtils.buileHateoasLinks(model, modelInfo);
-        log.debug("toHateoasResource, model: {}, modelType: {}, modelInfo: {}", model, modelType, modelInfo);
         if (CollectionUtils.isNotEmpty(links)) {
             resource.add(links);
         }
@@ -130,7 +131,6 @@ public class HypermediaUtils {
      * @param models
      */
     public static <RT> ModelResources<RT> toHateoasResources(@NonNull Iterable<RT> models, Class<RT> modelType, ModelInfoRegistry modelInfoRegistry) {
-        log.debug("toHateoasResources");
         LinkedList<ModelResource<RT>> wrapped = new LinkedList<>();
         ModelInfo modelInfo;
         modelInfo = modelInfoRegistry.getEntryFor(modelType);
@@ -148,8 +148,6 @@ public class HypermediaUtils {
      * @return
      */
     public static <RT, RID extends Serializable> JsonApiModelResourceDocument<RT, RID> toDocument(RT model, ModelInfo<RT, RID> modelInfo) {
-        log.debug("toDocument");
-
         JsonApiModelResourceDocument<RT, RID> doc = new JsonApiModelBasedDocumentBuilder<RT, RID>(modelInfo.getUriComponent())
                 .withData(model)
                 .buildModelDocument();

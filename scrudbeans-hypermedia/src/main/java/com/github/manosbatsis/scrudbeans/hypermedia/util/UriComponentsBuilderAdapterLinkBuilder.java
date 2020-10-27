@@ -23,6 +23,7 @@ package com.github.manosbatsis.scrudbeans.hypermedia.util;
 import org.springframework.hateoas.Affordance;
 import org.springframework.hateoas.server.LinkBuilder;
 import org.springframework.hateoas.server.core.LinkBuilderSupport;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
@@ -35,10 +36,10 @@ public class UriComponentsBuilderAdapterLinkBuilder extends LinkBuilderSupport<U
     /**
      * Creates a new {@link UriComponentsBuilderAdapterLinkBuilder} using the given {@link UriComponentsBuilder}.
      *
-     * @param builder must not be {@literal null}.
+     * @param components must not be {@literal null}.
      */
-    public UriComponentsBuilderAdapterLinkBuilder(UriComponentsBuilder builder, List<Affordance> affordances) {
-        super(builder, affordances);
+    public UriComponentsBuilderAdapterLinkBuilder(UriComponents components, List<Affordance> affordances) {
+        super(components, affordances);
     }
 
 
@@ -53,12 +54,12 @@ public class UriComponentsBuilderAdapterLinkBuilder extends LinkBuilderSupport<U
     /**
      * Creates a new instance
      *
-     * @param builder will never be {@literal null}.
+     * @param components will never be {@literal null}.
      * @return
      */
     @Override
-    protected UriComponentsBuilderAdapterLinkBuilder createNewInstance(UriComponentsBuilder builder, List<Affordance> affordances) {
-        return new UriComponentsBuilderAdapterLinkBuilder(builder, affordances);
+    protected UriComponentsBuilderAdapterLinkBuilder createNewInstance(UriComponents components, List<Affordance> affordances) {
+        return new UriComponentsBuilderAdapterLinkBuilder(components, affordances);
 	}
 
 }
