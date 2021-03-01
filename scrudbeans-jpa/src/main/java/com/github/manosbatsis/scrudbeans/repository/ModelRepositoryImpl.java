@@ -20,6 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.repository;
 
+import com.github.manosbatsis.kotlin.utils.api.Dto;
 import com.github.manosbatsis.scrudbeans.api.domain.DisableableModel;
 import com.github.manosbatsis.scrudbeans.api.domain.KPersistable;
 import com.github.manosbatsis.scrudbeans.api.exception.BeanValidationException;
@@ -27,7 +28,6 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry;
 import com.github.manosbatsis.scrudbeans.util.EntityUtil;
-import com.github.manotbatsis.kotlin.utils.api.Dto;
 import lombok.NonNull;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.hibernate.engine.spi.SessionImplementor;

@@ -1,6 +1,7 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin
 
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
+import com.github.manosbatsis.kotlin.utils.kapt.processor.SimpleAnnotatedElementInfo
 import com.github.manosbatsis.scrudbeans.api.DtoMapper
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean
@@ -21,8 +22,8 @@ import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
 import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory
 import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
-import com.github.manotbatsis.kotlin.utils.kapt.processor.SimpleAnnotatedElementInfo
 import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.KModifier.OPEN
 import com.squareup.kotlinpoet.KModifier.OVERRIDE
 import com.squareup.kotlinpoet.KModifier.PUBLIC
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -210,7 +211,7 @@ internal class TypeSpecBuilder(
                                 descriptor.idClassName,
                                 ClassName(descriptor.parentPackageName + ".repository", descriptor.simpleName + "Repository")))
                 .addSuperinterface(ClassName(descriptor.parentPackageName + ".service", interfaceClassName))
-                .addModifiers(KModifier.PUBLIC)
+                .addModifiers(PUBLIC, OPEN)
                 .build()
     }
 

@@ -20,6 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.service;
 
+import com.github.manosbatsis.kotlin.utils.api.Dto;
 import com.github.manosbatsis.scrudbeans.api.domain.MetadatumModel;
 import com.github.manosbatsis.scrudbeans.api.domain.UploadedFileModel;
 import com.github.manosbatsis.scrudbeans.api.domain.event.EntityCreatedEvent;
@@ -30,7 +31,6 @@ import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.specification.SpecificationUtils;
 import com.github.manosbatsis.scrudbeans.specification.SpecificationsBuilder;
-import com.github.manotbatsis.kotlin.utils.api.Dto;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
