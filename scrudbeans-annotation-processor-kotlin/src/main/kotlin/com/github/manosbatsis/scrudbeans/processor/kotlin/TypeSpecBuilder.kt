@@ -23,9 +23,7 @@ import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicate
 import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
 import com.squareup.kotlinpoet.*
-import com.squareup.kotlinpoet.KModifier.OPEN
-import com.squareup.kotlinpoet.KModifier.OVERRIDE
-import com.squareup.kotlinpoet.KModifier.PUBLIC
+import com.squareup.kotlinpoet.KModifier.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.apache.commons.lang3.StringUtils
@@ -293,7 +291,8 @@ internal class TypeSpecBuilder(
                 mixinTypeElementSimpleName = null,
                 secondaryTargetTypeElement = null,
                 secondaryTargetTypeElementFields = emptyList(),
-                secondaryTargetTypeElementSimpleName = null
+                secondaryTargetTypeElementSimpleName = null,
+                isNonDataClass = false
         )
         val dtoStrategy = ScrudBeansDtoStrategy(elementInfo)
         return dtoStrategy.dtoTypeSpec()
