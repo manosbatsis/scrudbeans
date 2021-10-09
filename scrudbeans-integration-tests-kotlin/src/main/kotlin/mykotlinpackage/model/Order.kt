@@ -1,23 +1,21 @@
 package mykotlinpackage.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.github.manosbatsis.scrudbeans.api.domain.AbstractBaseEntityWithUuidId
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.model.AbstractHibernateKPersistable
 import com.github.manosbatsis.scrudbeans.validation.Unique
 import io.swagger.v3.oas.annotations.media.Schema
 import mykotlinpackage.dto.OrderUpdateEmailDTO
-import org.hibernate.annotations.GenericGenerator
 import org.javers.core.metamodel.annotation.DiffIgnore
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import org.springframework.format.annotation.DateTimeFormat
 import java.time.LocalDateTime
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.EntityListeners
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
 import javax.persistence.Table
 import javax.validation.constraints.NotNull
 
@@ -27,12 +25,9 @@ import javax.validation.constraints.NotNull
 @EntityListeners(AuditingEntityListener::class)
 @ScrudBean(dtoTypes = [OrderUpdateEmailDTO::class], dtoTypeNames = ["mykotlinpackage.dto.OrderUpdateCommentDTO"])
 @Schema(name = "Order", description = "A model representing an order of product items")
-data class Order(
+class Order(
 
-        @field:Id
-        @field:GeneratedValue(generator = "system-uuid")
-        @field:GenericGenerator(name = "system-uuid", strategy = "uuid2")
-        override var id: String? = null,
+        id: UUID? = null,
 
         @field:NotNull
         @field:Column(nullable = false)
@@ -60,5 +55,5 @@ data class Order(
         var lastModifiedDate: LocalDateTime? = null
 
 
-) : AbstractHibernateKPersistable<String>() {
+) : AbstractBaseEntityWithUuidId(id) {
 }

@@ -28,7 +28,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.domain.Persistable;
 
 import javax.persistence.MappedSuperclass;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 /**
@@ -36,7 +35,6 @@ import java.io.Serializable;
  *
  * @param <PK> The id Serializable
  */
-@XmlRootElement
 @MappedSuperclass
 @Unique
 @EqualsAndHashCode

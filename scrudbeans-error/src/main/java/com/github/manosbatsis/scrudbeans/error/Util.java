@@ -35,7 +35,6 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.ValidationException;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,7 +66,6 @@ public class Util {
         exceptionStatuses.put("org.springframework.dao.DataIntegrityViolationException", HttpServletResponse.SC_BAD_REQUEST);
         exceptionStatuses.put(MissingServletRequestParameterException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
         exceptionStatuses.put(ServletRequestBindingException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
-        exceptionStatuses.put(ValidationException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
         exceptionStatuses.put(ConversionNotSupportedException.class.getCanonicalName(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         exceptionStatuses.put(TypeMismatchException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);
         exceptionStatuses.put(HttpMessageNotReadableException.class.getCanonicalName(), HttpServletResponse.SC_BAD_REQUEST);

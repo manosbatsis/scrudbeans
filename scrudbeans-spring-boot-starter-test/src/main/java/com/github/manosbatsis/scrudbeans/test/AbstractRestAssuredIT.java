@@ -30,12 +30,14 @@ import io.restassured.config.ObjectMapperConfig;
 import io.restassured.config.RestAssuredConfig;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
+import io.restassured.mapper.factory.Jackson2ObjectMapperFactory;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
-
 import org.springframework.boot.web.server.LocalServerPort;
+
+import java.lang.reflect.Type;
 
 //import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 //import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -95,24 +97,29 @@ public abstract class AbstractRestAssuredIT {
 		// configure our object mapper
 		RestAssured.config = RestAssuredConfig.config().objectMapperConfig(
 				// config object mapper
-				new ObjectMapperConfig().jackson2ObjectMapperFactory((type, s) -> {
-					ObjectMapper objectMapper = new ObjectMapper()
-							//.registerModule(new ParameterNamesModule())
-							//.registerModule(new Jdk8Module())
-							//.registerModule(new JavaTimeModule())
-							;
+				new ObjectMapperConfig().jackson2ObjectMapperFactory(
+						new Jackson2ObjectMapperFactory() {
+							@Override
+							public ObjectMapper create(Type type, String s) {
+								ObjectMapper objectMapper = new ObjectMapper()
+										//.registerModule(new ParameterNamesModule())
+										//.registerModule(new Jdk8Module())
+										//.registerModule(new JavaTimeModule())
+										;
 
-					// Disable features
-					objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-					objectMapper.configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
-					objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
-					objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
-					objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-					// enable features
-					objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
+								// Disable features
+								objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+								objectMapper.configure(DeserializationFeature.READ_DATE_TIMESTAMPS_AS_NANOSECONDS, false);
+								objectMapper.configure(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE, false);
+								objectMapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+								objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+								// enable features
+								objectMapper.configure(MapperFeature.DEFAULT_VIEW_INCLUSION, true);
 
-					return objectMapper;
-				}));
+								return objectMapper;
+							}
+						}
+				));
 	}
 
 }

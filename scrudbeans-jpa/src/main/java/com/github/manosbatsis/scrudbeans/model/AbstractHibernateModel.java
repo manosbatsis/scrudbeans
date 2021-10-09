@@ -26,7 +26,6 @@ import lombok.ToString;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.MappedSuperclass;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 /**
@@ -34,7 +33,6 @@ import java.io.Serializable;
  *
  * @param <PK> The id Serializable
  */
-@XmlRootElement
 @MappedSuperclass
 @Unique
 @EqualsAndHashCode

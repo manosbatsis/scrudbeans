@@ -21,13 +21,10 @@
 package com.github.manosbatsis.scrudbeans.error;
 
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.core.PriorityOrdered;
@@ -38,6 +35,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -66,10 +65,11 @@ public class ScrudbeansErrorAttributes
 	}
 
 	@Override
-	public Map<String, Object> getErrorAttributes(WebRequest request, boolean includeStackTrace) {
+	public Map<String, Object> getErrorAttributes(WebRequest request, ErrorAttributeOptions options) {
 		Map<String, Object> errorAttributes = new HashMap<String, Object>();
 		Throwable throwable = getError(request);
 		printRequestProps(request);
+		boolean includeStackTrace = options.isIncluded(ErrorAttributeOptions.Include.EXCEPTION);
 		ScrudbeansErrorResponse errorResponse = getErrorResponse(request, throwable, includeStackTrace);
 		errorAttributes.put("message", errorResponse.getMessage());
 		errorAttributes.put("remoteAddress", errorResponse.getRemoteAddress());

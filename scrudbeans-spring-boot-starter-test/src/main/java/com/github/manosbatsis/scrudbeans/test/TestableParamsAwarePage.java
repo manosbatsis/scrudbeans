@@ -1,18 +1,17 @@
 package com.github.manosbatsis.scrudbeans.test;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-import com.github.manosbatsis.scrudbeans.api.util.ParamsAwarePage;
-import lombok.Data;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An basic {@link Page} implementation used for JSON deserialization during tests, e.g.:
@@ -20,7 +19,7 @@ import org.springframework.data.domain.Sort;
  * // Somewhere in your test class:
  * public static class ProductsPage extends TestableParamsAwarePage<Product> { }
  *
- * // Later in a test method, using restassured:
+ * // Later in a test method, e.g. using restassured:
  * ProductsPage products = given()
  * 		.spec(defaultSpec())
  * 		.queryParam("name", "LOTR %")
@@ -31,84 +30,45 @@ import org.springframework.data.domain.Sort;
  *
  * @param <T> the model type
  */
-@Data
-public class TestableParamsAwarePage<T> implements ParamsAwarePage<T> {
-
-	private int size;
-
-	private int number;
-
-	private int totalPages;
-
-	private int numberOfElements;
-
-	private long totalElements;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class TestableParamsAwarePage<T> extends PageImpl<T> {
 
 	private Map<String, String[]> parameters;
 
-	private List<T> content;
-
-
-	@Override
-	public boolean hasContent() {
-		return this.content != null && !this.content.isEmpty();
+	@JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+	public TestableParamsAwarePage(@JsonProperty("content") List<T> content,
+							@JsonProperty("number") int number,
+							@JsonProperty("size") int size,
+							@JsonProperty("totalElements") Long totalElements,
+							@JsonProperty("pageable") JsonNode pageable,
+							@JsonProperty("last") boolean last,
+							@JsonProperty("totalPages") int totalPages,
+							@JsonProperty("sort") JsonNode sort,
+							@JsonProperty("first") boolean first,
+							@JsonProperty("numberOfElements") int numberOfElements,
+							Map<String, String[]> parameters
+	) {
+		super(content, PageRequest.of(number, size), totalElements);
+		this.parameters = parameters;
 	}
 
-	@Override
-	public Sort getSort() {
-		return Sort.by(Sort.DEFAULT_DIRECTION);
+	public TestableParamsAwarePage(List<T> content, Pageable pageable, long total) {
+		super(content, pageable, total);
 	}
 
-	@Override
-	public boolean isFirst() {
-		return this.number == 0;
+	public TestableParamsAwarePage(List<T> content) {
+		super(content);
 	}
 
-	@Override
-	public boolean hasNext() {
-		return getNumber() + 1 < getTotalPages();
+	public TestableParamsAwarePage() {
+		super(new ArrayList<>());
 	}
 
-
-	@Override
-	public boolean hasPrevious() {
-		return !isFirst();
+	public Map<String, String[]> getParameters() {
+		return parameters;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.domain.Slice#nextPageable()
-	 */
-	public Pageable nextPageable() {
-		return hasNext() ? PageRequest.of(this.number, this.size, Sort.DEFAULT_DIRECTION).next() : Pageable.unpaged();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.domain.Slice#previousPageable()
-	 */
-	public Pageable previousPageable() {
-		return hasPrevious() ? PageRequest.of(this.number, this.size, Sort.DEFAULT_DIRECTION).previousOrFirst() : Pageable.unpaged();
-	}
-
-
-	@Override
-	public boolean isLast() {
-		return !hasNext();
-	}
-
-	@Override
-	public <U> Page<U> map(Function<? super T, ? extends U> converter) {
-		throw new NotImplementedException();
-	}
-
-	/**
-	 * Returns an iterator over elements of type {@code T}.
-	 *
-	 * @return an Iterator.
-	 */
-	@Override
-	public Iterator<T> iterator() {
-		return this.getContent().iterator();
+	public void setParameters(Map<String, String[]> parameters) {
+		this.parameters = parameters;
 	}
 }

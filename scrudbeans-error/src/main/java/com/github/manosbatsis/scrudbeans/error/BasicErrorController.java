@@ -3,12 +3,12 @@ package com.github.manosbatsis.scrudbeans.error;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
 import org.springframework.core.PriorityOrdered;
-import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.ServletWebRequest;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,20 +34,24 @@ public class BasicErrorController implements ErrorController, PriorityOrdered {
     @Autowired
     private ErrorAttributes errorAttributes;
 
+    protected ErrorAttributeOptions buildErrorAttributeOptions(boolean includeException){
+        List<ErrorAttributeOptions.Include> includes = new LinkedList();
+        if(includeException) includes.add(ErrorAttributeOptions.Include.EXCEPTION);
+        return ErrorAttributeOptions.of(includes);
+    }
 
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> error(ServletWebRequest request, Exception ex) {
-        Map<String, Object> body = errorAttributes.getErrorAttributes(request, true);
+        Map<String, Object> body = errorAttributes.getErrorAttributes(request, buildErrorAttributeOptions(true));
         return new ResponseEntity(body, HttpStatus.resolve(request.getResponse().getStatus()));
     }
 
     @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
     public ResponseEntity<Map<String, Object>> errorHtml(ServletWebRequest request, Exception ex) {
-        Map<String, Object> body = errorAttributes.getErrorAttributes(request, true);
+        Map<String, Object> body = errorAttributes.getErrorAttributes(request, buildErrorAttributeOptions(true));
         return new ResponseEntity(body, HttpStatus.resolve(request.getResponse().getStatus()));
     }
 
-    @Override
     public String getErrorPath() {
         return PATH;
     }
