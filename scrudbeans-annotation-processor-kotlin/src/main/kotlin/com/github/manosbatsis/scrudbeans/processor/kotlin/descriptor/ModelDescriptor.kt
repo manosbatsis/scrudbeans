@@ -3,13 +3,9 @@ package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
+import javax.lang.model.element.*
 import javax.lang.model.element.ElementKind.FIELD
 import javax.lang.model.element.ElementKind.METHOD
-import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.TypeElement
-import javax.lang.model.element.VariableElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind.DECLARED
 import javax.lang.model.type.TypeMirror
@@ -41,6 +37,9 @@ abstract class ModelDescriptor(
     }
 
     protected fun scanMembers(types: Types, currentTypeElement: Element) {
+        processingEnvironment.noteMessage {
+            "scanMembers, currentTypeElement: ${currentTypeElement.simpleName}, " +
+                    "kind: ${currentTypeElement.kind}" }
         when (currentTypeElement.kind) {
             ElementKind.CLASS -> {
                 val typeElement = currentTypeElement as TypeElement
@@ -55,6 +54,10 @@ abstract class ModelDescriptor(
     }
 
     protected fun scanMembers(types: Types, currentTypeElement: TypeElement, fields: List<VariableElement>) {
+
+        processingEnvironment.noteMessage {
+            "scanMembers, currentTypeElement: ${currentTypeElement.simpleName}, " +
+                    "fields: ${fields.joinToString(",") { it.simpleName }}" }
         fields.forEach {
             scanMember(types, currentTypeElement, it)
         }
@@ -115,7 +118,7 @@ abstract class ModelDescriptor(
                     "Could not process member " + scrudModelMember + ", kind: " + scrudModelMember.kind)
         }
 
-        return asTypeElement(types, typeMirror).asKotlinClassName().toString()
+        return typeMirror.asTypeElement().asKotlinClassName().toString()
     }
 
     val stack: String

@@ -1,28 +1,21 @@
 package mykotlinpackage.model
 
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.model.AbstractHibernateKPersistable
-import com.github.manosbatsis.scrudbeans.validation.Unique
+import com.github.manosbatsis.scrudbeans.model.AbstractAuditableEntity
 import io.swagger.v3.oas.annotations.media.Schema
-import org.hibernate.annotations.GenericGenerator
 import java.math.BigDecimal
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
 import javax.persistence.Table
 import javax.validation.constraints.NotNull
 
 @Entity
-@Unique
 @Table(name = "products")
 @ScrudBean
 @Schema(name = "Product", description = "A model representing a single product")
-data class Product(
-        @field:Id
-        @field:GeneratedValue(generator = "system-uuid")
-        @field:GenericGenerator(name = "system-uuid", strategy = "uuid2")
-        override var id: String? = null,
+class Product(
+        id: UUID? = null,
 
         @field:NotNull
         @field:Column(nullable = false)
@@ -38,5 +31,5 @@ data class Product(
         @field:Column(nullable = false)
         @field:Schema(type = "float", description = "The product price", required = true, example = "3.05")
         var price: BigDecimal? = null
-) : AbstractHibernateKPersistable<String>() {
+) : AbstractAuditableEntity(id) {
 }

@@ -1,7 +1,8 @@
 package mykotlinpackage.dto
 
-import com.github.manosbatsis.scrudbeans.model.AbstractSystemUuidPersistableModel
+import java.util.*
 
-class OrderUpdateCommentDTO : AbstractSystemUuidPersistableModel() {
+class OrderUpdateCommentDTO {
+    val id: UUID? = null
     val comment: String? = null
 }

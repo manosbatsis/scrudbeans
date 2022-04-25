@@ -1,7 +1,5 @@
 package mykotlinpackage
 
-import com.github.manosbatsis.scrudbeans.repository.ModelRepository
-import com.github.manosbatsis.scrudbeans.repository.ModelRepositoryFactoryBean
 import mykotlinpackage.model.Order
 import mykotlinpackage.model.OrderLine
 import mykotlinpackage.model.Product
@@ -15,8 +13,6 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.FilterType
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.format.Formatter
@@ -36,10 +32,8 @@ import java.util.*
 // Scan for existing or runtime-generated (scrudbeans) components
 @EntityScan(ScrudBeansSampleApplication.PACKAGE_NAME)
 @EnableJpaRepositories(
-        basePackages = [ScrudBeansSampleApplication.PACKAGE_NAME],
-        includeFilters = [ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE,
-                classes = [ModelRepository::class])],
-        repositoryFactoryBeanClass = ModelRepositoryFactoryBean::class)
+        basePackages = [ScrudBeansSampleApplication.PACKAGE_NAME]
+)
 class ScrudBeansSampleApplication {
 
     companion object {
@@ -67,28 +61,28 @@ class ScrudBeansSampleApplication {
     /**
      * Create sample products for demo purposes
      */
-
     @Bean
     fun demo(
-            orderService: OrderService,
-            orderLineService: OrderLineService,
-            productService: ProductService): CommandLineRunner {
+        orderService: OrderService,
+        orderLineService: OrderLineService,
+        productService: ProductService
+    ): CommandLineRunner {
         return CommandLineRunner { args: Array<String?>? ->
             // save a few products
-            productService.create(Product(name = "Systemantics", description = "How Systems Work and Especially How They Fail", price = BigDecimal.valueOf(126.95)))
-            productService.create(Product(name = "Design Patterns", description = "Elements of Reusable Object-Oriented Software", price = BigDecimal.valueOf(42.93)))
-            productService.create(Product(name = "XML Topic Maps", description = "Creating and Using Topic Maps for the Web", price = BigDecimal.valueOf(3.44)))
-            productService.create(Product(name = "LOTR 1", description = "Lord or the rings:  The Fellowship of the Ring", price = BigDecimal.valueOf(3.44)))
-            productService.create(Product(name = "LOTR 2", description = "Lord or the rings:  The Two Towers", price = BigDecimal.valueOf(3.44)))
-            productService.create(Product(name = "LOTR 3", description = "Lord or the rings:  The Return of the King", price = BigDecimal.valueOf(3.44)))
+            productService.save(Product(name = "Systemantics", description = "How Systems Work and Especially How They Fail", price = BigDecimal.valueOf(126.95)))
+            productService.save(Product(name = "Design Patterns", description = "Elements of Reusable Object-Oriented Software", price = BigDecimal.valueOf(42.93)))
+            productService.save(Product(name = "XML Topic Maps", description = "Creating and Using Topic Maps for the Web", price = BigDecimal.valueOf(3.44)))
+            productService.save(Product(name = "LOTR 1", description = "Lord or the rings:  The Fellowship of the Ring", price = BigDecimal.valueOf(3.44)))
+            productService.save(Product(name = "LOTR 2", description = "Lord or the rings:  The Two Towers", price = BigDecimal.valueOf(3.44)))
+            productService.save(Product(name = "LOTR 3", description = "Lord or the rings:  The Return of the King", price = BigDecimal.valueOf(3.44)))
             // fetch all customers
-            val order: Order = orderService.create(Order(email = "foo@bar.baz"))
+            val order: Order = orderService.save(Order(email = "foo@bar.baz"))
             for (p in productService.findAll()) {
                 var orderLine = OrderLine(
                         order = order,
                         product = p,
                         quantity = 2)
-                orderLine = orderLineService.create(orderLine)
+                orderLine = orderLineService.save(orderLine)
             }
         }
     }

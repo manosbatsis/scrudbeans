@@ -2,35 +2,25 @@ package com.github.manosbatsis.scrudbeans.processor.kotlin
 
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.kotlin.utils.kapt.processor.SimpleAnnotatedElementInfo
-import com.github.manosbatsis.scrudbeans.api.DtoMapper
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService
 import com.github.manosbatsis.scrudbeans.api.util.Mimes.*
-import com.github.manosbatsis.scrudbeans.controller.AbstractDtoModelController
 import com.github.manosbatsis.scrudbeans.controller.AbstractModelServiceBackedController
-import com.github.manosbatsis.scrudbeans.controller.AbstractPersistableModelController
-import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.EntityModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository
 import com.github.manosbatsis.scrudbeans.service.AbstractJpaPersistableModelServiceImpl
-import com.github.manosbatsis.scrudbeans.service.AbstractModelServiceImpl
 import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
-import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory
 import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.KModifier.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import io.swagger.v3.oas.annotations.tags.Tag
 import org.apache.commons.lang3.StringUtils
 import org.atteo.evo.inflector.English
-import org.mapstruct.Mapper
 import org.slf4j.LoggerFactory
-import org.springframework.hateoas.server.ExposesResourceFor
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.RequestMapping
@@ -62,14 +52,14 @@ internal class TypeSpecBuilder(
                 // Default repos
                 ModelDescriptor.STACK_JPA + CLASSNAME_KEY_REPOSITORY to ModelRepository::class.java.canonicalName,
                 // Default service interface per stack
-                CLASSNAME_KEY_SERVICE_INTERFACE to ModelService::class.java.canonicalName,
+                CLASSNAME_KEY_SERVICE_INTERFACE to JpaPersistableModelService::class.java.canonicalName,
                 ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_INTERFACE to JpaPersistableModelService::class.java.canonicalName,
                 // Default service interface per stack
-                CLASSNAME_KEY_SERVICE_IMPL to AbstractModelServiceImpl::class.java.canonicalName,
+                CLASSNAME_KEY_SERVICE_IMPL to AbstractJpaPersistableModelServiceImpl::class.java.canonicalName,
                 ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL to AbstractJpaPersistableModelServiceImpl::class.java.canonicalName,
                 // Default service controller per stack
                 CLASSNAME_KEY_CONTROLLER to AbstractModelServiceBackedController::class.java.canonicalName,
-                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER to AbstractDtoModelController::class.java.canonicalName,
+                ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER to AbstractModelServiceBackedController::class.java.canonicalName,
                 // Default ID accessor
                 ModelDescriptor.STACK_JPA + CLASSNAME_KEY_IDADAPTER to IdentifierAdapter::class.java.canonicalName
         )
@@ -112,16 +102,18 @@ internal class TypeSpecBuilder(
                 .addAnnotation(
                         AnnotationSpec.builder(RestController::class.java)
                                 . addMember("value = %S", beanName).build())
-                .addAnnotation(
+                /*.addAnnotation(
                         AnnotationSpec.builder(Tag::class.java)
                                 .addMember("name=%S", apiName)
                                 .addMember("description=%S", apiDescription).build())
+
+                 */
                 .addAnnotation(
                         AnnotationSpec.builder(RequestMapping::class.java)
                                 . addMember("value = [%S]", getRequestMappingPattern(descriptor)).build())
-                .addAnnotation(
-                        AnnotationSpec.builder(ExposesResourceFor::class.java)
-                                . addMember("value = %L", descriptor.simpleName + "::class").build())
+                //.addAnnotation(
+                //        AnnotationSpec.builder(ExposesResourceFor::class.java)
+                //                . addMember("value = %L", descriptor.simpleName + "::class").build())
                 .superclass(
                         ClassName(pkgAndName.left, pkgAndName.right).parameterizedBy(
                                 ClassName(descriptor.packageName, descriptor.simpleName),
@@ -238,7 +230,6 @@ internal class TypeSpecBuilder(
      *
      * @param descriptor The target model descriptor
      * @return the resulting type spec
-     */
     fun createPredicateFactory(descriptor: EntityModelDescriptor): TypeSpec {
         val className = "AnyToOne" + descriptor.simpleName + "PredicateFactory"
         return TypeSpec.classBuilder(className)
@@ -253,6 +244,7 @@ internal class TypeSpecBuilder(
                 .addModifiers(KModifier.PUBLIC)
                 .build()
     }
+     */
 
     /**
      * Generate a [RequestMapping] pattern for an [Entity]-specific  SCRUD REST controller
@@ -292,7 +284,7 @@ internal class TypeSpecBuilder(
                 secondaryTargetTypeElement = null,
                 secondaryTargetTypeElementFields = emptyList(),
                 secondaryTargetTypeElementSimpleName = null,
-                isNonDataClass = false
+                isNonDataClass = true
         )
         val dtoStrategy = ScrudBeansDtoStrategy(elementInfo)
         return dtoStrategy.dtoTypeSpec()
@@ -307,7 +299,7 @@ internal class TypeSpecBuilder(
          */
     }
 
-    /** Create a mapstruct-based mapper for non-generated DTOs */
+    /** Create a mapstruct-based mapper for non-generated DTOs
     fun createDtoMapper(descriptor: ScrudModelDescriptor, dtoClass: String): TypeSpec {
         log.debug("createDtoMapper, dtoClass: $dtoClass")
         val dtoSimpleName = dtoClass.substring(dtoClass.lastIndexOf('.') + 1)
@@ -329,7 +321,7 @@ internal class TypeSpecBuilder(
                                         ClassName(dtoPackage, dtoSimpleName)))
                 .addModifiers(KModifier.PUBLIC)
                 .build()
-    }
+    }*/
 
     /**
      * Get the superclass type for the given component type.

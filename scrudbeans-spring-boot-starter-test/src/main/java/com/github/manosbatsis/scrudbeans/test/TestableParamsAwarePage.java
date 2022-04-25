@@ -1,18 +1,17 @@
 package com.github.manosbatsis.scrudbeans.test;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
 import com.github.manosbatsis.scrudbeans.api.util.ParamsAwarePage;
 import lombok.Data;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * An basic {@link Page} implementation used for JSON deserialization during tests, e.g.:
@@ -99,7 +98,7 @@ public class TestableParamsAwarePage<T> implements ParamsAwarePage<T> {
 
 	@Override
 	public <U> Page<U> map(Function<? super T, ? extends U> converter) {
-		throw new NotImplementedException();
+		throw new NotImplementedException("Non-implemented");
 	}
 
 	/**

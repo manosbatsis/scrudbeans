@@ -7,7 +7,7 @@
 	<parent>
         <artifactId>scrudbeans</artifactId>
         <groupId>com.github.manosbatsis.scrudbeans</groupId>
-        <version>0.31</version><!--scrudbeans -->
+        <version>0.32-SNAPSHOT</version><!--scrudbeans -->
     </parent>
 
 	<dependencies>
@@ -53,8 +53,13 @@
 			</plugin>
 
 			<plugin>
-				<artifactId>kotlin-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
+
+			<plugin>
 				<groupId>org.jetbrains.kotlin</groupId>
+				<artifactId>kotlin-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>

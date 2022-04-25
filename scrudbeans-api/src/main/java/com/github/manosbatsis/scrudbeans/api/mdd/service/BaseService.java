@@ -22,7 +22,6 @@ package com.github.manosbatsis.scrudbeans.api.mdd.service;
 
 import com.github.manosbatsis.scrudbeans.api.message.IActivityNotificationMessage;
 import com.github.manosbatsis.scrudbeans.api.message.IMessageResource;
-
 import org.springframework.core.convert.ConversionService;
 
 /**
@@ -37,8 +36,8 @@ public interface BaseService {
 
 	/**
 	 * Get the configured file persistence service
-	 */
 	FilePersistenceService getFilePersistenceService();
+	 */
 
 	// TODO
 	/**

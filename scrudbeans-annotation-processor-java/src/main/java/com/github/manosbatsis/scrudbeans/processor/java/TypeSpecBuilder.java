@@ -27,7 +27,6 @@ import org.atteo.evo.inflector.English;
 import org.mapstruct.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.hateoas.server.ExposesResourceFor;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -124,9 +123,11 @@ class TypeSpecBuilder {
 				.addAnnotation(
 						AnnotationSpec.builder(RequestMapping.class)
 								.addMember("value", getRequestMappingPattern(descriptor)).build())
-				.addAnnotation(
+				/*.addAnnotation(
 						AnnotationSpec.builder(ExposesResourceFor.class)
 								.addMember("value", descriptor.getSimpleName() + ".class").build())
+
+				 */
 				.superclass(
 						ParameterizedTypeName.get(
 								ClassName.get(pkgAndName.getLeft(), pkgAndName.getRight()),

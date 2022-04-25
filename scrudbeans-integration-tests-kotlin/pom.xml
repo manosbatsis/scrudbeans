@@ -7,7 +7,7 @@
 	<parent>
         <groupId>com.github.manosbatsis.scrudbeans</groupId>
         <artifactId>scrudbeans</artifactId>
-        <version>0.31</version><!--scrudbeans -->
+        <version>0.32-SNAPSHOT</version><!--scrudbeans -->
     </parent>
 
 	<properties>
@@ -51,10 +51,12 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
+		<!--
 		<dependency>
 			<groupId>org.springdoc</groupId>
 			<artifactId>springdoc-openapi-ui</artifactId>
 		</dependency>
+		-->
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-parameter-names</artifactId>
@@ -205,7 +207,7 @@
 						<configuration>
 							<sourceDirs>
 								<sourceDir>src/main/kotlin</sourceDir>
-								<sourceDir>src/main/resourcesw</sourceDir>
+								<sourceDir>src/main/resources</sourceDir>
 								<sourceDir>target/generated-sources/kaptKotlin/compile</sourceDir>
 							</sourceDirs>
 						</configuration>
@@ -218,79 +220,9 @@
 						<configuration>
 							<sourceDirs>
 								<sourceDir>src/test/kotlin</sourceDir>
-								<sourceDir>src/test/resourcesw</sourceDir>
+								<sourceDir>src/test/resources</sourceDir>
 								<sourceDir>target/generated-sources/kaptKotlin/test</sourceDir>
 							</sourceDirs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- Spring Boot configures surefire by default, but not failsafe -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>${maven-compiler-plugin.version}</version>
-				<configuration>
-					<proc>none</proc>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-				<executions>
-					<!-- Replacing default-compile as it is treated specially by maven -->
-					<execution>
-						<id>default-compile</id>
-						<phase>none</phase>
-					</execution>
-					<!-- Replacing default-testCompile as it is treated specially by maven -->
-					<execution>
-						<id>default-testCompile</id>
-						<phase>none</phase>
-					</execution>
-					<execution>
-						<id>java-compile</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>java-test-compile</id>
-						<phase>test-compile</phase>
-						<goals> <goal>testCompile</goal> </goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.asciidoctor</groupId>
-				<artifactId>asciidoctor-maven-plugin</artifactId>
-				<version>1.5.7.1</version>
-				<executions>
-					<execution>
-						<id>output-html</id>
-						<phase>post-integration-test</phase>
-						<goals>
-							<goal>process-asciidoc</goal>
-						</goals>
-						<configuration>
-							<skip>true</skip>
-							<skip>${it.skip}</skip>
-							<sourceDirectory>target/swagger2asciidoc</sourceDirectory>
-							<outputDirectory>target/swagger2html</outputDirectory>
-							<backend>html5</backend>
-							<sourceHighlighter>coderay</sourceHighlighter>
-							<!-- <doctype>book</doctype> -->
-							<attributes>
-								<toc>left</toc>
-								<sectnums>true</sectnums>
-								<!-- <stylesheet>my-theme.css</stylesheet> -->
-								<project-version>${project.version}</project-version>
-								<endpoint-url>/</endpoint-url>
-								<sourcedir>${project.build.sourceDirectory}</sourcedir>
-							</attributes>
 						</configuration>
 					</execution>
 				</executions>

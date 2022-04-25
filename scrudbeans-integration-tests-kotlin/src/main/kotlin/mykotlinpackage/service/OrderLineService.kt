@@ -1,25 +1,25 @@
 package mykotlinpackage.service
 
-import com.github.manosbatsis.scrudbeans.repository.ModelRepository
-import com.github.manosbatsis.scrudbeans.service.PersistableModelService
-import com.github.manosbatsis.scrudbeans.service.AbstractPersistableModelServiceImpl
+import com.github.manosbatsis.scrudbeans.service.AbstractJpaPersistableModelServiceImpl
 import mykotlinpackage.model.OrderLine
-import mykotlinpackage.model.Product
+import mykotlinpackage.repository.OrderLineRepository
+import mykotlinpackage.repository.ProductRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
-class OrderLineService : AbstractPersistableModelServiceImpl<OrderLine, String, ModelRepository<OrderLine, String>>(), PersistableModelService<OrderLine, String> {
+class OrderLineService : AbstractJpaPersistableModelServiceImpl<OrderLine, UUID, OrderLineRepository>() {
 
     @Autowired
-    lateinit var productRepository: ModelRepository<Product, String>
+    lateinit var productRepository: ProductRepository
 
     /**
      * {@inheritDoc}
      * @param resource
      */
-    override fun create(resource: OrderLine): OrderLine {
-        return super.create(resource)!!
+    override fun save(resource: OrderLine): OrderLine {
+        return super.save(resource)
     }
 
 }

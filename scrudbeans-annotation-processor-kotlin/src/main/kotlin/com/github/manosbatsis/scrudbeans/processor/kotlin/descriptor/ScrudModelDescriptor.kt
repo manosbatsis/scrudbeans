@@ -1,9 +1,8 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.EntityModelDescriptor
 import com.squareup.kotlinpoet.ClassName
-import java.util.Properties
+import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
@@ -15,7 +14,8 @@ import javax.lang.model.element.TypeElement
 class ScrudModelDescriptor(
         processingEnv: ProcessingEnvironment,
         typeElement: TypeElement,
-        val configProperties: Properties) : EntityModelDescriptor(processingEnv, typeElement) {
+        val configProperties: Properties
+) : EntityModelDescriptor(processingEnv, typeElement) {
 
     val scrudBean: ScrudBean
     val className: ClassName

@@ -3,32 +3,21 @@ package mykotlinpackage.model
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.model.AbstractHibernateKPersistable
-import com.github.manosbatsis.scrudbeans.validation.Unique
+import com.github.manosbatsis.scrudbeans.model.AbstractBaseEntity
 import io.swagger.v3.oas.annotations.media.Schema
 import org.hibernate.annotations.Formula
-import org.hibernate.annotations.GenericGenerator
 import java.math.BigDecimal
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.GeneratedValue
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
-import javax.persistence.Table
+import java.util.*
+import javax.persistence.*
 import javax.validation.constraints.NotNull
 
 @Entity
-@Unique
 @Table(name = "order_lines")
 @ScrudBean
 @Schema(name = "Order Line", description = "A model representing an order line")
-data class OrderLine(
+class OrderLine(
 
-        @field:Id
-        @field:GeneratedValue(generator = "system-uuid")
-        @field:GenericGenerator(name = "system-uuid", strategy = "uuid2")
-        override var id: String? = null,
+        id: UUID? = null,
 
         @field:NotNull
         @field:Column(nullable = false)
@@ -53,5 +42,5 @@ data class OrderLine(
         @field:JoinColumn(referencedColumnName = "id", nullable = false, updatable = false)
         @field:Schema(title = "The parent order", required = true)
         var order: Order? = null
-) : AbstractHibernateKPersistable<String>() {
+) : AbstractBaseEntity(id) {
 }

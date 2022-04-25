@@ -5,7 +5,6 @@ import com.github.manosbatsis.scrudbeans.api.DtoMapper
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
-import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.EntityModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
 import com.squareup.kotlinpoet.*
@@ -27,7 +26,7 @@ import javax.tools.StandardLocation
  * annotated with @[Entity]
  */
 @SupportedAnnotationTypes("com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean")
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_11)
 class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironmentAware {
 
     companion object {
@@ -79,7 +78,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
         // Load config/properties
         configProps = this.loadProperties()
         // Create JPA query predicate factories for each entity in the source path
-        generateEntityPredicateFactories(roundEnv)
+        //generateEntityPredicateFactories(roundEnv)
         // Create other SCRUD components for each model annotated with ScrudBean
         generateScrudComponents(roundEnv)
         // Claiming that annotations have been processed by this processor
@@ -102,7 +101,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
                         // Parse model to something more convenient
                         val descriptor = ScrudModelDescriptor(processingEnv, element, configProps)
                         // Mappers for manual DTOs
-                        generateDtoMappers(descriptor)
+                        //generateDtoMappers(descriptor)
                         generateDto(descriptor)
                         createIdAdapters(descriptor)
                         createRepository(descriptor)
@@ -134,7 +133,6 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     /**
      * Create JPA query predicate factories for each entity in the source path
      * @param roundEnv The current compilation round environment
-     */
     private fun generateEntityPredicateFactories(roundEnv: RoundEnvironment) {
         val entities = roundEnv.getElementsAnnotatedWith(ScrudBean::class.java)
         for (element in entities) {
@@ -159,6 +157,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
 
         }
     }
+     */
 
     /**
      * Create a SCRUD REST controller source file
@@ -175,7 +174,6 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
      * Create [DtoMapper]s for the ScudBeans' target DTOs
      * @param descriptor The target model descriptor
      * @return the mapper files
-     */
     private fun generateDtoMappers(descriptor: ScrudModelDescriptor): List<FileSpec?> {
         val files = LinkedList<FileSpec?>()
         log.debug("generateDtoMappers, dtoTypes (${descriptor.dtoTypes.size}): ${descriptor.dtoTypes}")
@@ -188,6 +186,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
         }
         return files
     }
+     */
 
     /**
      * Create SCRUD service source files
@@ -246,8 +245,8 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
      * @return the written file
      */
     private fun createIdAdapters(descriptor: ScrudModelDescriptor): List<FileSpec> {
-        return listOf(ClassName(descriptor.packageName, descriptor.simpleName),
-                ClassName(descriptor.packageName, descriptor.simpleName + "Dto"))
+        return listOf(ClassName(descriptor.packageName, descriptor.simpleName)/*,
+                ClassName(descriptor.packageName, descriptor.simpleName + "Dto")*/)
                 .mapNotNull {
                     writeKotlinFile(descriptor, typeSpecBuilder.createIdAdapter(it, descriptor), descriptor.packageName)
                 }
@@ -257,11 +256,11 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
      * Create a JPA specification predicate factory source file
      * @param descriptor The target model descriptor
      * @return the written file
-     */
     private fun createPredicateFactory(descriptor: EntityModelDescriptor): FileSpec? {
         val typeSpec = typeSpecBuilder.createPredicateFactory(descriptor)
         return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".specification")
     }
+     */
 
     /**
      * Write and return a source file for the given [TypeSpec]
