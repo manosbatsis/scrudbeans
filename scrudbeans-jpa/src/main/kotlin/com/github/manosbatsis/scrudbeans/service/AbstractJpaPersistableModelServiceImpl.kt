@@ -7,68 +7,72 @@ import com.github.manosbatsis.scrudbeans.model.BaseEntity
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository
 import io.github.perplexhub.rsql.RSQLJPASupport
 import io.github.perplexhub.rsql.RSQLJPASupport.toSpecification
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.util.ReflectionUtils
-import java.lang.reflect.Field
 import java.util.*
 import javax.persistence.EntityManager
-import javax.persistence.criteria.CriteriaUpdate
-import javax.persistence.criteria.Root
 
 open class AbstractJpaPersistableModelServiceImpl<T: BaseEntity<S>, S: Any, B: ModelRepository<T, S>>(
+	protected val repository: B,
+	val entityType: Class<T>,
+	val entityIdType: Class<S>,
+	protected val entityManager: EntityManager
 ) : JpaPersistableModelService<T, S> {
 
-	// TODO: add target entity type via annotation processor
-
-	// TODO: support multiple datasources
-	@Autowired
-	lateinit var repository: B
-	@Autowired
-	lateinit var entityManager: EntityManager
-
+	@Transactional(readOnly = true)
 	override fun count(): Long = repository.count()
 
+	@Transactional(readOnly = true)
 	override fun count(filter: String): Long =
 		if(filter.isBlank()) count() else count(toSpecification(filter))
 
+	@Transactional(readOnly = true)
 	override fun count(specification: Specification<T>): Long =
 		repository.count(specification)
 
+	@Transactional(readOnly = true)
 	override fun existsById(id: S): Boolean = repository.existsById(id)
 
+	@Transactional(readOnly = true)
 	override fun existsByIdAssert(id: S): Unit = if (existsById(id)) Unit else throw EntityNotFoundException()
 
+	@Transactional(readOnly = true)
 	override fun findAll(): Iterable<T> = repository.findAll()
 
+	@Transactional(readOnly = true)
 	override fun <P> findAllProjectedBy(projection: Class<P>): Iterable<P> =
 		repository.findBy(projection)
 
+	@Transactional(readOnly = true)
 	override fun findById(id: S): Optional<T> = repository.findById(id)
 
+	@Transactional(readOnly = true)
 	override fun <P> findByIdProjectedBy(id: S, projection: Class<P>): Optional<P> =
 		repository.findById(id, projection)
 
+	@Transactional(readOnly = true)
 	override fun findAllByIdIn(ids: Set<S>): Iterable<T> = repository.findAllById(ids)
 
+	@Transactional(readOnly = true)
 	override fun <P> findAllByIdInProjectedBy(ids: Set<S>, projection: Class<P>): Iterable<P> =
 		repository.findAllByIdIn(ids, projection)
 
+	@Transactional(readOnly = true)
 	override fun findChildById(id: S, child: String): Any? {
-		findById(id)?.let {entity ->
-			val field = entity.javaClass.declaredFields.find { it.name.equals(child) }
-			field?.let {
+		val entity = findById(id)
+		entity.javaClass.declaredFields
+			.find { it.name.equals(child) }
+			?.let {
 				it.isAccessible = true
 				return it.value(entity)
 			}
-		}
 		return null
 	}
 
+	@Transactional(readOnly = true)
 	override fun findAll(
 		filter: String,
 		sortBy: String,
@@ -81,6 +85,7 @@ open class AbstractJpaPersistableModelServiceImpl<T: BaseEntity<S>, S: Any, B: M
 			toSpecification<T>(filter).and(RSQLJPASupport.toSort("$sortBy,${sortDirection.toString().lowercase()}")),
 			pageNumber, pageSize)
 
+	@Transactional(readOnly = true)
 	override fun <P> findAllProjectedBy(
 		filter: String,
 		sortBy: String,
@@ -94,12 +99,14 @@ open class AbstractJpaPersistableModelServiceImpl<T: BaseEntity<S>, S: Any, B: M
 			toSpecification<T>(filter).and(RSQLJPASupport.toSort("$sortBy,${sortDirection.toString().lowercase()}")),
 			pageNumber, pageSize, projection)
 
+	@Transactional(readOnly = true)
 	override fun findAll(
 		specification: Specification<T>,
 		pageNumber: Int,
 		pagesize: Int
 	): Page<T> = repository.findAll(specification, PageRequest.of(pageNumber, pagesize))
 
+	@Transactional(readOnly = true)
 	override fun <P> findAllProjectedBy(
 		specification: Specification<T>,
 		pageNumber: Int,
@@ -107,8 +114,10 @@ open class AbstractJpaPersistableModelServiceImpl<T: BaseEntity<S>, S: Any, B: M
 		projection: Class<P>
 	): Page<P> = repository.findBy(specification, PageRequest.of(pageNumber, pagesize), projection)
 
+	@Transactional(readOnly = true)
 	override fun getById(id: S): T = findById(id).orElseThrow { EntityNotFoundException() }
 
+	@Transactional(readOnly = true)
 	override fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P =
 		findByIdProjectedBy(id, projection).orElseThrow { EntityNotFoundException() }
 
@@ -120,9 +129,8 @@ open class AbstractJpaPersistableModelServiceImpl<T: BaseEntity<S>, S: Any, B: M
 		repository.saveAll(resources)
 
 	@Transactional(readOnly = false)
-	override fun update(dto: Dto<T>, id: S): T{
-		return repository.getById(id)
-			?.let { save(dto.toPatched(it)) }
+	override fun partialUpdate(dto: Dto<T>, id: S): T{
+		return save(dto.toPatched(getById(id)))
 	}
 
 	@Transactional(readOnly = false)
@@ -137,19 +145,5 @@ open class AbstractJpaPersistableModelServiceImpl<T: BaseEntity<S>, S: Any, B: M
 	@Transactional(readOnly = false)
 	override fun deleteAllById(ids: Iterable<S> ) {
 		repository.deleteAllById(ids)
-	}
-
-	private fun handleEmbedded(field: Field, criteria: CriteriaUpdate<T>, root: Root<T>, entity: T) {
-		val value = field.value(entity)
-		value?.let { safeValue ->
-			val fields: MutableList<Any> = mutableListOf()
-			safeValue::class.java.declaredFields.forEach {
-				it?.let {
-					ReflectionUtils.makeAccessible(it)
-					fields.add(it)
-				}
-			}
-			criteria.set(root.get(field.name), value)
-		}
 	}
 }

@@ -20,13 +20,9 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.annotation.model;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import com.github.manosbatsis.scrudbeans.api.DtoMapper;
+
+import java.lang.annotation.*;
 
 
 /**
@@ -109,6 +105,13 @@ public @interface ScrudBean {
 	 * The API description for the generated controller. Used for swagger documentation.
 	 */
 	String apiDescription() default "";
+
+	/**
+	 * May be used to determine the target transaction manager,
+	 * matching the qualifier value (or the bean name) of a specific TransactionManager bean definition.
+	 */
+	String transactionManager() default "";
+
 
 	/**
 	 * Hint to enable javers auditing

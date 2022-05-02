@@ -21,7 +21,7 @@ data class DiscountCode(
         override var id: Long = 0,
 
         @field:NotNull
-        @field:Column(nullable = false, unique = true)
+        @field:Column(nullable = false, unique = true, updatable = false)
         @field:Schema(title = "The discount code", required = true)
         var code: String? = null,
 

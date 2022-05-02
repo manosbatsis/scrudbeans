@@ -71,7 +71,7 @@ interface JpaPersistableModelService<T: BaseEntity<S>, S> {
 	/** Save, i.e. create or update, the given resources as given */
 	fun saveAll(resources: Iterable<T>): Iterable<T>
 	/** Update the resource matching the given [id] using the input [dto]'s non-null members as delta */
-	fun update(dto: Dto<T>, id: S): T
+	fun partialUpdate(dto: Dto<T>, id: S): T
 	/** Delete an existing resource. */
 	fun delete(resource: T)
 	/** Delete the resource matching the given ID */

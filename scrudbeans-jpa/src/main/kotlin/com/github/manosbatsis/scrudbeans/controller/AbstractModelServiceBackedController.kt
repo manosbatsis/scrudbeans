@@ -62,7 +62,7 @@ open class AbstractModelServiceBackedController<
 
 	@PutMapping("{id}")
 	override fun update(@RequestBody dto: DTO, @PathVariable id: S): ResponseEntity<T> {
-		return business.update(dto, id)
+		return business.partialUpdate(dto, id)
 			.let { ResponseEntity.ok(it) }
 	}
 

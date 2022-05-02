@@ -10,6 +10,7 @@ import com.github.manosbatsis.scrudbeans.api.util.Mimes.*
 import com.github.manosbatsis.scrudbeans.controller.AbstractModelServiceBackedController
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
+import com.github.manosbatsis.scrudbeans.processor.kotlin.strategy.ScrudBeansDtoStrategy
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository
 import com.github.manosbatsis.scrudbeans.service.AbstractJpaPersistableModelServiceImpl
 import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
@@ -21,14 +22,17 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.apache.commons.lang3.StringUtils
 import org.atteo.evo.inflector.English
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.io.File
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
-import javax.persistence.Entity
+import javax.lang.model.element.VariableElement
+import javax.persistence.*
 
 /**
  * Utility methods creating [TypeSpec] instances for target SCRUD component types
@@ -189,20 +193,41 @@ internal class TypeSpecBuilder(
     fun createServiceImpl(descriptor: ScrudModelDescriptor): TypeSpec {
         val className: String = descriptor.simpleName + "ServiceImpl"
         val interfaceClassName: String = descriptor.simpleName + "Service"
-        val pkgAndName = ClassUtils.getPackageAndSimpleName(
-                getSuperclassName(descriptor, CLASSNAME_KEY_SERVICE_IMPL)!!)
+        val entityType = ClassName(descriptor.packageName, descriptor.simpleName)
+        val repositoryType = ClassName(descriptor.parentPackageName + ".repository", descriptor.simpleName + "Repository")
+        val superClassPackageAndName = ClassUtils.getPackageAndSimpleName(getSuperclassName(descriptor, CLASSNAME_KEY_SERVICE_IMPL))
+        val superClassName = ClassName(superClassPackageAndName.left, superClassPackageAndName.right).parameterizedBy(
+            entityType, descriptor.idClassName, repositoryType)
         return TypeSpec.classBuilder(className)
                 .addAnnotation(
                         AnnotationSpec.builder(Service::class.java)
                                 .addMember("value = %S", interfaceClassName.decapitalize()).build())
-                .superclass(
-                        ClassName(pkgAndName.left, pkgAndName.right).parameterizedBy(
-                                ClassName(descriptor.packageName, descriptor.simpleName),
-                                descriptor.idClassName,
-                                ClassName(descriptor.parentPackageName + ".repository", descriptor.simpleName + "Repository")))
-                .addSuperinterface(ClassName(descriptor.parentPackageName + ".service", interfaceClassName))
-                .addModifiers(PUBLIC, OPEN)
-                .build()
+            .also {
+                if(!descriptor.scrudBean.transactionManager.isNullOrEmpty())
+                    it.addAnnotation(
+                        AnnotationSpec.builder(Transactional::class.java)
+                            .addMember("value = %S", descriptor.scrudBean.transactionManager)
+                            .addMember("readOnly = true")
+                            .build())
+            }
+            .primaryConstructor(FunSpec.constructorBuilder()
+                .addParameter("repository", repositoryType)
+                .addParameter("entityManager", EntityManager::class.java)
+                .also {
+                    if(!descriptor.scrudBean.transactionManager.isNullOrEmpty())
+                        it.addAnnotation(
+                            AnnotationSpec.builder(Qualifier::class.java)
+                                .addMember("value = %S", descriptor.scrudBean.transactionManager).build())
+                }
+                .build())
+            .superclass(superClassName)
+            .addSuperinterface(ClassName(descriptor.parentPackageName + ".service", interfaceClassName))
+            .addModifiers(PUBLIC, OPEN)
+            .addSuperclassConstructorParameter("repository")
+            .addSuperclassConstructorParameter("%T::class.java", entityType)
+            .addSuperclassConstructorParameter("%T::class.java", descriptor.idClassName)
+            .addSuperclassConstructorParameter("entityManager")
+            .build()
     }
 
     /**
@@ -266,15 +291,43 @@ internal class TypeSpecBuilder(
         return pattern.replace("/{2,}".toRegex(), "/")
     }
 
+    fun isNonUpdatableField(
+        stateInfo: ScrudModelDescriptor,
+        stateField: VariableElement
+    ): Boolean{
+        val typeElementHierarchy = stateInfo.typeElement.getTypeElementHierarchy()
+        return typeElementHierarchy.find { currentTypeElement ->
+            processingEnvironment.elementUtils
+                .getAllMembers(currentTypeElement)
+                .find {
+                    it.simpleName == stateField.simpleName
+                            && (it.hasAnnotation(Id::class.java)
+                                || it.hasAnnotation(EmbeddedId::class.java)
+                                || (it.hasAnnotation(Column::class.java)
+                                        && it.getAnnotationMirror(Column::class.java)
+                                            .findAnnotationValue("updatable")?.value == false))
+                } != null
+        } != null
+    }
+    fun getNonUpdatableFields(
+        stateInfo: ScrudModelDescriptor,
+        stateFields: List<VariableElement>
+    ): List<String>{
+        return stateFields
+            .filter { isNonUpdatableField(stateInfo, it) }
+            .map { it.simpleName.toString() }
+    }
+
     /** Create a DTO for the given model */
     fun dtoSpecBuilder(stateInfo: ScrudModelDescriptor, sourceRootFile: File): TypeSpec {
-
+        val primaryTargetTypeElementFields = stateInfo.typeElement.accessibleConstructorParameterFields()
         val elementInfo = SimpleAnnotatedElementInfo(
                 processingEnvironment = processingEnvironment,
                 primaryTargetTypeElement = stateInfo.typeElement,
-                primaryTargetTypeElementFields = stateInfo.typeElement.accessibleConstructorParameterFields(),
+                primaryTargetTypeElementFields = primaryTargetTypeElementFields,
                 annotation = stateInfo.typeElement.getAnnotationMirror(ScrudBean::class.java),
                 ignoreProperties = emptyList(),
+                nonUpdatableProperties = getNonUpdatableFields(stateInfo, primaryTargetTypeElementFields),
                 copyAnnotationPackages = listOf("io.swagger.v3.oas.annotations", "com.fasterxml.jackson.annotation"),
                 sourceRoot = sourceRootFile,
                 generatedPackageName = stateInfo.packageName,

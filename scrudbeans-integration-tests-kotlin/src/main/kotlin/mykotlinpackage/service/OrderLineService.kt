@@ -3,23 +3,16 @@ package mykotlinpackage.service
 import com.github.manosbatsis.scrudbeans.service.AbstractJpaPersistableModelServiceImpl
 import mykotlinpackage.model.OrderLine
 import mykotlinpackage.repository.OrderLineRepository
-import mykotlinpackage.repository.ProductRepository
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.*
+import javax.persistence.EntityManager
 
 @Service
-class OrderLineService : AbstractJpaPersistableModelServiceImpl<OrderLine, UUID, OrderLineRepository>() {
-
-    @Autowired
-    lateinit var productRepository: ProductRepository
-
-    /**
-     * {@inheritDoc}
-     * @param resource
-     */
-    override fun save(resource: OrderLine): OrderLine {
-        return super.save(resource)
-    }
+class OrderLineService(
+    orderLineRepository: OrderLineRepository,
+    entityManager: EntityManager
+) : AbstractJpaPersistableModelServiceImpl<OrderLine, UUID, OrderLineRepository>(
+    orderLineRepository, OrderLine::class.java, UUID::class.java, entityManager
+) {
 
 }
