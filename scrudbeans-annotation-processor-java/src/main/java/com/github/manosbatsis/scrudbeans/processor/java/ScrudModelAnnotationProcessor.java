@@ -1,10 +1,8 @@
 package com.github.manosbatsis.scrudbeans.processor.java;
 
-import com.github.manosbatsis.scrudbeans.api.DtoMapper;
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
-import com.github.manosbatsis.scrudbeans.processor.java.descriptor.EntityModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ScrudModelDescriptor;
 import com.squareup.javapoet.JavaFile;
@@ -59,8 +57,6 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 		this.filer = processingEnv.getFiler();
 		// Load config/properties
 		configProps = this.loadProperties();
-		// Create JPA query predicate factories for each entity in the source path
-		generateEntityPredicateFactories(roundEnv);
 		// Create other SCRUD components for each model annotated with ScrudBean
 		generateScrudComponents(roundEnv);
 		// Claiming that annotations have been processed by this processor
@@ -84,7 +80,6 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
                         // Parse model to something more convenient
                         ScrudModelDescriptor descriptor = new ScrudModelDescriptor(processingEnv, typeElement, configProps);
                         // Generate components for model
-                        generateDtoMappers(descriptor);
                         createIdAdapter(descriptor);
                         createRepository(descriptor);
                         createService(descriptor);
@@ -100,32 +95,6 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 			}
 		}
 	}
-
-	/**
-	 * Create JPA query predicate factories for each entity in the source path
-	 * @param roundEnv The current compilation round environment
-	 */
-	private void generateEntityPredicateFactories(RoundEnvironment roundEnv) {
-		Set<? extends Element> entities = roundEnv.getElementsAnnotatedWith(ScrudBean.class);
-		for (final Element element : entities) {
-			try {
-				if (element.getAnnotation(Entity.class) != null) {
-					if (element instanceof TypeElement) {
-						log.debug("generateEntityPredicateFactories, processing element: {}", element.getSimpleName());
-						final TypeElement typeElement = (TypeElement) element;
-						EntityModelDescriptor descriptor = new EntityModelDescriptor(processingEnv, typeElement);
-						createPredicateFactory(descriptor);
-					}
-					else {
-						log.warn("Not an instance of TypeElement but annotated with ScrudBean: {}", element.getSimpleName());
-                    }
-                }
-            } catch (RuntimeException | ScrudModelProcessorException e) {
-                log.error("Error generating components for {}: " + e.getMessage(),
-                        element.getSimpleName(), e);
-            }
-        }
-    }
 
     /**
      * Create an {@link IdentifierAdapter} implementation
@@ -153,22 +122,6 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 		return null;
 	}
 
-	/**
-	 * Create {@link DtoMapper}s for the ScudBeans' target DTOs
-	 * @param descriptor The target model descriptor
-	 * @return the mapper files
-	 */
-	private List<JavaFile> generateDtoMappers(ScrudModelDescriptor descriptor) {
-		List<JavaFile> files = new LinkedList<>();
-		descriptor.getDtoTypes().forEach((dtoClass) -> {
-			TypeSpec typeSpec = TypeSpecBuilder.createDtoMapper(descriptor, dtoClass);
-			files.add(writeJavaFile(
-					descriptor,
-					typeSpec,
-					descriptor.getParentPackageName() + ".mapper"));
-		});
-		return files;
-	}
 	/**
 	 * Create SCRUD service source files
 	 * @param descriptor The target model descriptor
@@ -219,16 +172,6 @@ public class ScrudModelAnnotationProcessor extends AbstractProcessor {
 	private JavaFile createRepository(ScrudModelDescriptor descriptor) {
 		TypeSpec typeSpec = TypeSpecBuilder.createRepository(descriptor);
 		return writeJavaFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".repository");
-	}
-
-	/**
-	 * Create a JPA specification predicate factory source file
-	 * @param descriptor The target model descriptor
-	 * @return the written file
-	 */
-	private JavaFile createPredicateFactory(EntityModelDescriptor descriptor) {
-		TypeSpec typeSpec = TypeSpecBuilder.createPredicateFactory(descriptor);
-		return writeJavaFile(descriptor, typeSpec, descriptor.getParentPackageName() + ".specification");
 	}
 
 	/**

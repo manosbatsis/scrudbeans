@@ -112,10 +112,10 @@
 
 	<modules>
 		<module>scrudbeans-annotation-processor-kotlin</module>
+		<module>scrudbeans-annotation-processor-java</module>
 		<module>scrudbeans-api</module>
 		<module>scrudbeans-common</module>
 		<!--
-		<module>scrudbeans-annotation-processor-java</module>
 		<module>scrudbeans-common</module>
 		<module>scrudbeans-error</module>
 		<module>scrudbeans-hypermedia</module>

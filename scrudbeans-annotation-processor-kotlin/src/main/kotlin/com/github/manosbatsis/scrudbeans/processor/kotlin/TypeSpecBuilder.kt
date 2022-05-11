@@ -69,15 +69,6 @@ internal class TypeSpecBuilder(
         )
     }
 
-    /**
-     * Create a subclass [TypeSpec] of [AbstractPersistableModelController]
-     * or [AbstractModelServiceBackedController] depending on whether
-     * the mndel is an [Entity]
-     * or [AbstractModelServiceImpl]
-     *
-     * @param descriptor The target model descriptor
-     * @return the resulting type spec
-     */
     fun createController(descriptor: ScrudModelDescriptor): TypeSpec {
         val className = descriptor.simpleName + "Controller"
         val beanName = ScrudStringUtils.withFirstCharToLowercase(className)
@@ -249,27 +240,6 @@ internal class TypeSpecBuilder(
                 .addModifiers(KModifier.PUBLIC)
                 .build()
     }
-
-    /**
-     * Create a subclass or [AnyToOnePredicateFactory] for the target [Entity] model
-     *
-     * @param descriptor The target model descriptor
-     * @return the resulting type spec
-    fun createPredicateFactory(descriptor: EntityModelDescriptor): TypeSpec {
-        val className = "AnyToOne" + descriptor.simpleName + "PredicateFactory"
-        return TypeSpec.classBuilder(className)
-                .addAnnotation(
-                        AnnotationSpec.builder(EntityPredicateFactory::class.java)
-                                .addMember("entityClass = %S", descriptor.qualifiedName).build())
-                .superclass(
-                        ClassName(AnyToOnePredicateFactory::class.java.`package`.name, AnyToOnePredicateFactory::class.java.simpleName)
-                                .parameterizedBy(
-                                        ClassName(descriptor.packageName, descriptor.simpleName),
-                                        descriptor.idClassName))
-                .addModifiers(KModifier.PUBLIC)
-                .build()
-    }
-     */
 
     /**
      * Generate a [RequestMapping] pattern for an [Entity]-specific  SCRUD REST controller

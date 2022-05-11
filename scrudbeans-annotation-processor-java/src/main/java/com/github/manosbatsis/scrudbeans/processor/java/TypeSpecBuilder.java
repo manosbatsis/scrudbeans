@@ -1,21 +1,15 @@
 package com.github.manosbatsis.scrudbeans.processor.java;
 
-import com.github.manosbatsis.scrudbeans.api.DtoMapper;
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
 import com.github.manosbatsis.scrudbeans.api.mdd.service.ModelService;
 import com.github.manosbatsis.scrudbeans.controller.AbstractModelServiceBackedController;
-import com.github.manosbatsis.scrudbeans.controller.AbstractPersistableModelController;
-import com.github.manosbatsis.scrudbeans.processor.java.descriptor.EntityModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ModelDescriptor;
 import com.github.manosbatsis.scrudbeans.processor.java.descriptor.ScrudModelDescriptor;
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository;
 import com.github.manosbatsis.scrudbeans.service.AbstractJpaPersistableModelServiceImpl;
-import com.github.manosbatsis.scrudbeans.service.AbstractModelServiceImpl;
 import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService;
-import com.github.manosbatsis.scrudbeans.specification.factory.AnyToOnePredicateFactory;
 import com.github.manosbatsis.scrudbeans.util.ClassUtils;
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils;
 import com.squareup.javapoet.*;
@@ -24,7 +18,6 @@ import lombok.NonNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.atteo.evo.inflector.English;
-import org.mapstruct.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -67,26 +60,18 @@ class TypeSpecBuilder {
         // Default repos
         componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_REPOSITORY, ModelRepository.class.getCanonicalName());
         // Default service interface per stack
-        componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_INTERFACE, ModelService.class.getCanonicalName());
+        componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_INTERFACE, JpaPersistableModelService.class.getCanonicalName());
         componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_INTERFACE, JpaPersistableModelService.class.getCanonicalName());
         // Default service interface per stack
-        componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_IMPL, AbstractModelServiceImpl.class.getCanonicalName());
+        componentSuperClassnames.put(CLASSNAME_KEY_SERVICE_IMPL, AbstractJpaPersistableModelServiceImpl.class.getCanonicalName());
         componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL, AbstractJpaPersistableModelServiceImpl.class.getCanonicalName());
         // Default service controller per stack
         componentSuperClassnames.put(CLASSNAME_KEY_CONTROLLER, AbstractModelServiceBackedController.class.getCanonicalName());
-        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER, AbstractPersistableModelController.class.getCanonicalName());
+        componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER, AbstractModelServiceBackedController.class.getCanonicalName());
         // Default ID accessor
         componentSuperClassnames.put(ModelDescriptor.STACK_JPA + CLASSNAME_KEY_IDADAPTER, IdentifierAdapter.class.getCanonicalName());
     }
-	/**
-	 * Create a subclass {@link TypeSpec} of {@link AbstractPersistableModelController}
-	 * or {@link AbstractModelServiceBackedController} depending on whether
-	 * the mndel is an {@link Entity}
-	 * or {@link AbstractModelServiceImpl}
-	 *
-	 * @param descriptor The target model descriptor
-	 * @return the resulting type spec
-	 */
+
 	static TypeSpec createController(ScrudModelDescriptor descriptor) {
 		String className = descriptor.getSimpleName() + "Controller";
 		String beanName = ScrudStringUtils.withFirstCharToLowercase(className);
@@ -160,14 +145,6 @@ class TypeSpecBuilder {
 				.build();
 	}
 
-	/**
-	 * Create a subclass {@link TypeSpec} of {@link AbstractJpaPersistableModelServiceImpl} or
-	 * or {@link AbstractModelServiceImpl}depending on whether
-	 * the mndel is an {@link Entity}
-	 *
-	 * @param descriptor The target model descriptor
-	 * @return the resulting type spec
-	 */
 	static TypeSpec createServiceImpl(ScrudModelDescriptor descriptor) {
 		String className = descriptor.getSimpleName() + "ServiceImpl";
 		String interfaceClassName = descriptor.getSimpleName() + "Service";
@@ -263,29 +240,6 @@ class TypeSpecBuilder {
         else return prefix + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1);
     }
 
-    /**
-     * Create a subclass or {@link AnyToOnePredicateFactory} for the target {@link Entity} model
-     *
-     * @param descriptor The target model descriptor
-     * @return the resulting type spec
-     */
-    static TypeSpec createPredicateFactory(EntityModelDescriptor descriptor) {
-        String className = "AnyToOne" + descriptor.getSimpleName() + "PredicateFactory";
-        log.debug("createPredicateFactory, id: {}", descriptor.getIdType());
-		//AnyToOnePredicateFactory
-		return TypeSpec.classBuilder(className)
-				.addAnnotation(
-						AnnotationSpec.builder(EntityPredicateFactory.class)
-								.addMember("entityClass", "\"" + descriptor.getQualifiedName() + "\"").build())
-				.superclass(
-						ParameterizedTypeName.get(
-								ClassName.get(AnyToOnePredicateFactory.class),
-								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
-								ClassName.bestGuess(descriptor.getIdType())))
-				.addModifiers(Modifier.PUBLIC)
-				.build();
-	}
-
 	/**
 	 * Generate a {@link RequestMapping} pattern for an {@link Entity}-specific  SCRUD REST controller
 	 * @param descriptor The target model descriptor
@@ -306,29 +260,6 @@ class TypeSpecBuilder {
 		// Construct the complete endpoint URL
 		String pattern = "\"/" + modelBasePath + "/" + scrudBean.parentPath() + "/" + modelUriComponent + "\"";
 		return pattern.replaceAll("/{2,}", "/");
-	}
-
-	public static TypeSpec createDtoMapper(ScrudModelDescriptor descriptor, String dtoClass) {
-		String dtoSimpleName = dtoClass.substring(dtoClass.lastIndexOf('.') + 1);
-		String dtoPackage = dtoClass.substring(0, dtoClass.lastIndexOf('.'));
-		log.debug("createDtoMapper, dtoPackage: {}, dtoSimpleName: {}", dtoPackage, dtoSimpleName);
-		String className = descriptor.getSimpleName() + "To" + dtoSimpleName + "Mapper";
-		log.debug("createDtoMapper, className: {}", className);
-
-		return TypeSpec.interfaceBuilder(className)
-				//@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
-				.addAnnotation(
-						AnnotationSpec.builder(Mapper.class)
-								.addMember("unmappedTargetPolicy", "org.mapstruct.ReportingPolicy.IGNORE")
-								.addMember("componentModel", "\"spring\"").build())
-				// extends DtoMapper<EntityClass, DTOClass>
-				.addSuperinterface(
-						ParameterizedTypeName.get(
-								ClassName.get(DtoMapper.class),
-								ClassName.get(descriptor.getPackageName(), descriptor.getSimpleName()),
-								ClassName.get(dtoPackage, dtoSimpleName)))
-				.addModifiers(Modifier.PUBLIC)
-				.build();
 	}
 
 	/**
