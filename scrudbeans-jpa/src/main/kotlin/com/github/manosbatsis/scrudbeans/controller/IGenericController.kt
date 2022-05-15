@@ -1,11 +1,10 @@
 package com.github.manosbatsis.scrudbeans.controller
 
 import com.github.manosbatsis.kotlin.utils.api.Dto
-import com.github.manosbatsis.scrudbeans.model.BaseEntity
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 
-interface IGenericController<T : BaseEntity<S>, S, DTO: Dto<T>> {
+interface IGenericController<T : Any, S, DTO: Dto<T>> {
 	fun find(
 	filter: String,
 	pn: Int,

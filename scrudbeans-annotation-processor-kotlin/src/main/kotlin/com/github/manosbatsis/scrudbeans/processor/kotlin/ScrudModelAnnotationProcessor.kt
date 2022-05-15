@@ -2,7 +2,6 @@ package com.github.manosbatsis.scrudbeans.processor.kotlin
 
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.DtoMapper
-import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
@@ -17,6 +16,7 @@ import javax.lang.model.SourceVersion
 import javax.lang.model.element.Name
 import javax.lang.model.element.TypeElement
 import javax.persistence.Entity
+import javax.tools.Diagnostic
 import javax.tools.StandardLocation
 
 /**
@@ -54,7 +54,15 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     val generatedSourcesRoot: String by lazy {
         processingEnv.options[KAPT_KOTLIN_SCRUDBEANS_GENERATED_OPTION_NAME]
                 ?: processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
-                ?: throw IllegalStateException("Can't find the target directory for generated Kotlin files.")
+                ?: defaultGeneratedSourcesDir()
+    }
+
+    private fun defaultGeneratedSourcesDir(): String {
+            val path = filer.createSourceFile("ScrudBeansGeneratedSourcesRoot")
+                .let { File(it.toUri().toURL().file).parent }
+            val msg = "No kapt.kotlin.generated option provided. Using $path"
+            this.processingEnv.messager.printMessage(Diagnostic.Kind.MANDATORY_WARNING, msg + "\n")
+            return path
     }
 
     val sourceRootFile by lazy {
@@ -98,6 +106,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
             for (element in annotatedModels) {
                 try {
                     if (element is TypeElement) {
+                        processingEnv.noteMessage { "ScrudModelAnnotationProcessor processing ${element.simpleName}" }
                         // Parse model to something more convenient
                         val descriptor = ScrudModelDescriptor(processingEnv, element, configProps)
                         // Mappers for manual DTOs
@@ -108,10 +117,10 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
                         createService(descriptor)
                         createController(descriptor)
                     } else {
-                        processingEnv.errorMessage { "Not an instance of TypeElement but annotated with ScrudBean: ${element.simpleName}" }
+                        element.errorMessage { "Not an instance of TypeElement but annotated with ScrudBean: ${element.simpleName}" }
                     }
-                } catch (e: ScrudModelProcessorException) {
-                    processingEnv.errorMessage { "Failed processing ScrudBean annotation for: ${element.simpleName}: ${e.message}" }
+                } catch (e: Throwable) {
+                    element.errorMessage { "Failed processing ScrudBean annotation for ${element.simpleName}: ${e.message}" }
                     throw e
                 }
 

@@ -3,7 +3,6 @@ package com.github.manosbatsis.scrudbeans.service
 import com.github.manosbatsis.kotlin.utils.api.Dto
 import com.github.manosbatsis.scrudbeans.exceptions.EntityNotFoundException
 import com.github.manosbatsis.scrudbeans.extensions.value
-import com.github.manosbatsis.scrudbeans.model.BaseEntity
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository
 import io.github.perplexhub.rsql.RSQLJPASupport
 import io.github.perplexhub.rsql.RSQLJPASupport.toSpecification
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import javax.persistence.EntityManager
 
-open class AbstractJpaPersistableModelServiceImpl<T: BaseEntity<S>, S: Any, B: ModelRepository<T, S>>(
+open class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRepository<T, S>>(
 	protected val repository: B,
 	val entityType: Class<T>,
 	val entityIdType: Class<S>,

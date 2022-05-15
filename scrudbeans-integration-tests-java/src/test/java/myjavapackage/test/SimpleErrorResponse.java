@@ -1,17 +1,14 @@
 package myjavapackage.test;
 
-import java.util.Set;
+
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.github.manosbatsis.scrudbeans.api.error.ConstraintViolationEntry;
-import com.github.manosbatsis.scrudbeans.api.error.Error;
 import lombok.Data;
 
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SimpleErrorResponse implements Error {
+public class SimpleErrorResponse {
 
     private String message;
 
@@ -29,6 +26,5 @@ public class SimpleErrorResponse implements Error {
 
     private Throwable throwable;
 
-    private Set<ConstraintViolationEntry> validationErrors;
 
 }

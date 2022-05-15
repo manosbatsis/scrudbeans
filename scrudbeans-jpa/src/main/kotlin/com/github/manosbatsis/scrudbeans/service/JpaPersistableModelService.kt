@@ -1,13 +1,12 @@
 package com.github.manosbatsis.scrudbeans.service
 
 import com.github.manosbatsis.kotlin.utils.api.Dto
-import com.github.manosbatsis.scrudbeans.model.BaseEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import java.util.*
 
-interface JpaPersistableModelService<T: BaseEntity<S>, S> {
+interface JpaPersistableModelService<T : Any, S> {
 	/** Count resources by type */
 	fun count(): Long
 	/** Count resources by type using an RSQL filter */

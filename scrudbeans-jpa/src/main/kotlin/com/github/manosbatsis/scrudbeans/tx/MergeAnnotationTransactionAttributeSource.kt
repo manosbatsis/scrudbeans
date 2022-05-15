@@ -101,7 +101,7 @@ class MergeAnnotationTransactionAttributeSource : AnnotationTransactionAttribute
 
             if (primary.qualifier.isNullOrBlank()) primary.qualifier = secondary.qualifier
             if (primary.descriptor.isNullOrBlank()) primary.descriptor = secondary.descriptor
-            if (primary.name.isNullOrBlank()) primary.setName(secondary.name!!)
+            if (primary.name.isNullOrBlank() && !secondary.name.isNullOrBlank()) primary.setName(secondary.name!!)
 
 
             // The following properties have default values in DefaultTransactionDefinition;

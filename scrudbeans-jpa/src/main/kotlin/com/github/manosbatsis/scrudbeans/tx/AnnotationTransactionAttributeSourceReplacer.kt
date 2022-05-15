@@ -4,7 +4,6 @@ import com.github.manosbatsis.scrudbeans.logging.loggerFor
 import org.springframework.beans.BeansException
 import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor
 import org.springframework.core.PriorityOrdered
-import org.springframework.stereotype.Component
 import org.springframework.transaction.interceptor.TransactionAttributeSource
 
 
@@ -16,7 +15,8 @@ import org.springframework.transaction.interceptor.TransactionAttributeSource
  *
  * @author Eugen Labun
  */
-@Component
+// TODO: is this needed at all?
+//@Component
 class AnnotationTransactionAttributeSourceReplacer : InstantiationAwareBeanPostProcessor,
     PriorityOrdered /*this is important*/ {
 
@@ -35,7 +35,7 @@ class AnnotationTransactionAttributeSourceReplacer : InstantiationAwareBeanPostP
         return if (beanName == "transactionAttributeSource"
             && TransactionAttributeSource::class.java.isAssignableFrom(beanClass)
         ) {
-            MergeAnnotationTransactionAttributeSource().let {
+            MergeAnnotationTransactionAttributeSource().also {
                 logger.debug("instantiating bean {} as {}", beanName, it::class.java.name)
             }
         } else {

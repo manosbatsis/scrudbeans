@@ -2,15 +2,12 @@ package myjavapackage.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
-import com.github.manosbatsis.scrudbeans.model.AbstractHibernateModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import myjavapackage.dto.OrderUpdateEmailDTO;
 import org.hibernate.annotations.GenericGenerator;
-import org.javers.core.metamodel.annotation.DiffIgnore;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -27,9 +24,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@ScrudBean(dtoTypes = OrderUpdateEmailDTO.class, dtoTypeNames = "myjavapackage.dto.OrderUpdateCommentDTO")
+@ScrudBean(dtoTypeNames = "myjavapackage.dto.OrderUpdateCommentDTO")
 @Schema(name = "Order", description = "A model representing an order of product items")
-public class Order extends AbstractHibernateModel<String> {
+public class Order {
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -46,7 +43,6 @@ public class Order extends AbstractHibernateModel<String> {
     private String comment;
 
     @CreatedDate
-    @DiffIgnore
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Date created", readOnly = true)
@@ -54,7 +50,6 @@ public class Order extends AbstractHibernateModel<String> {
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @DiffIgnore
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Date last modified", readOnly = true)

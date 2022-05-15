@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.atteo.evo.inflector.English;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.lang.model.element.Modifier;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -164,6 +166,21 @@ class TypeSpecBuilder {
 								ClassName.get(descriptor.getParentPackageName() + ".repository", descriptor.getSimpleName() + "Repository")))
 				.addSuperinterface(ClassName.get(descriptor.getParentPackageName() + ".service", interfaceClassName))
 				.addModifiers(Modifier.PUBLIC)
+				.addMethod(MethodSpec.constructorBuilder()
+						.addParameter(ParameterSpec
+								.builder(ClassName.bestGuess(
+										descriptor.getParentPackageName() + ".repository." + descriptor.getSimpleName() + "Repository"),
+										"repository")
+								.addAnnotation(Autowired.class)
+								.build())
+						.addParameter(ParameterSpec
+								.builder(EntityManager.class, "entityManager")
+								.addAnnotation(Autowired.class)
+								.build())
+						.addStatement("super(repository, $T.class, $T.class, entityManager)",
+								ClassName.bestGuess(descriptor.getQualifiedName()),
+								ClassName.bestGuess(descriptor.getIdType()))
+						.build())
 				.build();
 	}
 

@@ -1,19 +1,16 @@
 package myjavapackage.model;
 
-import java.math.BigDecimal;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean;
-import com.github.manosbatsis.scrudbeans.model.AbstractSystemUuidPersistableModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "products")
@@ -23,7 +20,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @ScrudBean
 @Schema(name = "Product", description = "A model representing a single product")
-public class Product extends AbstractSystemUuidPersistableModel {
+public class Product {
+
+    @Id
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
+    private String id;
 
     @NotNull
     @Column(nullable = false)

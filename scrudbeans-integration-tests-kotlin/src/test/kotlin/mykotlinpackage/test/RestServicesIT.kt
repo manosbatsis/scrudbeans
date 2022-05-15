@@ -6,8 +6,9 @@ import com.github.manosbatsis.scrudbeans.logging.RequestResponseLoggingIntercept
 import com.github.manosbatsis.scrudbeans.test.TestableParamsAwarePage
 import mykotlinpackage.ScrudBeansSampleApplication
 import mykotlinpackage.model.*
-import org.junit.jupiter.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.slf4j.LoggerFactory
@@ -55,12 +56,12 @@ class RestServicesIT(
             null,
             ProductsPage::class.java
         ).let {
-            org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
-            org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
             it.body!!
         }
         // expecting three books
-        Assertions.assertTrue(products.content.size == 3)
+        assertTrue(products.content.size == 3)
         // Test Create
         //============================
         // We have no auth mechanism by default, so we'll
@@ -72,20 +73,32 @@ class RestServicesIT(
             HttpEntity(order),
             Order::class.java
         ).let {
-            org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
-            org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+            assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
+            assertThat(it.body).isNotNull
             it.body!!
         }
         // Test Update
         //============================
         order.email = order.email.toString() + "_updated"
+        // 1) test update result...
         order = restTemplate.exchange(
             "/api/rest/orders/${order.id}", HttpMethod.PUT,
             HttpEntity(order),
             Order::class.java
         ).let {
-            org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
-            org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
+            it.body!!
+        }
+        assertEquals(email + "_updated", order.email)
+        // 1) test reloaded resource...
+        order = restTemplate.exchange(
+            "/api/rest/orders/${order.id}", HttpMethod.GET,
+            null,
+            Order::class.java
+        ).let {
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
             it.body!!
         }
         assertEquals(email + "_updated", order.email)
@@ -102,8 +115,8 @@ class RestServicesIT(
             HttpEntity(orderMap),
             Order::class.java
         ).let {
-            org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
-            org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
             it.body!!
         }
         assertEquals(email + "_updated_patched", order.email)
@@ -116,8 +129,8 @@ class RestServicesIT(
             null,
             Order::class.java
         ).let {
-            org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
-            org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
             it.body!!
         }
         assertEquals(email + "_updated_patched", order.email)
@@ -133,8 +146,8 @@ class RestServicesIT(
                 HttpEntity(orderLine),
                 OrderLine::class.java
             ).let {
-                org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
-                org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+                assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
+                assertThat(it.body).isNotNull
                 it.body!!
             }
         }
@@ -149,12 +162,12 @@ class RestServicesIT(
             null,
             OrdersPage::class.java
         ).let {
-            org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
-            org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
             it.body!!
         }
         // expecting 2 orders, one created on startup and one from this test
-        Assertions.assertEquals(2, ordersOfTheDay.totalElements)
+        assertEquals(2, ordersOfTheDay.totalElements)
         // try the same dates for the following year
         startOfDay = startOfDay.plusYears(1)
         endOfDay = endOfDay.plusYears(1)
@@ -163,12 +176,12 @@ class RestServicesIT(
             null,
             OrdersPage::class.java
         ).let {
-            org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
-            org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
             it.body!!
         }
         // expecting 0 orders as the date range is set to the future
-        Assertions.assertEquals(0, ordersOfTheDay.totalElements)
+        assertEquals(0, ordersOfTheDay.totalElements)
     }
 
     @Test
@@ -178,8 +191,8 @@ class RestServicesIT(
             null,
             ProductsPage::class.java
         ).let {
-            org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
-            org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
             it.body!!
         }
         // Create ProductRelationship for each combination
@@ -201,8 +214,8 @@ class RestServicesIT(
                         HttpEntity(relationship),
                         ProductRelationship::class.java
                     ).let {
-                        org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
-                        org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+                        assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
+                        assertThat(it.body).isNotNull
                         it.body!!
                     }
 
@@ -213,8 +226,8 @@ class RestServicesIT(
                         HttpEntity(relationship),
                         ProductRelationship::class.java
                     ).let {
-                        org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
-                        org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+                        assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+                        assertThat(it.body).isNotNull
                         it.body!!
                     }
                     // Test Patch
@@ -225,8 +238,8 @@ class RestServicesIT(
                         HttpEntity(patch),
                         ProductRelationship::class.java
                     ).let {
-                        org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
-                        org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+                        assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+                        assertThat(it.body).isNotNull
                         it.body!!
                     }
                     // Test Read
@@ -235,8 +248,8 @@ class RestServicesIT(
                         null,
                         ProductRelationship::class.java
                     ).let {
-                        org.assertj.core.api.Assertions.assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
-                        org.assertj.core.api.Assertions.assertThat(it.body).isNotNull
+                        assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+                        assertThat(it.body).isNotNull
                         it.body!!
                     }
                     assertEquals(description + "_updated_patched", relationship.description)

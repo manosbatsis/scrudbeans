@@ -31,9 +31,7 @@ import java.util.*
 @EnableJpaAuditing
 // Scan for existing or runtime-generated (scrudbeans) components
 @EntityScan(ScrudBeansSampleApplication.PACKAGE_NAME)
-@EnableJpaRepositories(
-        basePackages = [ScrudBeansSampleApplication.PACKAGE_NAME]
-)
+@EnableJpaRepositories(basePackages = [ScrudBeansSampleApplication.PACKAGE_NAME])
 class ScrudBeansSampleApplication {
 
     companion object {

@@ -22,9 +22,14 @@ class ScrudModelDescriptor(
     val dtoTypes: MutableSet<String> = mutableSetOf()
 
     init {
-        scrudBean = typeElement.getAnnotation(ScrudBean::class.java)
-        className = typeElement.asKotlinClassName()
-        initDtoClassnames(typeElement)
+        try {
+            scrudBean = typeElement.getAnnotation(ScrudBean::class.java)
+            className = typeElement.asKotlinClassName()
+            initDtoClassnames(typeElement)
+        }catch (e: Throwable){
+            e.printStackTrace()
+            throw e;
+        }
     }
 
 

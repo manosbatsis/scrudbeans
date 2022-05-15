@@ -20,14 +20,15 @@ open class ScrudBeansDtoMembersStrategy(
 
     override fun toPatchStatement(fieldIndex: Int, variableElement: VariableElement, commaOrEmpty: String): DtoMembersStrategy.Statement? {
         val propertyName = rootDtoMembersStrategy.toPropertyName(variableElement)
+        val maybeNamedParam = if(annotatedElementInfo.primaryTargetTypeElement.isKotlin()) "$propertyName = " else ""
         return if(annotatedElementInfo.nonUpdatableProperties.contains(propertyName)){
-            return DtoMembersStrategy.Statement("      $propertyName = " +
+            return DtoMembersStrategy.Statement("      $maybeNamedParam" +
                     "errNonUpdatableOrOriginalValue(%S, $propertyName, original.$propertyName)$commaOrEmpty", listOf(propertyName)
             )
         }
         else {
             val assignmentContext = assignmentCtxForToPatched(propertyName)
-            return DtoMembersStrategy.Statement("      $propertyName = this.$propertyName${assignmentContext.fallbackValue}$commaOrEmpty")
+            return DtoMembersStrategy.Statement("      ${maybeNamedParam}this.$propertyName${assignmentContext.fallbackValue}$commaOrEmpty")
         }
 
     }
