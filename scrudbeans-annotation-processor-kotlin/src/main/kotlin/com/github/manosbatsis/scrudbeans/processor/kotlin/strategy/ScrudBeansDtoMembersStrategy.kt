@@ -18,6 +18,8 @@ open class ScrudBeansDtoMembersStrategy(
         this.rootDtoStrategy = rootDtoStrategy
     }
 
+    override fun useMutableIterables(): Boolean = true
+
     override fun toPatchStatement(fieldIndex: Int, variableElement: VariableElement, commaOrEmpty: String): DtoMembersStrategy.Statement? {
         val propertyName = rootDtoMembersStrategy.toPropertyName(variableElement)
         val maybeNamedParam = if(annotatedElementInfo.primaryTargetTypeElement.isKotlin()) "$propertyName = " else ""

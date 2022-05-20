@@ -130,7 +130,7 @@ internal class TypeSpecBuilder(
         val className: String = modelClassName.simpleName + "IdentifierAdapter"
         val pkgAndName = ClassUtils.getPackageAndSimpleName(
                 getSuperclassName(descriptor, TypeSpecBuilder.CLASSNAME_KEY_IDADAPTER))
-        return TypeSpec.classBuilder(className)
+        return TypeSpec.objectBuilder(className)
                 .addAnnotation(AnnotationSpec.builder(IdentifierAdapterBean::class.java)
                         .addMember("className = %S", modelClassName)
                         .build())
@@ -189,6 +189,7 @@ internal class TypeSpecBuilder(
         val superClassPackageAndName = ClassUtils.getPackageAndSimpleName(getSuperclassName(descriptor, CLASSNAME_KEY_SERVICE_IMPL))
         val superClassName = ClassName(superClassPackageAndName.left, superClassPackageAndName.right).parameterizedBy(
             entityType, descriptor.idClassName, repositoryType)
+        val identifierAdapterClassName = ClassName(descriptor.packageName, "${descriptor.simpleName}IdentifierAdapter")
         return TypeSpec.classBuilder(className)
                 .addAnnotation(
                         AnnotationSpec.builder(Service::class.java)
@@ -218,6 +219,10 @@ internal class TypeSpecBuilder(
             .addSuperclassConstructorParameter("%T::class.java", entityType)
             .addSuperclassConstructorParameter("%T::class.java", descriptor.idClassName)
             .addSuperclassConstructorParameter("entityManager")
+            .addProperty(PropertySpec.builder(
+                "identifierAdapter", identifierAdapterClassName, OVERRIDE)
+                .initializer("%T", identifierAdapterClassName)
+                .build())
             .build()
     }
 

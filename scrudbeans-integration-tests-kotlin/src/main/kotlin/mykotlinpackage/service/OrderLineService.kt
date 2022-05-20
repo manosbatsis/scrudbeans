@@ -2,6 +2,7 @@ package mykotlinpackage.service
 
 import com.github.manosbatsis.scrudbeans.service.AbstractJpaPersistableModelServiceImpl
 import mykotlinpackage.model.OrderLine
+import mykotlinpackage.model.OrderLineIdentifierAdapter
 import mykotlinpackage.repository.OrderLineRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -14,5 +15,6 @@ class OrderLineService(
 ) : AbstractJpaPersistableModelServiceImpl<OrderLine, UUID, OrderLineRepository>(
     orderLineRepository, OrderLine::class.java, UUID::class.java, entityManager
 ) {
+    override val identifierAdapter = OrderLineIdentifierAdapter
 
 }

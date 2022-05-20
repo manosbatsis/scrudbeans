@@ -67,7 +67,13 @@ class RestServicesIT(
         // We have no auth mechanism by default, so we'll
         // create and use an actual order as a shopping basket
         val email = "foo@bar.baz"
-        var order: Order = Order(email = email)
+        var order: Order = Order(
+            email = email,
+            lines = mutableListOf(
+                OrderLine(
+                    product = products.last()
+                ))
+        )
         order = restTemplate.exchange(
             "/api/rest/orders", HttpMethod.POST,
             HttpEntity(order),
@@ -136,7 +142,8 @@ class RestServicesIT(
         assertEquals(email + "_updated_patched", order.email)
         // Add order items (lines)
         val quantity = 2
-        for (p in products) {
+        val orderLineProducs = products.content.dropLast(1)
+        for (p in orderLineProducs) {
 
             val orderLine: OrderLine = OrderLine(order = order, product = p, quantity = quantity)
             log.debug("Saving order line: $orderLine")
@@ -155,6 +162,7 @@ class RestServicesIT(
         val localDate = LocalDate.now(ZoneId.systemDefault())
         var startOfDay = OffsetDateTime.of(localDate.atStartOfDay(), ZoneOffset.UTC)
         var endOfDay = OffsetDateTime.of(localDate.atTime(23, 59, 59), ZoneOffset.UTC)
+
         // Test RSQL Search
         //============================
         var ordersOfTheDay = restTemplate.exchange(
@@ -182,6 +190,20 @@ class RestServicesIT(
         }
         // expecting 0 orders as the date range is set to the future
         assertEquals(0, ordersOfTheDay.totalElements)
+
+        // Test child endpoint
+        //============================
+        val firstOrderLine = order.lines.first()
+        val firstOrderLineProduct = restTemplate.exchange(
+            "/api/rest/orderLines/product", HttpMethod.GET,
+            null,
+            Product::class.java
+        ).let {
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
+            it.body!!
+        }
+        assertEquals(firstOrderLine.product, firstOrderLineProduct)
     }
 
     @Test

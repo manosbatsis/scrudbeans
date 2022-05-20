@@ -137,11 +137,11 @@ object EntityUtil {
         }
     }
 
-    fun getNullPropertyNames(source: Any): Array<String> {
+    fun getNullPropertyNames(source: Any): List<String> {
         val beanWrapper = BeanWrapperImpl(source)
         return beanWrapper.propertyDescriptors
             .filter { isNullOrUnreadableProperty(beanWrapper, it.name) }
-            .map { it.name }.distinct().toTypedArray()
+            .map { it.name }.distinct()
     }
 
     fun isNullOrUnreadableProperty(source: BeanWrapper, name: String?): Boolean {

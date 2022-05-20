@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import javax.persistence.EntityManager
 
-open class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRepository<T, S>>(
+abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRepository<T, S>>(
 	protected val repository: B,
 	val entityType: Class<T>,
 	val entityIdType: Class<S>,
