@@ -24,6 +24,7 @@ import java.lang.annotation.Documented
 import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
 
+@Deprecated("Use RSQL operators instead")
 @Documented
 @Target(AnnotationTarget.FIELD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -26,23 +26,23 @@ public abstract class ModelDescriptor {
 
     public static final String STACK_JPA = "jpa";
 
-    private TypeElement typeElement;
+    protected TypeElement typeElement;
 
-    private final Boolean jpaEntity;
+	protected final Boolean jpaEntity;
 
-    private String idType;
+	protected String idType;
 
-    private String idName;
+	protected String idName;
 
-    private final String qualifiedName;
+	protected final String qualifiedName;
 
-    private final String simpleName;
+	protected final String simpleName;
 
-    private final String packageName;
+	protected String packageName;
 
-    private final String parentPackageName;
+	protected String parentPackageName;
 
-    private Map<String, String> genericParamTypes = new HashMap<>();
+	protected Map<String, String> genericParamTypes = new HashMap<>();
 
 	public ModelDescriptor(ProcessingEnvironment processingEnv, TypeElement typeElement) throws ScrudModelProcessorException {
 		this.typeElement = typeElement;

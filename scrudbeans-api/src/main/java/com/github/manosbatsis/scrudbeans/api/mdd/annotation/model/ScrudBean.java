@@ -79,6 +79,10 @@ public @interface ScrudBean {
      */
 	String controllerSuperClass() default "";
 
+	Class serviceSuperInterface() default Object.class;
+
+	Class serviceImplSuperClass() default Object.class;
+
 	/**
 	 * The default "parent" mapping part for annotated type
 	 */

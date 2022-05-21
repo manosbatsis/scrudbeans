@@ -21,121 +21,22 @@
 package com.github.manosbatsis.scrudbeans.util
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudRelatedBean
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry
-import com.github.manosbatsis.scrudbeans.validation.CaseSensitive
 import org.apache.commons.lang3.StringUtils
-import org.apache.commons.lang3.reflect.FieldUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.BeanWrapper
 import org.springframework.beans.BeanWrapperImpl
-import org.springframework.beans.factory.config.BeanDefinition
-import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
-import org.springframework.core.type.filter.AnnotationTypeFilter
-import org.springframework.util.Assert
-import org.springframework.util.ReflectionUtils
-import java.beans.BeanInfo
-import java.beans.IntrospectionException
-import java.beans.Introspector
 import java.io.Serializable
-import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import javax.persistence.Embeddable
-import javax.persistence.Entity
 
 object EntityUtil {
     private val LOGGER = LoggerFactory.getLogger(EntityUtil::class.java)
-    private val fieldCaseSensitivity = ConcurrentHashMap<String, Boolean>()
-    private var provider: ClassPathScanningCandidateComponentProvider? = null
     private val scrudBeanTypes: MutableMap<Class<*>, Boolean> = ConcurrentHashMap()
-    fun isScrudBean(domainType: Class<*>): Boolean? {
-        var isScrudBean = scrudBeanTypes[domainType]
-        if (Objects.isNull(isScrudBean)) {
-            isScrudBean = domainType.isAnnotationPresent(ScrudBean::class.java)
-            scrudBeanTypes[domainType] = true
+    fun isScrudBean(domainType: Class<*>): Boolean =
+        scrudBeanTypes.getOrPut(domainType){
+            domainType.isAnnotationPresent(ScrudBean::class.java)
         }
-        return isScrudBean
-    }
-
-    fun <T> getParentEntity(child: Any): T? {
-        val anr = child.javaClass.getAnnotation(ScrudRelatedBean::class.java)
-        Assert.notNull(anr, "Given child object has no @RelatedEntity annotation")
-        val field = ReflectionUtils.findField(child.javaClass, anr.parentProperty)
-        field!!.isAccessible = true
-        val parent = ReflectionUtils.getField(field, child)
-        return parent as T?
-    }
-
-    fun findPersistableModels(scanPackage: String?): Set<BeanDefinition> {
-        createComponentScanner(Entity::class.java, Embeddable::class.java)
-        return provider!!.findCandidateComponents(scanPackage!!)
-    }
-
-    fun findModelResources(scanPackage: String?): Set<BeanDefinition> {
-        createComponentScanner(ScrudBean::class.java, ScrudRelatedBean::class.java)
-        return provider!!.findCandidateComponents(scanPackage!!)
-    }
-
-    fun findEntities(vararg basePackages: String?): Set<BeanDefinition> {
-        createComponentScanner(Entity::class.java)
-        val entities: MutableSet<BeanDefinition> = HashSet()
-        for (basePackage in basePackages) {
-            entities.addAll(provider!!.findCandidateComponents(basePackage!!))
-        }
-        return entities
-    }
-
-    fun findAllHelpers(vararg basePackages: String?): Set<BeanDefinition> {
-        createComponentScanner(EntityPredicateFactory::class.java, IdentifierAdapterBean::class.java)
-        val predicateFactories: MutableSet<BeanDefinition> = HashSet()
-        for (basePackage in basePackages) {
-            predicateFactories.addAll(provider!!.findCandidateComponents(basePackage!!))
-        }
-        return predicateFactories
-    }
-
-    fun findAllModels(vararg basePackages: String?): Set<BeanDefinition> {
-        createComponentScanner(Entity::class.java, ScrudBean::class.java, ScrudRelatedBean::class.java)
-        val entities: MutableSet<BeanDefinition> = HashSet()
-        for (basePackage in basePackages) {
-            entities.addAll(provider!!.findCandidateComponents(basePackage!!))
-        }
-        return entities
-    }
-
-    fun findEntityPackageNames(vararg basePackages: String?): Set<String> {
-        val ids: MutableSet<String> = HashSet()
-        for (basePackage in basePackages) {
-            val entityBeanDefs = findEntities(basePackage)
-            for (beanDef in entityBeanDefs) {
-                val entity = ClassUtils.getClass(beanDef.beanClassName)
-                ids.add(entity.getPackage().name)
-            }
-        }
-        return ids
-    }
-
-    fun createComponentScanner(vararg annotations: Class<out Annotation>) {
-        if (provider == null) {
-            provider = ClassPathScanningCandidateComponentProvider(false)
-        } else {
-            provider!!.resetFilters(false)
-        }
-        for (annotation in annotations) {
-            provider!!.addIncludeFilter(AnnotationTypeFilter(annotation))
-        }
-    }
-
-    fun getBeanInfo(beanType: Class<*>?): BeanInfo {
-        return try {
-            Introspector.getBeanInfo(beanType)
-        } catch (e: IntrospectionException) {
-            throw RuntimeException(e)
-        }
-    }
 
     fun getNullPropertyNames(source: Any): List<String> {
         val beanWrapper = BeanWrapperImpl(source)
@@ -160,26 +61,9 @@ object EntityUtil {
         return nullOrUnreadable
     }
 
-    fun isCaseSensitive(domainClass: Class<*>, propertyName: String?): Boolean {
-        var caseSensitive = false
-        val fieldKey = StringBuffer(domainClass.canonicalName).append('.').append(propertyName).toString()
-        if (!fieldCaseSensitivity.containsKey(fieldKey)) {
-            val field = FieldUtils.getField(domainClass, propertyName, true)
-            if (field != null && String::class.java.isAssignableFrom(field.type)) {
-                val annotation = field.getAnnotation(CaseSensitive::class.java)
-                if (annotation != null) {
-                    caseSensitive = annotation.value
-                }
-                fieldCaseSensitivity[fieldKey] = caseSensitive
-            }
-        } else {
-            caseSensitive = fieldCaseSensitivity[fieldKey]!!
-        }
-        return caseSensitive
-    }
 
     fun <PK : Serializable?> idOrNull(entity: Any?): PK? {
-        return entity?.let {entity ->
+        return entity?.let {
                 IdentifierAdaptersRegistry.getAdapterForClass(entity.javaClass)
                     .readId(entity) as PK
         }

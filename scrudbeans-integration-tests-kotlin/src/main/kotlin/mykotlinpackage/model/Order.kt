@@ -5,6 +5,8 @@ import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.model.AbstractAuditableEntity
 import io.swagger.v3.oas.annotations.media.Schema
 import mykotlinpackage.dto.OrderUpdateEmailDTO
+import mykotlinpackage.service.CustomBaseService
+import mykotlinpackage.service.CustomBaseServiceImpl
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.util.*
 import javax.persistence.*
@@ -13,7 +15,12 @@ import javax.validation.constraints.NotNull
 @Entity
 @Table(name = "product_orders")
 @EntityListeners(AuditingEntityListener::class)
-@ScrudBean(dtoTypes = [OrderUpdateEmailDTO::class], dtoTypeNames = ["mykotlinpackage.dto.OrderUpdateCommentDTO"])
+@ScrudBean(
+        serviceSuperInterface = CustomBaseService::class,
+        serviceImplSuperClass = CustomBaseServiceImpl::class,
+        dtoTypes = [OrderUpdateEmailDTO::class],
+        dtoTypeNames = ["mykotlinpackage.dto.OrderUpdateCommentDTO"]
+)
 @Schema(name = "Order", description = "A model representing an order of product items")
 class Order(
         id: UUID? = null,

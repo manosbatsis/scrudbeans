@@ -120,7 +120,8 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
                         element.errorMessage { "Not an instance of TypeElement but annotated with ScrudBean: ${element.simpleName}" }
                     }
                 } catch (e: Throwable) {
-                    element.errorMessage { "Failed processing ScrudBean annotation for ${element.simpleName}: ${e.message}" }
+                    element.errorMessage { "Failed processing ScrudBean annotation for ${element.simpleName}: ${e.message ?: e.cause?.message}" }
+                    e.printStackTrace()
                     throw e
                 }
 

@@ -52,6 +52,8 @@ internal class TypeSpecBuilder(
         val CLASSNAME_KEY_SERVICE_IMPL = "serviceImpl"
         val CLASSNAME_KEY_CONTROLLER = "controller"
         val CLASSNAME_KEY_IDADAPTER = "idadapter"
+
+        val multipleSlashesRegex = "/{2,}".toRegex()
         val componentSuperClassnames: Map<String, String> = mapOf(
                 // Default repos
                 ModelDescriptor.STACK_JPA + CLASSNAME_KEY_REPOSITORY to ModelRepository::class.java.canonicalName,
@@ -110,7 +112,7 @@ internal class TypeSpecBuilder(
                 //        AnnotationSpec.builder(ExposesResourceFor::class.java)
                 //                . addMember("value = %L", descriptor.simpleName + "::class").build())
                 .superclass(
-                        ClassName(pkgAndName.left, pkgAndName.right).parameterizedBy(
+                        ClassName(pkgAndName.first, pkgAndName.second).parameterizedBy(
                                 ClassName(descriptor.packageName, descriptor.simpleName),
                                 descriptor.idClassName,
                                 ClassName(descriptor.parentPackageName + ".service", descriptor.simpleName + "Service"),
@@ -129,15 +131,17 @@ internal class TypeSpecBuilder(
     fun createIdAdapter(modelClassName: ClassName, descriptor: ScrudModelDescriptor): TypeSpec {
         val className: String = modelClassName.simpleName + "IdentifierAdapter"
         val pkgAndName = ClassUtils.getPackageAndSimpleName(
-                getSuperclassName(descriptor, TypeSpecBuilder.CLASSNAME_KEY_IDADAPTER))
+                getSuperclassName(descriptor, CLASSNAME_KEY_IDADAPTER))
         return TypeSpec.objectBuilder(className)
                 .addAnnotation(AnnotationSpec.builder(IdentifierAdapterBean::class.java)
                         .addMember("className = %S", modelClassName)
                         .build())
                 .addModifiers(PUBLIC)
                 .addSuperinterface(
-                        ClassName(pkgAndName.left, pkgAndName.right)
-                                .parameterizedBy(modelClassName, descriptor.idClassName)).addFunction(FunSpec.builder("getIdName")
+                        ClassName(pkgAndName.first, pkgAndName.second)
+                                .parameterizedBy(modelClassName, descriptor.idClassName)
+                )
+                .addFunction(FunSpec.builder("getIdName")
                         .addModifiers(PUBLIC, OVERRIDE)
                         .returns(String::class)
                         .addParameter(ParameterSpec.builder("resource", modelClassName).build())
@@ -152,6 +156,19 @@ internal class TypeSpecBuilder(
                 .build()
     }
 
+    private fun getTargetPackageAndSimpleName(
+        descriptor: ScrudModelDescriptor,
+        scrudBeansPropName: String,
+        defaultPropValueKey: String
+    ): ClassName {
+        val classNameStringOrNull = descriptor.scrudBeanClassNamesValue(scrudBeansPropName)
+        return if(classNameStringOrNull.isNullOrBlank() || classNameStringOrNull == Object::class.qualifiedName)
+            ClassName.bestGuess(getSuperclassName(descriptor, defaultPropValueKey))
+        else {
+            ClassName.bestGuess(classNameStringOrNull)
+        }
+    }
+
     /**
      * Create a sub-interface [TypeSpec] of [JpaPersistableModelService]
      * or [ModelService] depending on whether
@@ -162,11 +179,11 @@ internal class TypeSpecBuilder(
      */
     fun createServiceInterface(descriptor: ScrudModelDescriptor): TypeSpec {
         val className: String = descriptor.simpleName + "Service"
-        val pkgAndName = ClassUtils.getPackageAndSimpleName(
-                getSuperclassName(descriptor, TypeSpecBuilder.CLASSNAME_KEY_SERVICE_INTERFACE)!!)
+        val superClassName = getTargetPackageAndSimpleName(
+            descriptor, "serviceSuperInterface", CLASSNAME_KEY_SERVICE_INTERFACE)
         return TypeSpec.interfaceBuilder(className)
                 .addSuperinterface(
-                        ClassName(pkgAndName.left, pkgAndName.right).parameterizedBy(
+                    superClassName.parameterizedBy(
                                 ClassName(descriptor.packageName, descriptor.simpleName),
                                 descriptor.idClassName))
                 .addModifiers(KModifier.PUBLIC)
@@ -186,8 +203,9 @@ internal class TypeSpecBuilder(
         val interfaceClassName: String = descriptor.simpleName + "Service"
         val entityType = ClassName(descriptor.packageName, descriptor.simpleName)
         val repositoryType = ClassName(descriptor.parentPackageName + ".repository", descriptor.simpleName + "Repository")
-        val superClassPackageAndName = ClassUtils.getPackageAndSimpleName(getSuperclassName(descriptor, CLASSNAME_KEY_SERVICE_IMPL))
-        val superClassName = ClassName(superClassPackageAndName.left, superClassPackageAndName.right).parameterizedBy(
+        val superClassNameRaw = getTargetPackageAndSimpleName(
+            descriptor, "serviceImplSuperClass", CLASSNAME_KEY_SERVICE_IMPL)
+        val superClassName = superClassNameRaw.parameterizedBy(
             entityType, descriptor.idClassName, repositoryType)
         val identifierAdapterClassName = ClassName(descriptor.packageName, "${descriptor.simpleName}IdentifierAdapter")
         return TypeSpec.classBuilder(className)
@@ -239,7 +257,7 @@ internal class TypeSpecBuilder(
         return TypeSpec.interfaceBuilder(className)
                 .addAnnotation(Repository::class.java)
                 .addSuperinterface(
-                        ClassName(pkgAndName.left, pkgAndName.right).parameterizedBy(
+                        ClassName(pkgAndName.first, pkgAndName.second).parameterizedBy(
                                 ClassName(descriptor.packageName, descriptor.simpleName),
                                 descriptor.idClassName))
                 .addModifiers(KModifier.PUBLIC)
@@ -263,7 +281,7 @@ internal class TypeSpecBuilder(
         val modelBasePath = if (StringUtils.isNotBlank(scrudBean.basePath)) scrudBean.basePath else "api/rest"
         // Construct the complete endpoint URL
         val pattern = "/$modelBasePath/${scrudBean.parentPath}/$modelUriComponent"
-        return pattern.replace("/{2,}".toRegex(), "/")
+        return pattern.replace(multipleSlashesRegex, "/")
     }
 
     fun isNonUpdatableField(

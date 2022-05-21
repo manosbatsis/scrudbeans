@@ -12,10 +12,10 @@ import javax.lang.model.element.TypeElement
  * [ScrudBean]. Used during kotlinpoet-driven sourcecode generation.
  */
 class ScrudModelDescriptor(
-        processingEnv: ProcessingEnvironment,
-        typeElement: TypeElement,
-        val configProperties: Properties
-) : EntityModelDescriptor(processingEnv, typeElement) {
+    processingEnvironment: ProcessingEnvironment,
+    typeElement: TypeElement,
+    val configProperties: Properties
+) : EntityModelDescriptor(processingEnvironment, typeElement) {
 
     val scrudBean: ScrudBean
     val className: ClassName
@@ -76,5 +76,9 @@ class ScrudModelDescriptor(
                 }
     }
 
+    fun scrudBeanClassNamesValue(annotationAttributeName: String): String? {
+        return toAnnotationClassNamesValueStream(typeElement, ScrudBean::class.java, annotationAttributeName)
+            .singleOrNull()
+    }
 
 }

@@ -13,9 +13,9 @@ import javax.persistence.Id
  * [Entity]. Used during kotlinpoet-driven sourcecode generation.
  */
 open class EntityModelDescriptor(
-        processingEnv: ProcessingEnvironment,
-        typeElement: TypeElement
-) : ModelDescriptor(processingEnv, typeElement) {
+    processingEnvironment: ProcessingEnvironment,
+    typeElement: TypeElement
+) : ModelDescriptor(processingEnvironment, typeElement) {
 
     companion object{
         val idAnnotations = listOf(Id::class.java, EmbeddedId::class.java)

@@ -41,7 +41,7 @@ public class ScrudModelDescriptor extends ModelDescriptor {
 	/** Initialise the set of DTO classnames for this ScrudBean. Used to create mappers from/to this ScrudBean */
 	private void initDtoClassnames(TypeElement typeElement) {
 		// Get DTO classnames from "dtoTypes"
-		dtoTypes = toAnnotationClassNamesValueStream(typeElement, ScrudBean.class, "dtoTypes")
+		dtoTypes = annotationClassNamesValueStream(typeElement, ScrudBean.class, "dtoTypes")
 				.filter(it -> !Object.class.getCanonicalName().equals(it))
 				.collect(Collectors.toSet());
 		// Add DTO classnames from "dtoTypeNames"
@@ -56,11 +56,10 @@ public class ScrudModelDescriptor extends ModelDescriptor {
 	/**
 	 * Avoid {@link MirroredTypesException} when retrieving Class or Class[] typed annotation attribute values
 	 * @param typeElement
-	 * @param annotationClass
 	 * @param annotationAttributeName
 	 * @return a stream with the value classnames
 	 */
-	private Stream<String> toAnnotationClassNamesValueStream(TypeElement typeElement, Class annotationClass, String annotationAttributeName) {
+	private Stream<String> annotationClassNamesValueStream(TypeElement typeElement, Class annotationClass, String annotationAttributeName) {
 		return typeElement.getAnnotationMirrors()
 				.stream()
 				.filter(annotationMirror -> annotationMirror.getAnnotationType().toString().contains(annotationClass.getName()))
@@ -78,6 +77,10 @@ public class ScrudModelDescriptor extends ModelDescriptor {
 					if (val.endsWith(".class")) val = val.substring(0, val.length() - 6);
 					return val;
 				});
+	}
+	public Set<String> scrudBeanClassNamesValue(String annotationAttributeName){
+		return annotationClassNamesValueStream(typeElement, ScrudBean.class, annotationAttributeName)
+				.collect(Collectors.toSet());
 	}
 
 	@Override
