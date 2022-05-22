@@ -38,29 +38,29 @@ interface JpaPersistableModelService<T : Any, S> {
 		filter: String,
 		sortBy: String,
 		sortDirection: Sort.Direction,
-		pageNumber: Int,
-		pageSize: Int
+		pageNumber: Int = 0,
+		pageSize: Int = 10,
 	): Page<T>
 	/** Find resources page-by-page using an RSQL filter, projected as [P] */
 	fun <P> findAllProjectedBy(
 		filter: String,
 		sortBy: String,
 		sortDirection: Sort.Direction,
-		pageNumber: Int,
-		pageSize: Int,
+		pageNumber: Int = 0,
+		pageSize: Int = 10,
 		projection: Class<P>
 	): Page<P>
 	/** Find resources page-by-page using a JPA specification */
 	fun findAll(
 		specification: Specification<T>,
 		pageNumber: Int = 0,
-		pagesize: Int = 10
+		pageSize: Int = 10,
 	): Page<T>
 	/** Find resources page-by-page using a JPA specification, projected as [P] */
 	fun <P> findAllProjectedBy(
 		specification: Specification<T>,
 		pageNumber: Int = 0,
-		pagesize: Int = 10,
+		pageSize: Int = 10,
 		projection: Class<P>
 	): Page<P>
 	/** Get the resource matching the given ID, throw an error otherwise */

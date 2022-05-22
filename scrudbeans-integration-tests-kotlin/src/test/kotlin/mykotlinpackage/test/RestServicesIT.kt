@@ -6,6 +6,8 @@ import com.github.manosbatsis.scrudbeans.logging.RequestResponseLoggingIntercept
 import com.github.manosbatsis.scrudbeans.test.TestableParamsAwarePage
 import mykotlinpackage.ScrudBeansSampleApplication
 import mykotlinpackage.model.*
+import mykotlinpackage.service.OrderService
+import mykotlinpackage.service.ProductService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -16,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
@@ -31,7 +35,9 @@ import java.time.ZoneOffset
 @SpringBootTest(classes = [ScrudBeansSampleApplication::class], webEnvironment = RANDOM_PORT)
 class RestServicesIT(
 
-    @Autowired val restTemplateOrig: TestRestTemplate
+    @Autowired val restTemplateOrig: TestRestTemplate,
+    @Autowired val productService: ProductService,
+    @Autowired val orderService: OrderService
 ) {
 
     companion object {
@@ -74,6 +80,7 @@ class RestServicesIT(
                     product = products.last()
                 ))
         )
+        val orderId = order.id
         order = restTemplate.exchange(
             "/api/rest/orders", HttpMethod.POST,
             HttpEntity(order),
@@ -81,6 +88,7 @@ class RestServicesIT(
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
             assertThat(it.body).isNotNull
+            assertThat(it.body!!.id).isEqualTo(orderId)
             it.body!!
         }
         // Test Update
@@ -177,10 +185,8 @@ class RestServicesIT(
         // expecting 2 orders, one created on startup and one from this test
         assertEquals(2, ordersOfTheDay.totalElements)
         // try the same dates for the following year
-        startOfDay = startOfDay.plusYears(1)
-        endOfDay = endOfDay.plusYears(1)
         ordersOfTheDay = restTemplate.exchange(
-            "/api/rest/orders?filter=created=ge=${startOfDay};created=le=${endOfDay}", HttpMethod.GET,
+            "/api/rest/orders?filter=created=ge=${startOfDay.plusYears(1)};created=le=${endOfDay.plusYears(1)}", HttpMethod.GET,
             null,
             OrdersPage::class.java
         ).let {
@@ -204,6 +210,19 @@ class RestServicesIT(
             it.body!!
         }
         assertEquals(firstOrderLine.product, firstOrderLineProduct)
+
+        // Test Service component API
+        //============================
+        val orderInfosPage: Page<OrderInfo> = orderService.findAllProjectedBy(
+            filter = "created=ge=${startOfDay};created=le=${endOfDay}",
+            sortBy = "created",
+            sortDirection = Sort.Direction.DESC,
+            pageNumber = 0,
+            pageSize = 10,
+            projection = OrderInfo::class.java)
+        assertThat(orderInfosPage.content).isNotEmpty
+        assertEquals(2, orderInfosPage.totalElements)
+        assertThat(orderInfosPage.content.last().email).isEqualTo(order.email)
     }
 
     @Test

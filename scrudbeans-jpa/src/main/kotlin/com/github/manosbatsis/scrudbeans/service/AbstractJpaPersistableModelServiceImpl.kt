@@ -102,16 +102,16 @@ abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRe
 	override fun findAll(
 		specification: Specification<T>,
 		pageNumber: Int,
-		pagesize: Int
-	): Page<T> = repository.findAll(specification, PageRequest.of(pageNumber, pagesize))
+		pageSize: Int
+	): Page<T> = repository.findAll(specification, PageRequest.of(pageNumber, pageSize))
 
 	@Transactional(readOnly = true)
 	override fun <P> findAllProjectedBy(
 		specification: Specification<T>,
 		pageNumber: Int,
-		pagesize: Int,
+		pageSize: Int,
 		projection: Class<P>
-	): Page<P> = repository.findBy(specification, PageRequest.of(pageNumber, pagesize), projection)
+	): Page<P> = repository.findBy(specification, PageRequest.of(pageNumber, pageSize), projection)
 
 	@Transactional(readOnly = true)
 	override fun getById(id: S): T = findById(id).orElseThrow { EntityNotFoundException() }

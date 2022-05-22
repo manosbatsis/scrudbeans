@@ -29,9 +29,9 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-			<id>jcenter-releases</id>
-			<name>jcenter</name>
-			<url>http://jcenter.bintray.com</url>
+			<id>spring-libs-milestone</id>
+			<name>spring-libs-milestone</name>
+			<url>https://repo.spring.io/libs-milestone</url>
 		</repository>
 	</repositories>
 	<pluginRepositories>
