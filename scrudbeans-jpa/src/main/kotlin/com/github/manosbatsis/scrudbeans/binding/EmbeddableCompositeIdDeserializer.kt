@@ -37,7 +37,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @param <T> the identifier implementation type
 </T> */
 class EmbeddableCompositeIdDeserializer<T : EmbeddableCompositeIdentifier>(
-    val targetType: Class<*>
+    val targetType: Class<*> = EmbeddableCompositeIdentifier::class.java
 ) : JsonDeserializer<T>(),ContextualDeserializer {
 
     override fun handledType(): Class<*> {

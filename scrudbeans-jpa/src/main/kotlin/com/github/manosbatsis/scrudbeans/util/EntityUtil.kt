@@ -21,22 +21,45 @@
 package com.github.manosbatsis.scrudbeans.util
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory
+import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdaptersRegistry
 import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.BeanWrapper
 import org.springframework.beans.BeanWrapperImpl
-import java.io.Serializable
+import org.springframework.beans.factory.config.BeanDefinition
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
+import org.springframework.core.type.filter.AnnotationTypeFilter
 import java.util.concurrent.ConcurrentHashMap
+
 
 object EntityUtil {
     private val LOGGER = LoggerFactory.getLogger(EntityUtil::class.java)
     private val scrudBeanTypes: MutableMap<Class<*>, Boolean> = ConcurrentHashMap()
+    private val provider = ClassPathScanningCandidateComponentProvider(false)
+
     fun isScrudBean(domainType: Class<*>): Boolean =
         scrudBeanTypes.getOrPut(domainType){
             domainType.isAnnotationPresent(ScrudBean::class.java)
         }
+
+    fun findAllHelpers(vararg basePackages: String): Set<BeanDefinition>? {
+        createComponentScanner(EntityPredicateFactory::class.java, IdentifierAdapterBean::class.java)
+        val predicateFactories: MutableSet<BeanDefinition> = HashSet<BeanDefinition>()
+        for (basePackage in basePackages) {
+            predicateFactories.addAll(provider.findCandidateComponents(basePackage))
+        }
+        return predicateFactories
+    }
+
+    fun createComponentScanner(vararg annotations: Class<out Annotation>) {
+        provider.resetFilters(false)
+        for (annotation in annotations) {
+            provider.addIncludeFilter(AnnotationTypeFilter(annotation))
+        }
+    }
 
     fun getNullPropertyNames(source: Any): List<String> {
         val beanWrapper = BeanWrapperImpl(source)
@@ -62,14 +85,15 @@ object EntityUtil {
     }
 
 
-    fun <PK : Serializable?> idOrNull(entity: Any?): PK? {
+    fun <PK : Any> idOrNull(entity: Any?): PK? {
         return entity?.let {
                 IdentifierAdaptersRegistry.getAdapterForClass(entity.javaClass)
-                    .readId(entity) as PK
+                    ?.let{ it.readId(entity) as PK }
+                    ?: throw IllegalArgumentException("No adapter for class ${entity.javaClass.canonicalName}")
         }
     }
 
     fun idOrNEmpty(entity: Any?): String {
-        return idOrNull(entity) ?: StringUtils.EMPTY
+        return idOrNull<Any>(entity)?.toString() ?: StringUtils.EMPTY
     }
 }

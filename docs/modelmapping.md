@@ -13,12 +13,6 @@ Model driven services are enabled per entity provided two conditions are met:
  
  - It must be annotated with `@ScrudBean`.
  - It must have a non-primitive id.
- - Java entities must either implement `org.springframework.data.domain.Persistable` or 
- subclass one of the mapped superclasses available, see [Java Base Models](#java-base-models)
- - Kotlin entities must implement `com.github.manosbatsis.scrudbeans.api.domain.KPersistable`, 
- an custom equivalent of Spring's `Persistable`. For Kotlin users of Hibernate JPA, 
-extending `com.github.manosbatsis.scrudbeans.model.AbstractHibernateKPersistable`just works, 
-even for `data` classes.
 
 ## Mapping Examples
  

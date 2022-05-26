@@ -51,6 +51,11 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     }
 
 
+    val sourceRootFile by lazy {
+        val sourceRootFile = File(generatedSourcesRoot)
+        sourceRootFile.mkdir()
+        sourceRootFile
+    }
     val generatedSourcesRoot: String by lazy {
         processingEnv.options[KAPT_KOTLIN_SCRUDBEANS_GENERATED_OPTION_NAME]
                 ?: processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
@@ -63,12 +68,6 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
             val msg = "No kapt.kotlin.generated option provided. Using $path"
             this.processingEnv.messager.printMessage(Diagnostic.Kind.MANDATORY_WARNING, msg + "\n")
             return path
-    }
-
-    val sourceRootFile by lazy {
-        val sourceRootFile = File(generatedSourcesRoot)
-        sourceRootFile.mkdir()
-        sourceRootFile
     }
 
     /**

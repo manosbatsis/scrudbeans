@@ -23,6 +23,11 @@ import org.apache.commons.lang3.StringUtils
 import org.atteo.evo.inflector.English
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.data.annotation.CreatedBy
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedBy
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.stereotype.Component
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -47,6 +52,9 @@ internal class TypeSpecBuilder(
         private val MIMES_PRODUCED = APPLICATIOM_JSON_VALUE + ", " +
                 MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE + ", " +
                 APPLICATION_VND_API_PLUS_JSON_VALUE
+
+        val TYPE_PARAMETER_STAR = WildcardTypeName.producerOf(Any::class.asTypeName().copy(nullable = true))
+        val ANY_CLASS_TYPENAME =  Class::class.asClassName().parameterizedBy(TYPE_PARAMETER_STAR)
         val CLASSNAME_KEY_REPOSITORY = "repository"
         val CLASSNAME_KEY_SERVICE_INTERFACE = "service"
         val CLASSNAME_KEY_SERVICE_IMPL = "serviceImpl"
@@ -133,19 +141,34 @@ internal class TypeSpecBuilder(
         val pkgAndName = ClassUtils.getPackageAndSimpleName(
                 getSuperclassName(descriptor, CLASSNAME_KEY_IDADAPTER))
         return TypeSpec.objectBuilder(className)
+                .addAnnotation(Component::class.java)
                 .addAnnotation(AnnotationSpec.builder(IdentifierAdapterBean::class.java)
-                        .addMember("className = %S", modelClassName)
-                        .build())
+                    .addMember("className = %S", modelClassName)
+                    .build())
                 .addModifiers(PUBLIC)
                 .addSuperinterface(
                         ClassName(pkgAndName.first, pkgAndName.second)
                                 .parameterizedBy(modelClassName, descriptor.idClassName)
                 )
+
+            .addProperty(PropertySpec.builder(
+                "entityType", Class::class.asClassName().parameterizedBy(modelClassName), OVERRIDE)
+                .initializer("%T::class.java", modelClassName)
+                .build())
+            .addProperty(PropertySpec.builder(
+                "entityIdType", Class::class.asClassName().parameterizedBy(descriptor.idClassName), OVERRIDE)
+                .initializer("%T::class.java", descriptor.idClassName)
+                .build())
+            .addProperty(PropertySpec.builder(
+                "entityIdName", String::class, OVERRIDE)
+                .initializer("%S", descriptor.idName)
+                .build())
+            .addSuperclassConstructorParameter("%T::class.java", descriptor.idClassName)
                 .addFunction(FunSpec.builder("getIdName")
                         .addModifiers(PUBLIC, OVERRIDE)
                         .returns(String::class)
                         .addParameter(ParameterSpec.builder("resource", modelClassName).build())
-                        .addStatement("return %S", descriptor.idName)
+                        .addStatement("return entityIdName")
                         .build())
                 .addFunction(FunSpec.builder("readId")
                         .addModifiers(PUBLIC, OVERRIDE)
@@ -223,6 +246,9 @@ internal class TypeSpecBuilder(
             .primaryConstructor(FunSpec.constructorBuilder()
                 .addParameter("repository", repositoryType)
                 .addParameter("entityManager", EntityManager::class.java)
+                .addParameter(ParameterSpec.builder(
+                    "identifierAdapter", identifierAdapterClassName)
+                    .build())
                 .also {
                     if(!descriptor.scrudBean.transactionManager.isNullOrEmpty())
                         it.addAnnotation(
@@ -234,13 +260,8 @@ internal class TypeSpecBuilder(
             .addSuperinterface(ClassName(descriptor.parentPackageName + ".service", interfaceClassName))
             .addModifiers(PUBLIC, OPEN)
             .addSuperclassConstructorParameter("repository")
-            .addSuperclassConstructorParameter("%T::class.java", entityType)
-            .addSuperclassConstructorParameter("%T::class.java", descriptor.idClassName)
             .addSuperclassConstructorParameter("entityManager")
-            .addProperty(PropertySpec.builder(
-                "identifierAdapter", identifierAdapterClassName, OVERRIDE)
-                .initializer("%T", identifierAdapterClassName)
-                .build())
+            .addSuperclassConstructorParameter("identifierAdapter")
             .build()
     }
 
@@ -294,7 +315,15 @@ internal class TypeSpecBuilder(
                 .getAllMembers(currentTypeElement)
                 .find {
                     it.simpleName == stateField.simpleName
-                            && (it.hasAnnotation(Id::class.java)
+                            && (it.hasAnnotation(CreatedDate::class.java)
+                                || it.hasAnnotation(LastModifiedDate::class.java)
+                                || it.hasAnnotation(CreatedBy::class.java)
+                                || it.hasAnnotation(LastModifiedBy::class.java)
+                                || it.hasAnnotation(Transient::class.java)
+                                || it.hasAnnotation(org.springframework.data.annotation.Transient::class.java)
+                                || it.hasAnnotation(org.springframework.data.annotation.ReadOnlyProperty::class.java)
+                                || it.hasAnnotation(Id::class.java)
+                                || it.hasAnnotation(Id::class.java)
                                 || it.hasAnnotation(EmbeddedId::class.java)
                                 || (it.hasAnnotation(Column::class.java)
                                         && it.getAnnotationMirror(Column::class.java)
@@ -313,14 +342,14 @@ internal class TypeSpecBuilder(
 
     /** Create a DTO for the given model */
     fun dtoSpecBuilder(stateInfo: ScrudModelDescriptor, sourceRootFile: File): TypeSpec {
-        val primaryTargetTypeElementFields = stateInfo.typeElement.accessibleConstructorParameterFields()
+        val primaryTargetTypeElementFields = getFieldInfos(stateInfo.typeElement)
         val elementInfo = SimpleAnnotatedElementInfo(
                 processingEnvironment = processingEnvironment,
                 primaryTargetTypeElement = stateInfo.typeElement,
                 primaryTargetTypeElementFields = primaryTargetTypeElementFields,
                 annotation = stateInfo.typeElement.getAnnotationMirror(ScrudBean::class.java),
                 ignoreProperties = emptyList(),
-                nonUpdatableProperties = getNonUpdatableFields(stateInfo, primaryTargetTypeElementFields),
+                nonUpdatableProperties = getNonUpdatableFields(stateInfo, primaryTargetTypeElementFields.map { it.variableElement }),
                 copyAnnotationPackages = listOf("io.swagger.v3.oas.annotations", "com.fasterxml.jackson.annotation"),
                 sourceRoot = sourceRootFile,
                 generatedPackageName = stateInfo.packageName,
@@ -334,15 +363,6 @@ internal class TypeSpecBuilder(
         )
         val dtoStrategy = ScrudBeansDtoStrategy(elementInfo)
         return dtoStrategy.dtoTypeSpec()
-        /*
-        return dtoSpec(DtoInputContext(
-                processingEnvironment = processingEnvironment,
-                originalTypeElement = stateInfo.typeElement,
-                fields = stateInfo.typeElement.accessibleConstructorParameterFields(),
-                //stateInfo.packageName,
-                copyAnnotationPackages = listOf("io.swagger.v3.oas.annotations", "com.fasterxml.jackson.annotation")))
-
-         */
     }
 
     /** Create a mapstruct-based mapper for non-generated DTOs

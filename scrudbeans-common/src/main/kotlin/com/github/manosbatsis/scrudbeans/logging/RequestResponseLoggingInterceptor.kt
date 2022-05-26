@@ -1,6 +1,5 @@
 package com.github.manosbatsis.scrudbeans.logging
 
-import org.slf4j.LoggerFactory
 import org.springframework.http.HttpRequest
 import org.springframework.http.client.ClientHttpRequestExecution
 import org.springframework.http.client.ClientHttpRequestInterceptor
@@ -12,7 +11,7 @@ import java.nio.charset.Charset
 class RequestResponseLoggingInterceptor : ClientHttpRequestInterceptor {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(RequestResponseLoggingInterceptor::class.java)
+        private val logger = loggerFor<RequestResponseLoggingInterceptor>()
         private val utf8: Charset = Charset.forName("UTF-8")
     }
 

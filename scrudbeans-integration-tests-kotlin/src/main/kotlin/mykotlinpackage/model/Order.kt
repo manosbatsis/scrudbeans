@@ -1,16 +1,22 @@
 package mykotlinpackage.model
 
-import com.fasterxml.jackson.annotation.JsonManagedReference
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.model.AbstractAuditableEntity
 import io.swagger.v3.oas.annotations.media.Schema
 import mykotlinpackage.dto.OrderUpdateEmailDTO
 import mykotlinpackage.service.CustomBaseService
 import mykotlinpackage.service.CustomBaseServiceImpl
+import org.apache.commons.lang3.builder.EqualsBuilder
+import org.apache.commons.lang3.builder.HashCodeBuilder
+import org.apache.commons.lang3.builder.ToStringBuilder
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.util.*
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.EntityListeners
+import javax.persistence.Table
 import javax.validation.constraints.NotNull
+
 
 @Entity
 @Table(name = "product_orders")
@@ -27,12 +33,37 @@ class Order(
         @field:NotNull
         @field:Column(nullable = false)
         @field:Schema(title = "The client's email", required = true)
-        var email: String? = null,
+        var email: String,
+
         @field:Column(length = 512)
         @field:Schema(title = "Order comment", required = false)
         var comment: String? = null,
-        @JsonManagedReference
-        @OneToMany(fetch = FetchType.LAZY, cascade = [CascadeType.ALL], mappedBy = "order")
-        var lines: List<OrderLine> = mutableListOf()
 ) : AbstractAuditableEntity(id) {
+        override fun equals(obj: Any?): Boolean {
+                if (obj == null) return false
+                if (obj === this) return true
+                if (!Order::class.isInstance(obj)) return false
+                obj as Order
+                return EqualsBuilder()
+                        .appendSuper(super.equals(obj))
+                        .append(email, obj.email)
+                        .append(comment, obj.comment)
+                        .isEquals
+        }
+
+        override fun hashCode(): Int {
+                return HashCodeBuilder(19, 39)
+                        .appendSuper(super.hashCode())
+                        .append(email)
+                        .append(comment)
+                        .toHashCode()
+        }
+
+        override fun toString(): String  {
+                return ToStringBuilder(this)
+                        .appendSuper(super.toString())
+                        .append("email", email)
+                        .append("comment", comment)
+                        .build()
+        }
 }

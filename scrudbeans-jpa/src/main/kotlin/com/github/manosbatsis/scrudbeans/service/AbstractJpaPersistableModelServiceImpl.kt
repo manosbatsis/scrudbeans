@@ -1,25 +1,44 @@
 package com.github.manosbatsis.scrudbeans.service
 
 import com.github.manosbatsis.kotlin.utils.api.Dto
+import com.github.manosbatsis.scrudbeans.api.domain.PersistenceHintsDto
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.exceptions.EntityNotFoundException
 import com.github.manosbatsis.scrudbeans.extensions.value
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository
 import io.github.perplexhub.rsql.RSQLJPASupport
 import io.github.perplexhub.rsql.RSQLJPASupport.toSpecification
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
+import java.lang.reflect.Field
 import java.util.*
 import javax.persistence.EntityManager
 
 abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRepository<T, S>>(
 	protected val repository: B,
-	val entityType: Class<T>,
-	val entityIdType: Class<S>,
-	protected val entityManager: EntityManager
+	protected val entityManager: EntityManager,
+	override val identifierAdapter: IdentifierAdapter<T, S>
 ) : JpaPersistableModelService<T, S> {
+
+	companion object{
+		val logger = LoggerFactory.getLogger(AbstractJpaPersistableModelServiceImpl::class.java)
+	}
+
+	private fun fieldByName(fieldName: String, container: Class<*>): Field? {
+		var clazz: Class<*> = container
+		val rootClasses = setOf(java.lang.Object::class.java, Any::class.java)
+		while (!rootClasses.contains(clazz)){
+			clazz.declaredFields.find { it.name == fieldName }
+				?.also { return it }
+			clazz = clazz.superclass
+		}
+		return null
+	}
 
 	@Transactional(readOnly = true)
 	override fun count(): Long = repository.count()
@@ -61,14 +80,8 @@ abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRe
 
 	@Transactional(readOnly = true)
 	override fun findChildById(id: S, child: String): Any? {
-		val entity = findById(id)
-		entity.javaClass.declaredFields
-			.find { it.name.equals(child) }
-			?.let {
-				it.isAccessible = true
-				return it.value(entity)
-			}
-		return null
+		val entity = getById(id)
+		return fieldByName(child, entity.javaClass)?.value(entity)
 	}
 
 	@Transactional(readOnly = true)
@@ -92,11 +105,21 @@ abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRe
 		pageNumber: Int,
 		pageSize: Int,
 		projection: Class<P>
-	): Page<P> =
-		if(filter.isBlank()) repository.findBy(PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy)), projection)
+	): Page<P> = try {
+		if (filter.isBlank()) repository.findBy(
+			PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy)),
+			projection
+		)
 		else findAllProjectedBy(
 			toSpecification<T>(filter).and(RSQLJPASupport.toSort("$sortBy,${sortDirection.toString().lowercase()}")),
-			pageNumber, pageSize, projection)
+			pageNumber,
+			pageSize,
+			projection
+		)
+	}catch (e: Throwable){
+		e.printStackTrace()
+		throw e
+	}
 
 	@Transactional(readOnly = true)
 	override fun findAll(
@@ -120,28 +143,33 @@ abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRe
 	override fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P =
 		findByIdProjectedBy(id, projection).orElseThrow { EntityNotFoundException() }
 
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.NESTED)
 	override fun save(entity: T): T = repository.save(entity)
 
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.NESTED)
 	override fun saveAll(resources: Iterable<T>): Iterable<T> =
 		repository.saveAll(resources)
 
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.NESTED)
 	override fun partialUpdate(dto: Dto<T>, id: S): T{
-		return save(dto.toPatched(getById(id)))
+		val persisted = getById(id)
+		val patched = dto.toPatched(persisted)
+		// TODO: maybe merge is enough?
+		if(dto is PersistenceHintsDto && dto.isDetachedUpdate())
+			entityManager.detach(persisted)
+		return repository.save(patched)
 	}
 
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.NESTED)
 	override fun delete(resource: T) = repository.delete(resource)
 
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.NESTED)
 	override fun deleteById(id: S) {
 		existsByIdAssert(id)
 		repository.deleteById(id)
 	}
 
-	@Transactional(readOnly = false)
+	@Transactional(readOnly = false, propagation = Propagation.NESTED)
 	override fun deleteAllById(ids: Iterable<S> ) {
 		repository.deleteAllById(ids)
 	}

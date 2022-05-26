@@ -21,8 +21,8 @@
 package com.github.manosbatsis.scrudbeans.hypermedia.util;
 
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdaptersRegistry;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.FieldInfo;
-import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfo;
 import com.github.manosbatsis.scrudbeans.api.mdd.registry.ModelInfoRegistry;
 import com.github.manosbatsis.scrudbeans.api.util.ParamsAwarePage;

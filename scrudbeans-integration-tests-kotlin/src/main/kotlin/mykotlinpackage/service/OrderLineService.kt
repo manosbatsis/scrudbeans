@@ -11,9 +11,10 @@ import javax.persistence.EntityManager
 @Service
 class OrderLineService(
     orderLineRepository: OrderLineRepository,
-    entityManager: EntityManager
+    entityManager: EntityManager,
+    identifierAdapter: OrderLineIdentifierAdapter
 ) : AbstractJpaPersistableModelServiceImpl<OrderLine, UUID, OrderLineRepository>(
-    orderLineRepository, OrderLine::class.java, UUID::class.java, entityManager
+    orderLineRepository, entityManager, identifierAdapter
 ) {
     override val identifierAdapter = OrderLineIdentifierAdapter
 

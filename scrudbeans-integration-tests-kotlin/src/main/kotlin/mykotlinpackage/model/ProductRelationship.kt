@@ -3,6 +3,7 @@ package mykotlinpackage.model
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.model.BaseEntity
 import io.swagger.v3.oas.annotations.media.Schema
+import org.apache.commons.lang3.builder.ToStringBuilder
 import javax.persistence.Column
 import javax.persistence.EmbeddedId
 import javax.persistence.Entity
@@ -27,4 +28,13 @@ class ProductRelationship(
         @field:Column(nullable = false, length = 512)
         @field:Schema(title = "The relationship short description (max 512 chars)", required = true)
         var description: String? = null
-): BaseEntity<ProductRelationshipIdentifier>
+): BaseEntity<ProductRelationshipIdentifier>{
+
+        override fun toString(): String  {
+                return ToStringBuilder(this)
+                        .appendSuper(super.toString())
+                        .append("id", id)
+                        .append("description", description)
+                        .build()
+        }
+}

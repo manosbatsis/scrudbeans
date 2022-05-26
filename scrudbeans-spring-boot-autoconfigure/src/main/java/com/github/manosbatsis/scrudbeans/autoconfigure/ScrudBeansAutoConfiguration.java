@@ -9,12 +9,12 @@ import com.github.manosbatsis.scrudbeans.validation.UniqueValidator;
 
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
+import com.github.manosbatsis.scrudbeans.binding.OffsetDateTimeDeserializer;
+import com.github.manosbatsis.scrudbeans.binding.OffsetDateTimeSerializer;
 import com.github.manosbatsis.scrudbeans.binding.StringToEmbeddableCompositeIdConverterFactory;
+import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistryInitializer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -22,15 +22,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.format.FormatterRegistry;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.orm.hibernate5.HibernateExceptionTranslator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.TimeZone;
+import java.util.List;
 
 @Slf4j
 @Configuration
@@ -62,30 +60,30 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 	public void addFormatters(FormatterRegistry registry) {
 		registry.addConverterFactory(new StringToEmbeddableCompositeIdConverterFactory());
 	}
-
-
 	@Bean
-	@Primary
-	@ConditionalOnProperty(name = "app.format.datetime.skip-objectmapper-config", havingValue = "false", matchIfMissing = true)
-	public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder jackson2ObjectMapperBuilder) {
-		jackson2ObjectMapperBuilder.dateFormat(
-				new StdDateFormat().withTimeZone(TimeZone.getTimeZone("UTC"))
-						.withColonInTimeZone(!BooleanUtils.toBoolean(skipColonInTimeZone)));
-		ObjectMapper mapper = jackson2ObjectMapperBuilder.build();
-		mapper.findAndRegisterModules();
-		//mapper.registerModule(ParameterNamesModule())
-		//mapper.registerModule(Jdk8Module())
-		//mapper.registerModule(JavaTimeModule())
-		mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-		return mapper;
+	@ConditionalOnProperty(name = "scrudbeans.jackson.format-offset-date-time", havingValue = "true", matchIfMissing = true)
+	public OffsetDateTimeSerializer offsetDateTimeSerializer() {
+		return new OffsetDateTimeSerializer();
 	}
-
+	@Bean
+	@ConditionalOnProperty(name = "scrudbeans.jackson.format-offset-date-time", havingValue = "true", matchIfMissing = true)
+	public OffsetDateTimeDeserializer offsetDateTimeDeserializer() {
+		return new OffsetDateTimeDeserializer();
+	}
 
 	/** Improve exception handling */
 	@Bean
 	@ConditionalOnMissingBean
 	public HibernateExceptionTranslator hibernateExceptionTranslator() {
 		return new HibernateExceptionTranslator();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public IdentifierAdapterRegistryInitializer identifierAdapterRegistryInitializer(
+			List<? extends IdentifierAdapter<?, ?>> identifierAdapters
+	) {
+		return new IdentifierAdapterRegistryInitializer(identifierAdapters);
 	}
 
 	/** Register a bean to collect model metadata

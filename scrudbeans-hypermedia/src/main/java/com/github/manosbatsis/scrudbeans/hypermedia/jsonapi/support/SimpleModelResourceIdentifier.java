@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
-import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdaptersRegistry;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiLink;
 import com.github.manosbatsis.scrudbeans.hypermedia.jsonapi.JsonApiResourceIdentifier;
 import lombok.Getter;

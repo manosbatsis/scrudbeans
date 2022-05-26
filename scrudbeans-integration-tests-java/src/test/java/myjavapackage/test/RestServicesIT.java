@@ -1,7 +1,7 @@
 package myjavapackage.test;
 
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
-import com.github.manosbatsis.scrudbeans.api.mdd.registry.IdentifierAdaptersRegistry;
+import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdaptersRegistry;
 import com.github.manosbatsis.scrudbeans.logging.RequestResponseLoggingInterceptor;
 import com.github.manosbatsis.scrudbeans.test.TestableParamsAwarePage;
 import lombok.extern.slf4j.Slf4j;

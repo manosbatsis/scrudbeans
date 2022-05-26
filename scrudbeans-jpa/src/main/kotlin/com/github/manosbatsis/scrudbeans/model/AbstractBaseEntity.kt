@@ -1,6 +1,8 @@
 package com.github.manosbatsis.scrudbeans.model
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import org.apache.commons.lang3.builder.EqualsBuilder
+import org.apache.commons.lang3.builder.HashCodeBuilder
+import org.apache.commons.lang3.builder.ToStringBuilder
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
@@ -23,6 +25,34 @@ open class AbstractAuditableEntity(
     var updated: OffsetDateTime? = null
 
 ): AbstractBaseEntity(id){
+
+    override fun equals(obj: Any?): Boolean {
+        if (obj == null) return false
+        if (obj === this) return true
+        if (!AbstractAuditableEntity::class.isInstance(obj)) return false
+        obj as AbstractAuditableEntity
+        return EqualsBuilder()
+            .appendSuper(super.equals(obj))
+            .append(created, obj.created)
+            .append(updated, obj.updated)
+            .isEquals
+    }
+
+    override fun hashCode(): Int {
+        return HashCodeBuilder(13, 33)
+            .appendSuper(super.hashCode())
+            .append(created)
+            .append(updated)
+            .toHashCode()
+    }
+
+    override fun toString(): String  {
+        return ToStringBuilder(this)
+            .appendSuper(super.toString())
+            .append("created", created)
+            .append("updated", updated)
+            .build()
+    }
 }
 
 /**
@@ -44,18 +74,32 @@ abstract class AbstractBaseEntity(id: UUID? = null): UuidIdEntity {
     @Version
     var version: Long? = null
 
-    @Transient
-    @JsonProperty("@type")
-    private val clazz = "jpa"
-
     override fun equals(other: Any?): Boolean {
         return when {
             this === other -> true
             other == null -> false
-            other !is AbstractBaseEntity -> false
-            else -> id == other.id
+            !AbstractBaseEntity::class.isInstance(other) -> false
+            else -> {
+                other as AbstractBaseEntity
+                id == other.id && version == other.version
+            }
         }
     }
 
-    override fun hashCode(): Int = id.hashCode()
+    override fun hashCode(): Int {
+        return HashCodeBuilder(21, 41)
+            .appendSuper(super.hashCode())
+            .append(id)
+            .append(version)
+            .toHashCode()
+    }
+
+    override fun toString(): String  {
+        return ToStringBuilder(this)
+            .appendSuper(super.toString())
+            .append("id", id)
+            .append("version", version)
+            .build()
+    }
+
 }

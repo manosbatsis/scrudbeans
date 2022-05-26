@@ -4,14 +4,13 @@ import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.kotlin.utils.kapt.dto.strategy.CompositeDtoStrategy
 import com.github.manosbatsis.kotlin.utils.kapt.dto.strategy.composition.DtoStrategyComposition
 import com.github.manosbatsis.kotlin.utils.kapt.dto.strategy.composition.SimpleDtoNameStrategy
-import com.github.manosbatsis.kotlin.utils.kapt.dto.strategy.composition.SimpleDtoTypeStrategy
 import com.github.manosbatsis.kotlin.utils.kapt.processor.AnnotatedElementInfo
 
 class ScrudBeansDtoStrategy(
         annotatedElementInfo: AnnotatedElementInfo,
         composition: DtoStrategyComposition = annotatedElementInfo.let {
                 val dtoNameStrategy = SimpleDtoNameStrategy(annotatedElementInfo)
-                val dtoTypeStrategy = SimpleDtoTypeStrategy(annotatedElementInfo)
+                val dtoTypeStrategy = ScrudBeansDtoTypeStrategy(annotatedElementInfo)
                 CompositeDtoStrategy(
                         annotatedElementInfo = annotatedElementInfo,
                         dtoNameStrategy = dtoNameStrategy,
