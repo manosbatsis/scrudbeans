@@ -62,7 +62,7 @@ public class SimpleModelResourceIdentifier<T, PK extends Serializable> implement
 	public SimpleModelResourceIdentifier(@NonNull T attributesModel, @NonNull String type) {
         IdentifierAdapter<T, PK> idAdapter =
                 (IdentifierAdapter<T, PK>) IdentifierAdaptersRegistry.getAdapterForClass(attributesModel.getClass());
-        this.identifier = idAdapter.readId(attributesModel);
+        this.identifier = idAdapter.getId(attributesModel);
         this.type = type;
     }
 

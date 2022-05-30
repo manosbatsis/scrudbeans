@@ -87,14 +87,14 @@ public class HypermediaUtils {
     public static List<Link> buileHateoasLinks(@NonNull Object model, ModelInfo modelInfo) {
         List<Link> links = null;
         IdentifierAdapter identifierAdapter = IdentifierAdaptersRegistry.getAdapterForClass(model.getClass());
-        if (identifierAdapter.readId(model) != null && modelInfo != null) {
+        if (identifierAdapter.getId(model) != null && modelInfo != null) {
 
             links = new LinkedList<>();
 
             // add link to self
             links.add(BasicLinkBuilder.linkToCurrentMapping()
                     .slash(modelInfo.getRequestMapping())
-                    .slash(identifierAdapter.readId(model)).withSelfRel());
+                    .slash(identifierAdapter.getId(model)).withSelfRel());
 
             // add links to linkable relationships
             Set<String> relationshipFields = new HashSet<>();
@@ -106,7 +106,7 @@ public class HypermediaUtils {
 				if (fieldInfo.isLinkableResource()) {
 					links.add(BasicLinkBuilder.linkToCurrentMapping()
                             .slash(modelInfo.getRequestMapping())
-                            .slash(identifierAdapter.readId(model))
+                            .slash(identifierAdapter.getId(model))
                             .slash("relationships")
                             .slash(fieldName).withRel(fieldName));
                 }

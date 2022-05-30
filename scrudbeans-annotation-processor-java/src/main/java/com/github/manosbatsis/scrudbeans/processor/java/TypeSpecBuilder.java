@@ -234,7 +234,7 @@ class TypeSpecBuilder {
                         .addParameter(ParameterSpec.builder(modelClassName, "resource", Modifier.FINAL).build())
                         .addStatement("return $S", descriptor.getIdName())
                         .build())
-                .addMethod(MethodSpec.methodBuilder("readId")
+                .addMethod(MethodSpec.methodBuilder("getId")
                         .addModifiers(Modifier.PUBLIC)
                         .addAnnotation(Override.class)
                         .returns(idClassName)

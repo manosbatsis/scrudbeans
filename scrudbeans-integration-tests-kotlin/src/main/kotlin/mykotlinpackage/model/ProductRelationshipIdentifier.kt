@@ -2,9 +2,9 @@ package mykotlinpackage.model
 
 import com.github.manosbatsis.scrudbeans.model.AbstractEmbeddableManyToManyIdentifier
 import io.swagger.v3.oas.annotations.media.Schema
-import java.io.Serializable
-import java.util.*
 import javax.persistence.Embeddable
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 
 /**
  * Sample composite identifier for manyToMany relationship entities.
@@ -12,8 +12,14 @@ import javax.persistence.Embeddable
  */
 @Embeddable
 @Schema(name = "ProductRelationshipIdentifier", description = "A composite identifier used an ID in ProductRelationship entities")
-class ProductRelationshipIdentifier : AbstractEmbeddableManyToManyIdentifier<Product, UUID, Product, UUID>() {
-    override fun buildLeft(left: Serializable?) = Product(id = UUID.fromString(left.toString()))
+class ProductRelationshipIdentifier(
+    @field:Schema(title = "The left part type", required = true)
+    @field:JoinColumn(name = "left_id", nullable = false, updatable = false)
+    @field:ManyToOne(optional = false)
+    val left: Product,
 
-    override fun buildRight(right: Serializable?) = Product(id = UUID.fromString(right.toString()))
-}
+    @field:Schema(title = "The right part type", required = true)
+    @field:JoinColumn(name = "right_id", nullable = false, updatable = false)
+    @field:ManyToOne(optional = false)
+    val right: Product
+)

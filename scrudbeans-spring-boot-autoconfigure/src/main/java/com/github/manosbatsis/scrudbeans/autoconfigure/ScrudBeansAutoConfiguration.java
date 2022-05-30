@@ -13,7 +13,9 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
 import com.github.manosbatsis.scrudbeans.binding.OffsetDateTimeDeserializer;
 import com.github.manosbatsis.scrudbeans.binding.OffsetDateTimeSerializer;
 import com.github.manosbatsis.scrudbeans.binding.StringToEmbeddableCompositeIdConverterFactory;
+import com.github.manosbatsis.scrudbeans.binding.StringToPersistedEntityGenericConverter;
 import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistryInitializer;
+import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,6 +80,12 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 		return new HibernateExceptionTranslator();
 	}
 
+	@Bean
+	public StringToPersistedEntityGenericConverter stringToPersistedEntityGenericConverter(
+			@Autowired List<? extends JpaPersistableModelService<?, ?>> entityServices
+	){
+		return new StringToPersistedEntityGenericConverter(entityServices);
+	}
 	@Bean
 	@ConditionalOnMissingBean
 	public IdentifierAdapterRegistryInitializer identifierAdapterRegistryInitializer(

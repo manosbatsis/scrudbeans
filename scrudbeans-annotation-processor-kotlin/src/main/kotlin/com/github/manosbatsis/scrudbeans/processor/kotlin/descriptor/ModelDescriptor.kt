@@ -34,6 +34,7 @@ abstract class ModelDescriptor(
         packageName = qualifiedName.substring(0, qualifiedName.length - (simpleName.length + 1))
         parentPackageName = packageName.substring(0, packageName.lastIndexOf("."))
         scanMembers(processingEnvironment.typeUtils, typeElement)
+        finalise()
     }
 
     protected fun scanMembers(types: Types, currentTypeElement: Element) {
@@ -61,14 +62,18 @@ abstract class ModelDescriptor(
         fields.forEach {
             scanMember(types, currentTypeElement, it)
         }
-        val superTypeelement = asTypeElement(types, currentTypeElement.superclass)
-        if (!superTypeelement.qualifiedName.contentEquals(Any::class.java.canonicalName)) {
-            scanMembers(types, superTypeelement)
+        val superTypeElement = asTypeElement(types, currentTypeElement.superclass)
+        if (!superTypeElement.qualifiedName.contentEquals(Any::class.java.canonicalName)) {
+            scanMembers(types, superTypeElement)
         }
     }
 
 
     abstract fun scanMember(types: Types, currentTypeElement: TypeElement, memberElement: VariableElement)
+
+    open fun finalise(){
+        /*NO-OP*/
+    }
 
     /**
      * Convert the given [TypeMirror] to a [TypeElement]

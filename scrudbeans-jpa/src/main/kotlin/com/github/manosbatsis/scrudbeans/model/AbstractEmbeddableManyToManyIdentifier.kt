@@ -26,6 +26,7 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.EmbeddableCompositeIdenti
 import com.github.manosbatsis.scrudbeans.binding.EmbeddableCompositeIdDeserializer
 import com.github.manosbatsis.scrudbeans.binding.EmbeddableCompositeIdSerializer
 import com.github.manosbatsis.scrudbeans.util.EntityUtil
+import io.swagger.v3.oas.annotations.media.Schema
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
@@ -59,9 +60,7 @@ import javax.validation.constraints.NotNull
 ` *
  *
  * @param <L>   The type of the left MenyToOne relationship entity
- * @param <LPK> The type of the left MenyToOne relationship entity ID
  * @param <R>   The type of the right MenyToOne relationship entity
- * @param <RPK> The type of the right MenyToOne relationship entity ID
  * @see EmbeddableCompositeIdentifier
  *
  * @see EmbeddableCompositeIdDeserializer
@@ -71,27 +70,22 @@ import javax.validation.constraints.NotNull
 @MappedSuperclass
 @JsonSerialize(using = EmbeddableCompositeIdSerializer::class)
 @JsonDeserialize(using = EmbeddableCompositeIdDeserializer::class)
-abstract class AbstractEmbeddableManyToManyIdentifier<L, LPK : Serializable?, R, RPK : Serializable?> : Serializable,
-    EmbeddableCompositeIdentifier {
-    //@ApiModelProperty(required = true, example = "{\"id\": \"[id]\"}")
-    @JoinColumn(name = "left_id", nullable = false, updatable = false)
-    @ManyToOne(optional = false)
-    var left: @NotNull L? = null
+abstract class AbstractEmbeddableManyToManyIdentifier<L, LT, R, RT>(
 
-    //@ApiModelProperty(required = true, example = "{\"id\": \"[id]\"}")
-    @JoinColumn(name = "right_id", nullable = false, updatable = false)
-    @ManyToOne(optional = false)
+    @field:Schema(title = "The left part type", required = true)
+    @field:JoinColumn(name = "left_id", nullable = false, updatable = false)
+    @field:ManyToOne(optional = false)
+    var left: @NotNull L,
+
+    @field:Schema(title = "The right part type", required = true)
+    @field:JoinColumn(name = "right_id", nullable = false, updatable = false)
+    @field:ManyToOne(optional = false)
     var right: @NotNull R? = null
 
-    constructor() {}
-    constructor(value: @NotNull String) {
-        init(value)
-    }
+) : Serializable, EmbeddableCompositeIdentifier {
 
-    abstract fun buildLeft(left: Serializable?): L
-    abstract fun buildRight(right: Serializable?): R
     override fun hashCode(): Int {
-        return HashCodeBuilder().append(EntityUtil.idOrNEmpty(left)).append(EntityUtil.idOrNEmpty(right)).toHashCode()
+        return HashCodeBuilder().append(left).append(right).toHashCode()
     }
 
     override fun equals(obj: Any?): Boolean {
@@ -108,17 +102,6 @@ abstract class AbstractEmbeddableManyToManyIdentifier<L, LPK : Serializable?, R,
                 .append(EntityUtil.idOrNEmpty(right), EntityUtil.idOrNull(other.right)).isEquals
         } else {
             false
-        }
-    }
-
-    override fun init(value: @NotNull String) {
-        val parts = value.split(SPLIT_CHAR.toRegex()).dropLastWhile { it.isEmpty() }
-            .toTypedArray()
-        if (parts.size == 2) {
-            left = buildLeft(parts[0])
-            right = buildRight(parts[1])
-        } else if (parts.size == 1) {
-            right = buildRight(parts[0])
         }
     }
 

@@ -4,7 +4,6 @@ import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.squareup.kotlinpoet.ClassName
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.AnnotationMirror
 import javax.lang.model.element.TypeElement
 
 /**
@@ -16,6 +15,12 @@ class ScrudModelDescriptor(
     typeElement: TypeElement,
     val configProperties: Properties
 ) : EntityModelDescriptor(processingEnvironment, typeElement) {
+    companion object{
+        val ignoredClassNameStringValues = setOf(
+            java.lang.Object::class.java.canonicalName,
+            Any::class.java.canonicalName
+        )
+    }
 
     val scrudBean: ScrudBean
     val className: ClassName
@@ -36,48 +41,19 @@ class ScrudModelDescriptor(
     /** Initialise the set of DTO classnames for this ScrudBean. Used to create mappers from/to this ScrudBean  */
     private fun initDtoClassnames(typeElement: TypeElement) {
         // Get DTO classnames from "dtoTypes"
-        val ignored = listOf(
-                Any::class.java.canonicalName,
-                Object::class.java.canonicalName
-        )
-        toAnnotationClassNamesValueStream(typeElement, ScrudBean::class.java, "dtoTypes")
-                .filter { it.isNotBlank() && !ignored.contains(it) }
+        typeElement.findAnnotationValueAsClassNameStrings(ScrudBean::class.java, "dtoTypes")
+                .filterNot { it.isNullOrBlank() || ignoredClassNameStringValues.contains(it) }
                 .forEach { dtoTypes.add(it) }
         // Add DTO classnames from "dtoTypeNames"
-        scrudBean.dtoTypeNames.filter { it.isNotBlank() && !ignored.contains(it) }.forEach { dtoTypes.add(it) }
+        scrudBean.dtoTypeNames
+            .filterNot { it.isNullOrBlank() || ignoredClassNameStringValues.contains(it) }
+            .forEach { dtoTypes.add(it) }
     }
 
-    /**
-     * Avoid [MirroredTypesException] when retrieving Class or Class[] typed annotation attribute values
-     * @param typeElement
-     * @param annotationClass
-     * @param annotationAttributeName
-     * @return a stream with the value classnames
-     */
-    private fun toAnnotationClassNamesValueStream(
-            typeElement: TypeElement, annotationClass: Class<*>,
-            annotationAttributeName: String): List<String> {
-        return typeElement.annotationMirrors
-                .filter { annotationMirror: AnnotationMirror -> annotationMirror.annotationType.toString().contains(annotationClass.name) }
-                .map { obj: AnnotationMirror -> obj.elementValues }
-                .flatMap { it.entries }
-                .filter { it.key.simpleName.contentEquals(annotationAttributeName) }
-                .flatMap {
-                    val value = it.value.value
-                    if (value is List<*>) value
-                    else if (value is Array<*>)  value.toList()
-                    else listOf(value)
-                }
-                .filterNotNull()
-                .map { it: Any ->
-                    var value = it.toString()
-                    if (value.endsWith(".class")) value = value.substring(0, value.length - 6)
-                    value
-                }
-    }
 
     fun scrudBeanClassNamesValue(annotationAttributeName: String): String? {
-        return toAnnotationClassNamesValueStream(typeElement, ScrudBean::class.java, annotationAttributeName)
+        return typeElement.findAnnotationValueAsClassNameStrings(ScrudBean::class.java, annotationAttributeName)
+            .filterNot { it.isNullOrBlank() || ignoredClassNameStringValues.contains(it) }
             .singleOrNull()
     }
 

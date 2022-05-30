@@ -63,8 +63,10 @@ interface JpaPersistableModelService<T : Any, S> {
 		pageSize: Int = 10,
 		projection: Class<P>
 	): Page<P>
-	/** Get the resource matching the given ID, throw an error otherwise */
+	/** Get the resource matching the given ID, throw an error if no match is found */
 	fun getById(id: S): T
+	/** Get the resource matching the ID given as a string, throw an error if no match is found */
+	fun getByIdAsString(id: String): T
 	/** Get the resource matching the given ID, projected as [P], throw an error otherwise */
 	fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P
 	/** Save, i.e. create or update, the given resource as given */

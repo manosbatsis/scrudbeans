@@ -6,39 +6,32 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.exceptions.EntityNotFoundException
 import com.github.manosbatsis.scrudbeans.extensions.value
 import com.github.manosbatsis.scrudbeans.repository.ModelRepository
+import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import io.github.perplexhub.rsql.RSQLJPASupport
 import io.github.perplexhub.rsql.RSQLJPASupport.toSpecification
 import org.slf4j.LoggerFactory
+import org.springframework.core.convert.ConversionService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import java.lang.reflect.Field
 import java.util.*
 import javax.persistence.EntityManager
 
 abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRepository<T, S>>(
 	protected val repository: B,
 	protected val entityManager: EntityManager,
-	override val identifierAdapter: IdentifierAdapter<T, S>
+	override val identifierAdapter: IdentifierAdapter<T, S>,
+	protected val conversionService: ConversionService
 ) : JpaPersistableModelService<T, S> {
 
 	companion object{
 		val logger = LoggerFactory.getLogger(AbstractJpaPersistableModelServiceImpl::class.java)
 	}
 
-	private fun fieldByName(fieldName: String, container: Class<*>): Field? {
-		var clazz: Class<*> = container
-		val rootClasses = setOf(java.lang.Object::class.java, Any::class.java)
-		while (!rootClasses.contains(clazz)){
-			clazz.declaredFields.find { it.name == fieldName }
-				?.also { return it }
-			clazz = clazz.superclass
-		}
-		return null
-	}
+
 
 	@Transactional(readOnly = true)
 	override fun count(): Long = repository.count()
@@ -81,7 +74,7 @@ abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRe
 	@Transactional(readOnly = true)
 	override fun findChildById(id: S, child: String): Any? {
 		val entity = getById(id)
-		return fieldByName(child, entity.javaClass)?.value(entity)
+		return ClassUtils.fieldByName(child, entity.javaClass)?.value(entity)
 	}
 
 	@Transactional(readOnly = true)
@@ -138,6 +131,13 @@ abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRe
 
 	@Transactional(readOnly = true)
 	override fun getById(id: S): T = findById(id).orElseThrow { EntityNotFoundException() }
+
+	@Transactional(readOnly = true)
+	override fun getByIdAsString(id: String): T {
+		val identifier = if(identifierAdapter.entityIdType == String::class.java) id
+		else conversionService.convert(id, identifierAdapter.entityIdType)
+		return getById(identifier as S)
+	}
 
 	@Transactional(readOnly = true)
 	override fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P =

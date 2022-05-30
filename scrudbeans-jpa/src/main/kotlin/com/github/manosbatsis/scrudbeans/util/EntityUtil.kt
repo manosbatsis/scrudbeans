@@ -88,7 +88,7 @@ object EntityUtil {
     fun <PK : Any> idOrNull(entity: Any?): PK? {
         return entity?.let {
                 IdentifierAdaptersRegistry.getAdapterForClass(entity.javaClass)
-                    ?.let{ it.readId(entity) as PK }
+                    ?.let{ it.getId(entity) as PK }
                     ?: throw IllegalArgumentException("No adapter for class ${entity.javaClass.canonicalName}")
         }
     }

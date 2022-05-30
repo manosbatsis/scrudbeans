@@ -40,6 +40,11 @@ class EmbeddableCompositeIdDeserializer<T : EmbeddableCompositeIdentifier>(
     val targetType: Class<*> = EmbeddableCompositeIdentifier::class.java
 ) : JsonDeserializer<T>(),ContextualDeserializer {
 
+    companion object {
+        private val LOGGER = LoggerFactory.getLogger(EmbeddableCompositeIdDeserializer::class.java)
+        private val typeSerializers = ConcurrentHashMap<Class<*>, JsonDeserializer<*>>()
+    }
+
     override fun handledType(): Class<*> {
         return EmbeddableCompositeIdentifier::class.java
     }
@@ -79,8 +84,4 @@ class EmbeddableCompositeIdDeserializer<T : EmbeddableCompositeIdentifier>(
         return deserializer
     }
 
-    companion object {
-        private val LOGGER = LoggerFactory.getLogger(EmbeddableCompositeIdDeserializer::class.java)
-        private val typeSerializers = ConcurrentHashMap<Class<*>, JsonDeserializer<*>>()
-    }
 }

@@ -43,7 +43,8 @@ class RestServicesIT(
 
     @Autowired val restTemplateOrig: TestRestTemplate,
     @Autowired val productService: ProductService,
-    @Autowired val orderService: OrderService
+    @Autowired val orderService: OrderService,
+    @Autowired val identi
 ) {
 
 
@@ -139,7 +140,7 @@ class RestServicesIT(
         orderMap["email"] = order.email.toString() + "_patched"
         // Submit the patch
         order = restTemplate.exchange(
-            "/api/rest/orders/${orderIdAdapter.readId(order)}", HttpMethod.PUT,
+            "/api/rest/orders/${orderIdAdapter.getId(order)}", HttpMethod.PUT,
             HttpEntity(orderMap),
             Order::class.java
         ).let {
@@ -153,7 +154,7 @@ class RestServicesIT(
         // verify order was created and can be retrieved
 
         order = restTemplate.exchange(
-            "/api/rest/orders/${orderIdAdapter.readId(order)}", HttpMethod.GET,
+            "/api/rest/orders/${orderIdAdapter.getId(order)}", HttpMethod.GET,
             null,
             Order::class.java
         ).let {
@@ -270,11 +271,10 @@ class RestServicesIT(
         for (leftProduct in products) {
             for (rightProduct in products) {
                 if (leftProduct != rightProduct) { // Test Create
-                    val id = ProductRelationshipIdentifier()
-                        .apply {
-                            left = leftProduct
-                            right = rightProduct
-                        }
+                    val id = ProductRelationshipIdentifier(
+                        left = leftProduct,
+                        right = rightProduct
+                    )
                     val description = "Part of LOTR trilogy"
                     var relationship = ProductRelationship(id = id, description = description)
                     try {
@@ -309,7 +309,7 @@ class RestServicesIT(
                     val patch: MutableMap<String, Any> = HashMap()
                     patch["description"] = "${relationship.description}_patched"
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships/${relIdAdapter.readId(relationship)}", HttpMethod.PUT,
+                        "/api/rest/productRelationships/${relIdAdapter.getId(relationship)}", HttpMethod.PUT,
                         HttpEntity(patch),
                         ProductRelationship::class.java
                     ).let {
@@ -319,7 +319,7 @@ class RestServicesIT(
                     }
                     // Test Read
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships/${relIdAdapter.readId(relationship)}", HttpMethod.GET,
+                        "/api/rest/productRelationships/${relIdAdapter.getId(relationship)}", HttpMethod.GET,
                         null,
                         ProductRelationship::class.java
                     ).let {

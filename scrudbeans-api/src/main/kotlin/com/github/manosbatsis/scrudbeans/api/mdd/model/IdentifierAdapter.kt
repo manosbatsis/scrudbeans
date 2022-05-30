@@ -8,6 +8,14 @@ interface IdentifierAdapter<T, ID> {
     val entityType: Class<T>
     val entityIdType: Class<ID>
     val entityIdName: String
+
     fun getIdName(resource: T): String
-    fun readId(resource: T): ID?
+
+    fun getId(resource: T): ID?
+
+    fun getIdAsString(resource: T): String?
+
+    fun toId(from: String?): ID?
+
+//    fun getIdAsString(resource: T): String?
 }

@@ -4,6 +4,7 @@ import com.github.manosbatsis.scrudbeans.service.AbstractJpaPersistableModelServ
 import mykotlinpackage.model.OrderLine
 import mykotlinpackage.model.OrderLineIdentifierAdapter
 import mykotlinpackage.repository.OrderLineRepository
+import org.springframework.core.convert.ConversionService
 import org.springframework.stereotype.Service
 import java.util.*
 import javax.persistence.EntityManager
@@ -12,10 +13,10 @@ import javax.persistence.EntityManager
 class OrderLineService(
     orderLineRepository: OrderLineRepository,
     entityManager: EntityManager,
-    identifierAdapter: OrderLineIdentifierAdapter
+    identifierAdapter: OrderLineIdentifierAdapter,
+    conversionService: ConversionService
 ) : AbstractJpaPersistableModelServiceImpl<OrderLine, UUID, OrderLineRepository>(
-    orderLineRepository, entityManager, identifierAdapter
+    orderLineRepository, entityManager, identifierAdapter, conversionService
 ) {
-    override val identifierAdapter = OrderLineIdentifierAdapter
 
 }
