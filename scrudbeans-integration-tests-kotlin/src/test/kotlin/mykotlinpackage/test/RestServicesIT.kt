@@ -1,8 +1,7 @@
 package mykotlinpackage.test
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.logging.RequestResponseLoggingInterceptor
+import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistry
 import com.github.manosbatsis.scrudbeans.test.TestableParamsAwarePage
 import mykotlinpackage.ScrudBeansSampleApplication
 import mykotlinpackage.model.*
@@ -44,7 +43,7 @@ class RestServicesIT(
     @Autowired val restTemplateOrig: TestRestTemplate,
     @Autowired val productService: ProductService,
     @Autowired val orderService: OrderService,
-    @Autowired val identi
+    @Autowired val identifierAdapterRegistry: IdentifierAdapterRegistry
 ) {
 
 
@@ -63,7 +62,7 @@ class RestServicesIT(
 
     @Test
     fun testScrud() {
-        val orderIdAdapter = OrderIdentifierAdapter
+        val orderIdAdapter = identifierAdapterRegistry.getServiceFor(Order::class.java).identifierAdapter
         // Test Search
         //============================
         // Get the lord of the rings trilogy as a page of results
@@ -195,8 +194,8 @@ class RestServicesIT(
         }
         // Load a page of orders made today
         val localDate = LocalDate.now(ZoneId.systemDefault())
-        var startOfDay = OffsetDateTime.of(localDate.atStartOfDay(), ZoneOffset.UTC)
-        var endOfDay = OffsetDateTime.of(localDate.atTime(23, 59, 59), ZoneOffset.UTC)
+        var startOfDay = OffsetDateTime.of(localDate.atStartOfDay(), ZoneOffset.UTC).toLocalDateTime()
+        var endOfDay = OffsetDateTime.of(localDate.atTime(23, 59, 59), ZoneOffset.UTC).toLocalDateTime()
 
         // Test RSQL Search
         //============================
@@ -205,26 +204,26 @@ class RestServicesIT(
         var ordersOfTheDay = restTemplate.exchange(
             "/api/rest/orders?filter=created=ge=${startOfDay};created=le=${endOfDay}", HttpMethod.GET,
             null,
-            JsonNode::class.java
+            OrdersPage::class.java
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
             it.body!!
         }
         // expecting 2 orders, one created on startup and one from this test
-        //assertEquals(2, ordersOfTheDay.totalElements)
+        assertEquals(2, ordersOfTheDay.totalElements)
         // try the same dates for the following year
         ordersOfTheDay = restTemplate.exchange(
             "/api/rest/orders?filter=created=ge=${startOfDay.plusYears(1)};created=le=${endOfDay.plusYears(1)}", HttpMethod.GET,
             null,
-            JsonNode::class.java
+            OrdersPage::class.java
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
             it.body!!
         }
         // expecting 0 orders as the date range is set to the future
-        //assertEquals(0, ordersOfTheDay.totalElements)
+        assertEquals(0, ordersOfTheDay.totalElements)
 
         // Test child endpoint
         //============================
@@ -267,7 +266,7 @@ class RestServicesIT(
             it.body!!
         }
         // Create ProductRelationship for each combination
-        val relIdAdapter: IdentifierAdapter<ProductRelationship, ProductRelationshipIdentifier> = ProductRelationshipIdentifierAdapter
+        val relIdAdapter = identifierAdapterRegistry.getServiceFor(ProductRelationship::class.java).identifierAdapter
         for (leftProduct in products) {
             for (rightProduct in products) {
                 if (leftProduct != rightProduct) { // Test Create
@@ -296,8 +295,11 @@ class RestServicesIT(
 
                     // Test Update
                     relationship.description = "${relationship.description}_updated"
+                    log.debug("Look up relationship $relationship")
+                    val relationshipId = relIdAdapter.getIdAsString(relationship)
+                    log.debug("Look up relationship for ID: $relationshipId")
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships/${relationship.id.toStringRepresentation()}", HttpMethod.PUT,
+                        "/api/rest/productRelationships/${relationshipId}", HttpMethod.PUT,
                         HttpEntity(relationship),
                         ProductRelationship::class.java
                     ).let {
@@ -309,7 +311,7 @@ class RestServicesIT(
                     val patch: MutableMap<String, Any> = HashMap()
                     patch["description"] = "${relationship.description}_patched"
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships/${relIdAdapter.getId(relationship)}", HttpMethod.PUT,
+                        "/api/rest/productRelationships/${relationshipId}", HttpMethod.PUT,
                         HttpEntity(patch),
                         ProductRelationship::class.java
                     ).let {
@@ -319,7 +321,7 @@ class RestServicesIT(
                     }
                     // Test Read
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships/${relIdAdapter.getId(relationship)}", HttpMethod.GET,
+                        "/api/rest/productRelationships/${relationshipId}", HttpMethod.GET,
                         null,
                         ProductRelationship::class.java
                     ).let {

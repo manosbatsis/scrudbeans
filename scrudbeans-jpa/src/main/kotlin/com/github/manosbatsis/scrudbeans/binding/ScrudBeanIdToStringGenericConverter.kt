@@ -20,36 +20,31 @@
  */
 package com.github.manosbatsis.scrudbeans.binding
 
-import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
+import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistry
 import org.springframework.core.convert.TypeDescriptor
 import org.springframework.core.convert.converter.GenericConverter
 
-/**
- * Convert string-serialized identifiers (or fragments thereof) to entity instances
- * by loading them using the corresponding [JpaPersistableModelService]
- */
-class StringToPersistedEntityGenericConverter(
-    private val entityServices: List<JpaPersistableModelService<*,*>>
+
+class ScrudBeanIdToStringGenericConverter(
+    private val identifierAdapterRegistry: IdentifierAdapterRegistry
 ): GenericConverter {
 
     private val convertibleTypesCache: MutableSet<GenericConverter.ConvertiblePair> by lazy {
-        val cache = entityServices.map {
-            GenericConverter.ConvertiblePair(String::class.java, it.identifierAdapter.entityType)
-        }.toMutableSet()
-        entityServices.mapTo(cache){
-            GenericConverter.ConvertiblePair(java.lang.String::class.java, it.identifierAdapter.entityType)
-        }
-        cache
+        identifierAdapterRegistry.getServices()
+            .filter { it.identifierAdapter.isCompositeId }
+            .map {
+                listOf(
+                    GenericConverter.ConvertiblePair(it.identifierAdapter.entityIdType, String::class.java),
+                    GenericConverter.ConvertiblePair(it.identifierAdapter.entityIdType, java.lang.String::class.java)
+                )
+            }.flatten().toMutableSet()
     }
 
     override fun getConvertibleTypes(): MutableSet<GenericConverter.ConvertiblePair> = convertibleTypesCache
 
     override fun convert(source: Any?, sourceType: TypeDescriptor, targetType: TypeDescriptor): Any? {
-        if(source == null || source.toString().isNullOrBlank()) return null
-
-        val targetTypeActual = targetType.type
-        return entityServices.find { it.identifierAdapter.entityType.isAssignableFrom(targetTypeActual) }
-            ?.getByIdAsString(source.toString())
+        return if(source == null) null
+        else identifierAdapterRegistry.getServiceFor(source::class.java).identifierAdapter.getIdAsString(source)
     }
 
 }

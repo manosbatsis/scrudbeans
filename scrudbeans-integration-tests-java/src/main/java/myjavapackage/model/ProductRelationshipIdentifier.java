@@ -1,33 +1,27 @@
 package myjavapackage.model;
 
-import java.io.Serializable;
 
-import javax.persistence.Embeddable;
-
-import com.github.manosbatsis.scrudbeans.model.AbstractEmbeddableManyToManyIdentifier;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import java.io.Serializable;
+
 /**
- * Sample composite identifier for manyToMany relationship entities.
- * @see AbstractEmbeddableManyToManyIdentifier
+ * Embeddable many2many identifier for Product relationships
  */
 @Embeddable
 @Schema(name = "ProductRelationshipIdentifier",
         description = "A composite identifier used an ID in ProductRelationship entities")
-public class ProductRelationshipIdentifier extends AbstractEmbeddableManyToManyIdentifier<Product, String, Product, String> {
+public class ProductRelationshipIdentifier implements Serializable {
+	@Schema(title = "The left part type", required = true)
+	@JoinColumn(name = "left_id", nullable = false, updatable = false)
+	@ManyToOne(optional = false)
+	Product left;
 
-	@Override
-	public Product buildLeft(Serializable left) {
-		Product product = new Product();
-		product.setId(left.toString());
-		return product;
-	}
-
-	@Override
-	public Product buildRight(Serializable right) {
-		Product product = new Product();
-		product.setId(right.toString());
-		return product;
-	}
-
+	@Schema(title = "The right part type", required = true)
+	@JoinColumn(name = "right_id", nullable = false, updatable = false)
+	@ManyToOne(optional = false)
+	Product right;
 }

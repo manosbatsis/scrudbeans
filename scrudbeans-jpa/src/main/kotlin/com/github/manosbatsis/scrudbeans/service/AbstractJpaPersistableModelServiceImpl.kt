@@ -10,7 +10,6 @@ import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import io.github.perplexhub.rsql.RSQLJPASupport
 import io.github.perplexhub.rsql.RSQLJPASupport.toSpecification
 import org.slf4j.LoggerFactory
-import org.springframework.core.convert.ConversionService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -23,8 +22,7 @@ import javax.persistence.EntityManager
 abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRepository<T, S>>(
 	protected val repository: B,
 	protected val entityManager: EntityManager,
-	override val identifierAdapter: IdentifierAdapter<T, S>,
-	protected val conversionService: ConversionService
+	override val identifierAdapter: IdentifierAdapter<T, S>
 ) : JpaPersistableModelService<T, S> {
 
 	companion object{
@@ -131,13 +129,6 @@ abstract class AbstractJpaPersistableModelServiceImpl<T: Any, S: Any, B: ModelRe
 
 	@Transactional(readOnly = true)
 	override fun getById(id: S): T = findById(id).orElseThrow { EntityNotFoundException() }
-
-	@Transactional(readOnly = true)
-	override fun getByIdAsString(id: String): T {
-		val identifier = if(identifierAdapter.entityIdType == String::class.java) id
-		else conversionService.convert(id, identifierAdapter.entityIdType)
-		return getById(identifier as S)
-	}
 
 	@Transactional(readOnly = true)
 	override fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P =

@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils
 import org.atteo.evo.inflector.English
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.context.annotation.Lazy
 import org.springframework.core.convert.ConversionService
 import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
@@ -153,7 +154,9 @@ internal class TypeSpecBuilder(
                             .parameterizedBy(modelClassName, descriptor.idClassName)
             )
             .primaryConstructor(FunSpec.constructorBuilder()
-                .addParameter("conversionService", ConversionService::class.java)
+                .addParameter(ParameterSpec.builder("conversionService", ConversionService::class.java)
+                    .addAnnotation(Lazy::class)
+                    .build())
                 .build())
             .addProperty(
                 PropertySpec.builder("conversionService", ConversionService::class)
@@ -170,20 +173,23 @@ internal class TypeSpecBuilder(
                 .initializer("%T::class.java", descriptor.idClassName)
                 .build())
             .addProperty(PropertySpec.builder(
-                "entityIdName", String::class, OVERRIDE)
-                .initializer("%S", descriptor.idFieldName)
+                "isCompositeId", Boolean::class, OVERRIDE)
+                .initializer("%L", descriptor.isCompositeId)
                 .build())
             .addSuperclassConstructorParameter("%T::class.java", descriptor.idClassName)
-            .addFunction(FunSpec.builder("getIdName")
-                    .addModifiers(PUBLIC, OVERRIDE)
-                    .returns(String::class)
-                    .addParameter(ParameterSpec.builder("resource", modelClassName).build())
-                    .addStatement("return entityIdName")
-                    .build())
             .addFunction(FunSpec.builder("getId")
                 .addModifiers(PUBLIC, OVERRIDE)
                 .returns(descriptor.idClassName.copy(nullable = true))
-                .addParameter(ParameterSpec.builder("resource", modelClassName).build())
+                .addParameter(ParameterSpec.builder("resource", Any::class.asClassName().copy(nullable = true)).build())
+                .addStatement("if(resource == null) return null")
+                .addStatement("if(resource !is %T) throw %T(%S)",
+                    descriptor.className,
+                    IllegalArgumentException::class,
+                    buildCodeBlock {
+                        add("Incompatible type "+'$'+"{resource::class.java.canonicalName}, should be %T",
+                            descriptor.idClassName)
+                    }
+                )
                 .let { funcSpecBuilder ->
                     if(descriptor.isIdClass){
                         val funcBody = CodeBlock.builder().addStatement("return %T(", descriptor.idClassName)
@@ -205,40 +211,11 @@ internal class TypeSpecBuilder(
             .addFunction(FunSpec.builder("getIdAsString")
                 .addModifiers(PUBLIC, OVERRIDE)
                 .returns(String::class.java.asTypeName().asKotlinTypeName().copy(nullable = true))
-                .addParameter(ParameterSpec.builder("resource", modelClassName).build())
-                .addStatement("val resourceId = getId(resource)")
-                .addStatement("if(resourceId == null) return null")
-                .addStatement(
-                    "val incompleteIdMsg = %S",
-                buildCodeBlock {
-                    add("Cannot build string representation from incomplete %T", descriptor.idClassName)
-                })
-                .let { funcSpecBuilder ->
-                    if(descriptor.isCompositeId){
-                        val funcBody = CodeBlock.builder().addStatement("return %T()", StringBuilder::class.java)
-                        funcBody.indent()
-                        descriptor.compositeIdFieldNames.forEachIndexed { index, fieldName ->
-                            //val fieldType = descriptor.compositeIdClassNames[fieldName]?: error("No type for composite id field $fieldName")
-
-                            funcBody.addStatement(
-                                ".append(conversionService.convert(resourceId.%L, %T::class.java) ?: throw %T(incompleteIdMsg))",
-                                fieldName,
-                                String::class.java.asTypeName().asKotlinTypeName(),
-                                IllegalArgumentException::class.java
-                            )
-                            if(index + 1 < descriptor.compositeIdFieldNames.size)
-                                funcBody.addStatement(".append(%S)", "_")
-                        }
-                        funcBody.addStatement(".toString()")
-                        funcBody.unindent()
-                        funcSpecBuilder.addCode(funcBody.build())
-                    }
-                    else funcSpecBuilder.addStatement("return conversionService.convert(resourceId, %T::class.java)",
-                        String::class.java.asTypeName().asKotlinTypeName())
-                    funcSpecBuilder
-                }
+                .addParameter(ParameterSpec.builder("resource",
+                    Any::class.asClassName().copy(nullable = true) /*modelClassName*/).build())
+                .addStatement("return convertIdToString(getId(resource))")
                 .build())
-            .addFunction(FunSpec.builder("toId")
+            .addFunction(FunSpec.builder("buildIdFromString")
                 .addModifiers(PUBLIC, OVERRIDE)
                 .returns(descriptor.idClassName.copy(nullable = true))
                 .addParameter(ParameterSpec.builder(
@@ -282,49 +259,45 @@ internal class TypeSpecBuilder(
                     funcSpecBuilder
                 }
                 .build())
-            /*
-            .addFunction(FunSpec.builder("getIdAsString")
+            .addFunction(FunSpec.builder("convertIdToString")
                 .addModifiers(PUBLIC, OVERRIDE)
-                .returns(String::class.java.asTypeName().asKotlinTypeName().let {
-                    it.copy(nullable = descriptor.idClassName.isNullable)
-                })
-                .addParameter(ParameterSpec.builder("resource", modelClassName).build())
+                .returns(String::class.java.asTypeName().asKotlinTypeName()
+                    .copy(nullable = true))
+                .addParameter(ParameterSpec.builder(
+                    "resourceId",
+                    descriptor.idClassName.copy(nullable = true)
+                ).build())
+                .addStatement("if(resourceId == null) return null")
+                .addStatement(
+                    "val incompleteIdMsg = %S",
+                    buildCodeBlock {
+                        add("Cannot build string representation from incomplete %T", descriptor.idClassName)
+                    })
                 .let { funcSpecBuilder ->
-
                     if(descriptor.isCompositeId){
-                        val funcBody = CodeBlock.builder().addStatement("return %T(", descriptor.idClassName)
+                        val funcBody = CodeBlock.builder().addStatement("return %T()", StringBuilder::class.java)
                         funcBody.indent()
-                        for (fieldName in descriptor.compositeIdFieldNames){
-                            val fieldType = descriptor.compositeIdClassNames[fieldName]?: error("No type for composite id field $fieldName")
-                            funcBody.addStatement("$fieldName = resource.$fieldName")
+                        descriptor.compositeIdFieldNames.forEachIndexed { index, fieldName ->
+                            //val fieldType = descriptor.compositeIdClassNames[fieldName]?: error("No type for composite id field $fieldName")
+
+                            funcBody.addStatement(
+                                ".append(conversionService.convert(resourceId.%L ?: throw %T(incompleteIdMsg), %T::class.java))",
+                                fieldName,
+                                IllegalArgumentException::class.java,
+                                String::class.java.asTypeName().asKotlinTypeName()
+                            )
+                            if(index + 1 < descriptor.compositeIdFieldNames.size)
+                                funcBody.addStatement(".append(%S)", "_")
                         }
+                        funcBody.addStatement(".toString()")
                         funcBody.unindent()
-                        funcBody.addStatement(")")
                         funcSpecBuilder.addCode(funcBody.build())
                     }
-                    else funcSpecBuilder.addStatement("return resource.%L", descriptor.idFieldName)
+                    else funcSpecBuilder.addStatement("return conversionService.convert(resourceId, %T::class.java)",
+                        String::class.java.asTypeName().asKotlinTypeName())
                     funcSpecBuilder
-
-                    if(descriptor.isCompositeId){
-                        val funcBody = CodeBlock.builder().addStatement("return %T(", descriptor.idClassName)
-                        funcBody.indent()
-                        for (fieldName in descriptor.compositeIdFieldNames){
-                            val fieldType = descriptor.compositeIdClassNames[fieldName]?: error("No type for composite id field $fieldName")
-                            funcSpecBuilder.addStatement(
-                                "$fieldName = %T.getAdapterForClass(%T::class.java).getId(resource.$fieldName)",
-                                IdentifierAdaptersRegistry::class.java,
-                                fieldType
-                            )
-
-                        }
-                        funcBody.unindent()
-                        funcSpecBuilder.addStatement(")")
-                    }
-                    else funcSpecBuilder.addStatement("return resource.%L", descriptor.idFieldName)
-
-
                 }
-                .build())*/
+                .build())
             .build()
     }
 
@@ -397,8 +370,9 @@ internal class TypeSpecBuilder(
                 .addParameter("entityManager", EntityManager::class.java)
                 .addParameter(ParameterSpec.builder(
                     "identifierAdapter", identifierAdapterClassName)
+                    .addAnnotation(org.springframework.context.annotation.Lazy::class.java)
                     .build())
-                .addParameter("conversionService", ConversionService::class.java)
+                //.addParameter("conversionService", ConversionService::class.java)
                 .also {
                     if(!descriptor.scrudBean.transactionManager.isNullOrEmpty())
                         it.addAnnotation(
@@ -412,7 +386,7 @@ internal class TypeSpecBuilder(
             .addSuperclassConstructorParameter("repository")
             .addSuperclassConstructorParameter("entityManager")
             .addSuperclassConstructorParameter("identifierAdapter")
-            .addSuperclassConstructorParameter("conversionService")
+            //.addSuperclassConstructorParameter("conversionService")
             .build()
     }
 

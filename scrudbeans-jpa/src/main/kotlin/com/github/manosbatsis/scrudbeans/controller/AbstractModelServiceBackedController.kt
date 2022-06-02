@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 open class AbstractModelServiceBackedController<
-		T : Any, S, SRV: JpaPersistableModelService<T, S>, DTO: Dto<T>
+		T : Any, S: Any, SRV: JpaPersistableModelService<T, S>, DTO: Dto<T>
 		> : IGenericController<T, S, DTO> {
 
 	@Autowired

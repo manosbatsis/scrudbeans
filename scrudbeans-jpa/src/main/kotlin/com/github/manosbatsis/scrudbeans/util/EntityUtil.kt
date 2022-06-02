@@ -24,8 +24,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.EntityPredicateFactory
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdaptersRegistry
-import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.beans.BeanWrapper
 import org.springframework.beans.BeanWrapperImpl
@@ -36,7 +34,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 
 object EntityUtil {
-    private val LOGGER = LoggerFactory.getLogger(EntityUtil::class.java)
+    private val logger = LoggerFactory.getLogger(EntityUtil::class.java)
     private val scrudBeanTypes: MutableMap<Class<*>, Boolean> = ConcurrentHashMap()
     private val provider = ClassPathScanningCandidateComponentProvider(false)
 
@@ -80,20 +78,7 @@ object EntityUtil {
                 nullOrUnreadable = true
             }
         }
-        LOGGER.debug("isNullOrUnreadableProperty {}: {}", name, nullOrUnreadable)
+        logger.debug("isNullOrUnreadableProperty {}: {}", name, nullOrUnreadable)
         return nullOrUnreadable
-    }
-
-
-    fun <PK : Any> idOrNull(entity: Any?): PK? {
-        return entity?.let {
-                IdentifierAdaptersRegistry.getAdapterForClass(entity.javaClass)
-                    ?.let{ it.getId(entity) as PK }
-                    ?: throw IllegalArgumentException("No adapter for class ${entity.javaClass.canonicalName}")
-        }
-    }
-
-    fun idOrNEmpty(entity: Any?): String {
-        return idOrNull<Any>(entity)?.toString() ?: StringUtils.EMPTY
     }
 }

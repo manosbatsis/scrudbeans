@@ -3,19 +3,17 @@ package com.github.manosbatsis.scrudbeans.api.mdd.model
 /**
  * Provides read/write access to the singular identifier of an (entity) type
  */
-interface IdentifierAdapter<T, ID> {
+interface IdentifierAdapter<T : Any, S: Any> {
 
     val entityType: Class<T>
-    val entityIdType: Class<ID>
-    val entityIdName: String
+    val entityIdType: Class<S>
+    val isCompositeId: Boolean
 
-    fun getIdName(resource: T): String
+    fun getId(resource: Any?): S?
 
-    fun getId(resource: T): ID?
+    fun getIdAsString(resource: Any?): String?
 
-    fun getIdAsString(resource: T): String?
+    fun buildIdFromString(from: String?): S?
 
-    fun toId(from: String?): ID?
-
-//    fun getIdAsString(resource: T): String?
+    fun convertIdToString(resourceId: S?): String?
 }

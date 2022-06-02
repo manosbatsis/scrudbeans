@@ -7,7 +7,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import java.util.*
 
-interface JpaPersistableModelService<T : Any, S> {
+interface JpaPersistableModelService<T : Any, S: Any> {
 	val identifierAdapter: IdentifierAdapter<T, S>
 	/** Count resources by type */
 	fun count(): Long
@@ -65,8 +65,6 @@ interface JpaPersistableModelService<T : Any, S> {
 	): Page<P>
 	/** Get the resource matching the given ID, throw an error if no match is found */
 	fun getById(id: S): T
-	/** Get the resource matching the ID given as a string, throw an error if no match is found */
-	fun getByIdAsString(id: String): T
 	/** Get the resource matching the given ID, projected as [P], throw an error otherwise */
 	fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P
 	/** Save, i.e. create or update, the given resource as given */

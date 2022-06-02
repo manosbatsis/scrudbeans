@@ -9,12 +9,8 @@ import com.github.manosbatsis.scrudbeans.validation.UniqueValidator;
 
  */
 
-import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter;
-import com.github.manosbatsis.scrudbeans.binding.OffsetDateTimeDeserializer;
-import com.github.manosbatsis.scrudbeans.binding.OffsetDateTimeSerializer;
-import com.github.manosbatsis.scrudbeans.binding.StringToEmbeddableCompositeIdConverterFactory;
-import com.github.manosbatsis.scrudbeans.binding.StringToPersistedEntityGenericConverter;
-import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistryInitializer;
+import com.github.manosbatsis.scrudbeans.binding.*;
+import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistry;
 import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.orm.hibernate5.HibernateExceptionTranslator;
@@ -30,12 +25,20 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Configuration
-@ComponentScan(basePackages = {"com.github.manosbatsis.scrudbeans"})
+//	@ComponentScan(basePackages = {"com.github.manosbatsis.scrudbeans"})
 public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
+
+	Map<String, ? extends JpaPersistableModelService<?, ?>> entityServices;
+
+	@Autowired
+	public void setEntityServices(Map<String, ? extends JpaPersistableModelService<?, ?>> entityServices) {
+		this.entityServices = entityServices;
+	}
+
 
 	/**
 	 * Initialized by the `app.format.datetime.with-colon-in-time-zone`
@@ -81,26 +84,30 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public StringToPersistedEntityGenericConverter stringToPersistedEntityGenericConverter(
-			@Autowired List<? extends JpaPersistableModelService<?, ?>> entityServices
-	){
-		return new StringToPersistedEntityGenericConverter(entityServices);
-	}
-	@Bean
-	@ConditionalOnMissingBean
-	public IdentifierAdapterRegistryInitializer identifierAdapterRegistryInitializer(
-			List<? extends IdentifierAdapter<?, ?>> identifierAdapters
-	) {
-		return new IdentifierAdapterRegistryInitializer(identifierAdapters);
+	public StringToScrudBeanGenericConverter stringToPersistedEntityGenericConverter(){
+		return new StringToScrudBeanGenericConverter(identifierAdapterRegistry());
 	}
 
-	/** Register a bean to collect model metadata
 	@Bean
-	@ConditionalOnMissingBean
-	public JpaModelInfoRegistry jpaModelInfoRegistry() {
-		return new JpaModelInfoRegistry();
+	public ScrudBeanToStringGenericConverter scrudBeanToStringGenericConverter(){
+		return new ScrudBeanToStringGenericConverter(identifierAdapterRegistry());
 	}
-	 */
+
+	@Bean
+	public StringToScrudBeanIdGenericConverter stringToScrudBeanIdGenericConverter(){
+		return new StringToScrudBeanIdGenericConverter(identifierAdapterRegistry());
+	}
+
+	@Bean
+	public ScrudBeanIdToStringGenericConverter scrudBeanIdToStringGenericConverter(){
+		return new ScrudBeanIdToStringGenericConverter(identifierAdapterRegistry());
+	}
+
+	@Bean
+	public IdentifierAdapterRegistry identifierAdapterRegistry(){
+		return new IdentifierAdapterRegistry(entityServices);
+	}
+
 	/** Add a validator is none is already created */
 	@Bean
 	@ConditionalOnMissingBean
@@ -108,13 +115,7 @@ public class ScrudBeansAutoConfiguration implements WebMvcConfigurer {
 		return new LocalValidatorFactoryBean();
 	}
 
-	/** Register custom unique constraints validator
-	@Bean
-	@ConditionalOnMissingBean
-	public UniqueValidator uniqueValidator() {
-		return new UniqueValidator();
-	}
-	 */
+
 	/*
 	//TODO
 	@Bean

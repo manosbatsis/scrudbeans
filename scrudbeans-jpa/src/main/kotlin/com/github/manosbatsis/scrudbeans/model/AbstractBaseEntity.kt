@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 import java.util.*
 import javax.persistence.*
 
@@ -18,11 +18,11 @@ open class AbstractAuditableEntity(
 
     @CreatedDate
     @Column(name = "created", nullable = false)
-    var created: OffsetDateTime? = null,
+    var created: LocalDateTime? = null,
 
     @LastModifiedDate
     @Column(name = "updated", nullable = false)
-    var updated: OffsetDateTime? = null
+    var updated: LocalDateTime? = null
 
 ): AbstractBaseEntity(id){
 
