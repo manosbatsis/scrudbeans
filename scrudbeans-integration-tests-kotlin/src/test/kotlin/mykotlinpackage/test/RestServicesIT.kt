@@ -255,7 +255,28 @@ class RestServicesIT(
     }
 
     @Test
-    fun testScrudForEmbeddedId() { // Get LOTR books
+    fun testScrudForIdType(){
+        for (i in 1..3) {
+
+            val customer = Customer(name = "User$i Name$i", phoneNumber = "1234556789$i", address = "Foo Av. $i Bar, Baz")
+
+            log.debug("Saving customer: $customer")
+
+            restTemplate.exchange(
+                "/api/rest/customers", HttpMethod.POST,
+                HttpEntity(customer),
+                Customer::class.java
+            ).let {
+                assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
+                assertThat(it.body).isNotNull
+                it.body!!
+            }
+        }
+    }
+
+    @Test
+    fun testScrudForEmbeddedId() {
+        // Get LOTR books
         val products = restTemplate.exchange(
             "/api/rest/products?filter=name=like=LOTR ", HttpMethod.GET,
             null,

@@ -177,6 +177,11 @@ internal class TypeSpecBuilder(
                 .initializer("%L", descriptor.isCompositeId)
                 .build())
             .addSuperclassConstructorParameter("%T::class.java", descriptor.idClassName)
+            .addType(TypeSpec.companionObjectBuilder()
+                .addProperty(PropertySpec.builder("incompleteIdMsg", String::class)
+                    .initializer("%S", buildCodeBlock {
+                        add("Cannot build string representation from incomplete %T", descriptor.idClassName)
+                    }).build()).build())
             .addFunction(FunSpec.builder("getId")
                 .addModifiers(PUBLIC, OVERRIDE)
                 .returns(descriptor.idClassName.copy(nullable = true))
@@ -190,6 +195,11 @@ internal class TypeSpecBuilder(
                             descriptor.idClassName)
                     }
                 )
+                .addStatement(
+                    "val noNullMsg = %S",
+                buildCodeBlock {
+                    add("Property find entity for string representation of %T or one of it' components", descriptor.idClassName)
+                })
                 .let { funcSpecBuilder ->
                     if(descriptor.isIdClass){
                         val funcBody = CodeBlock.builder().addStatement("return %T(", descriptor.idClassName)
@@ -197,7 +207,10 @@ internal class TypeSpecBuilder(
                         descriptor.compositeIdFieldNames.forEachIndexed { index, fieldName ->
                             //val fieldType = descriptor.compositeIdClassNames[fieldName]?: error("No type for composite id field $fieldName")
                             val maybeComma = if(index + 1 == descriptor.compositeIdFieldNames.size) "" else ","
-                            funcBody.addStatement("$fieldName = resource.$fieldName$maybeComma")
+                            funcBody.addStatement("$fieldName = resource.$fieldName")
+                                .indent()
+                                .addStatement("?: throw %T(incompleteIdMsg)$maybeComma", IllegalArgumentException::class.java)
+                                .unindent()
                         }
                         funcBody.unindent()
                         funcBody.addStatement(")")
@@ -268,24 +281,21 @@ internal class TypeSpecBuilder(
                     descriptor.idClassName.copy(nullable = true)
                 ).build())
                 .addStatement("if(resourceId == null) return null")
-                .addStatement(
-                    "val incompleteIdMsg = %S",
-                    buildCodeBlock {
-                        add("Cannot build string representation from incomplete %T", descriptor.idClassName)
-                    })
                 .let { funcSpecBuilder ->
                     if(descriptor.isCompositeId){
                         val funcBody = CodeBlock.builder().addStatement("return %T()", StringBuilder::class.java)
                         funcBody.indent()
                         descriptor.compositeIdFieldNames.forEachIndexed { index, fieldName ->
-                            //val fieldType = descriptor.compositeIdClassNames[fieldName]?: error("No type for composite id field $fieldName")
-
+                            val fieldType = descriptor.compositeIdClassNames[fieldName]?: error("No type for composite id field $fieldName")
                             funcBody.addStatement(
-                                ".append(conversionService.convert(resourceId.%L ?: throw %T(incompleteIdMsg), %T::class.java))",
-                                fieldName,
+                                ".append(conversionService.convert(resourceId.%L",
+                                fieldName)
+                                .indent()
+                                .addStatement(
+                                "?: throw %T(incompleteIdMsg), %T::class.java))",
                                 IllegalArgumentException::class.java,
-                                String::class.java.asTypeName().asKotlinTypeName()
-                            )
+                                String::class.java.asTypeName().asKotlinTypeName())
+                                .unindent()
                             if(index + 1 < descriptor.compositeIdFieldNames.size)
                                 funcBody.addStatement(".append(%S)", "_")
                         }
