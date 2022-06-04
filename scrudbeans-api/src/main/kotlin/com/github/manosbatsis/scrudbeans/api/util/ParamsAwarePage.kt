@@ -16,20 +16,15 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http:></http:>//www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.api.util;
+package com.github.manosbatsis.scrudbeans.api.util
 
-import java.util.Map;
-
-import org.springframework.data.domain.Page;
-
+import org.springframework.data.domain.Page
 
 /**
  * A page aware of the query params that created it and able to provide links for navigation
  */
-public interface ParamsAwarePage<T> extends Page<T> {
-	Map<String, String[]> getParameters();
-	// TODO
-	//List<org.springframework.hateoas.Link> buildLinks(HttpServletRequest request);
+interface ParamsAwarePage<T> : Page<T> {
+    val parameters: Map<String, Array<String>>
 }

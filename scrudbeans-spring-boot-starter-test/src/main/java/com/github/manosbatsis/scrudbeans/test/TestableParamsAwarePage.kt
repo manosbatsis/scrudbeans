@@ -1,113 +1,67 @@
-package com.github.manosbatsis.scrudbeans.test;
+package com.github.manosbatsis.scrudbeans.test
 
-import com.github.manosbatsis.scrudbeans.api.util.ParamsAwarePage;
-import lombok.Data;
-import org.apache.commons.lang3.NotImplementedException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import com.github.manosbatsis.scrudbeans.api.util.ParamsAwarePage
+import org.apache.commons.lang3.NotImplementedException
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import java.util.function.Function
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+open class TestableParamsAwarePage<T> : ParamsAwarePage<T> {
+    private val size = 0
+    override fun getSize(): Int = size
 
-/**
- * An basic {@link Page} implementation used for JSON deserialization during tests, e.g.:
- * <code>
- * // Somewhere in your test class:
- * public static class ProductsPage extends TestableParamsAwarePage<Product> { }
- *
- * // Later in a test method, using restassured:
- * ProductsPage products = given()
- * 		.spec(defaultSpec())
- * 		.queryParam("name", "LOTR %")
- * 		.get("/products")
- * 		.then()
- * 		.statusCode(200).extract().as(ProductsPage.class);
- * </code>
- *
- * @param <T> the model type
- */
-@Data
-public class TestableParamsAwarePage<T> implements ParamsAwarePage<T> {
+    private val number = 0
+    override fun getNumber(): Int = number
 
-	private int size;
+    private val totalPages = 0
+    override fun getTotalPages(): Int = totalPages
 
-	private int number;
+    private val numberOfElements = 0
+    override fun getNumberOfElements(): Int = numberOfElements
 
-	private int totalPages;
+    private val totalElements: Long = 0
+    override fun getTotalElements(): Long = totalElements
 
-	private int numberOfElements;
+    override var parameters: Map<String, Array<String>> = emptyMap()
 
-	private long totalElements;
+    private var content: List<T> = emptyList()
+    override fun getContent(): List<T> = content
 
-	private Map<String, String[]> parameters;
+    override fun hasContent(): Boolean = !content.isEmpty()
 
-	private List<T> content;
+    private var sort: Sort = Sort.by(Sort.DEFAULT_DIRECTION)
+    override fun getSort(): Sort = sort
 
+    private val first: Boolean = number == 0
+    override fun isFirst(): Boolean = first
 
-	@Override
-	public boolean hasContent() {
-		return this.content != null && !this.content.isEmpty();
-	}
+    override operator fun hasNext(): Boolean {
+        return getNumber() + 1 < getTotalPages()
+    }
 
-	@Override
-	public Sort getSort() {
-		return Sort.by(Sort.DEFAULT_DIRECTION);
-	}
+    override fun hasPrevious(): Boolean {
+        return !isFirst
+    }
 
-	@Override
-	public boolean isFirst() {
-		return this.number == 0;
-	}
+    override fun nextPageable(): Pageable {
+        return if (hasNext()) PageRequest.of(number, size, Sort.DEFAULT_DIRECTION).next() else Pageable.unpaged()
+    }
 
-	@Override
-	public boolean hasNext() {
-		return getNumber() + 1 < getTotalPages();
-	}
+    override fun previousPageable(): Pageable {
+        return if (hasPrevious()) PageRequest.of(number, size, Sort.DEFAULT_DIRECTION)
+            .previousOrFirst() else Pageable.unpaged()
+    }
 
+    private val isLast: Boolean = !hasNext()
+    override fun isLast(): Boolean = isLast
 
-	@Override
-	public boolean hasPrevious() {
-		return !isFirst();
-	}
+    override operator fun iterator(): MutableIterator<T> {
+        return this.getContent().toMutableList().iterator()
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.domain.Slice#nextPageable()
-	 */
-	public Pageable nextPageable() {
-		return hasNext() ? PageRequest.of(this.number, this.size, Sort.DEFAULT_DIRECTION).next() : Pageable.unpaged();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.springframework.data.domain.Slice#previousPageable()
-	 */
-	public Pageable previousPageable() {
-		return hasPrevious() ? PageRequest.of(this.number, this.size, Sort.DEFAULT_DIRECTION).previousOrFirst() : Pageable.unpaged();
-	}
-
-
-	@Override
-	public boolean isLast() {
-		return !hasNext();
-	}
-
-	@Override
-	public <U> Page<U> map(Function<? super T, ? extends U> converter) {
-		throw new NotImplementedException("Non-implemented");
-	}
-
-	/**
-	 * Returns an iterator over elements of type {@code T}.
-	 *
-	 * @return an Iterator.
-	 */
-	@Override
-	public Iterator<T> iterator() {
-		return this.getContent().iterator();
-	}
+    override fun <U : Any?> map(converter: Function<in T, out U>): Page<U> {
+        throw NotImplementedException("Non-implemented")
+    }
 }

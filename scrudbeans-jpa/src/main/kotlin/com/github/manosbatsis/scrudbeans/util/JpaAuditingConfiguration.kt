@@ -11,7 +11,8 @@ import java.util.*
 @Configuration
 @EnableJpaAuditing(
     // TODO auditorAwareRef = "auditorProvider",
-    dateTimeProviderRef = "auditingDateTimeProvider")
+    dateTimeProviderRef = "auditingDateTimeProvider"
+)
 class JpaAuditingConfiguration {
     @Bean(name = ["auditingDateTimeProvider"])
     fun dateTimeProvider(): DateTimeProvider {

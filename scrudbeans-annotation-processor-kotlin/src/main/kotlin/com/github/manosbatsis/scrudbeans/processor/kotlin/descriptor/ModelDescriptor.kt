@@ -2,6 +2,7 @@ package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
+import jakarta.persistence.Entity
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.*
 import javax.lang.model.element.ElementKind.FIELD
@@ -11,15 +12,14 @@ import javax.lang.model.type.TypeKind.DECLARED
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
 import javax.lang.model.util.Types
-import javax.persistence.Entity
 
 /**
  * Base implementation for classes describing (entity) models
  */
 abstract class ModelDescriptor(
-        override val processingEnvironment: ProcessingEnvironment,
-        val typeElement: TypeElement
-): ProcessingEnvironmentAware {
+    override val processingEnvironment: ProcessingEnvironment,
+    val typeElement: TypeElement
+) : ProcessingEnvironmentAware {
 
     var jpaEntity: Boolean = false
     val qualifiedName: String
@@ -40,14 +40,15 @@ abstract class ModelDescriptor(
     protected fun scanMembers(types: Types, currentTypeElement: Element) {
         processingEnvironment.noteMessage {
             "scanMembers, currentTypeElement: ${currentTypeElement.simpleName}, " +
-                    "kind: ${currentTypeElement.kind}" }
+                "kind: ${currentTypeElement.kind}"
+        }
         when (currentTypeElement.kind) {
             ElementKind.CLASS -> {
                 val typeElement = currentTypeElement as TypeElement
                 scanMembers(types, typeElement, typeElement.accessibleConstructorParameterFields())
             }
             ElementKind.CONSTRUCTOR -> {
-                val constructorTypeElement  = currentTypeElement as ExecutableElement
+                val constructorTypeElement = currentTypeElement as ExecutableElement
                 scanMembers(types, constructorTypeElement.enclosingElement as TypeElement, constructorTypeElement.parameters)
             }
             else -> throw IllegalArgumentException("Invalid element type, expected a class or constructor")
@@ -58,7 +59,8 @@ abstract class ModelDescriptor(
 
         processingEnvironment.noteMessage {
             "scanMembers, currentTypeElement: ${currentTypeElement.simpleName}, " +
-                    "fields: ${fields.joinToString(",") { it.simpleName }}" }
+                "fields: ${fields.joinToString(",") { it.simpleName }}"
+        }
         fields.forEach {
             scanMember(types, currentTypeElement, it)
         }
@@ -68,10 +70,9 @@ abstract class ModelDescriptor(
         }
     }
 
-
     abstract fun scanMember(types: Types, currentTypeElement: TypeElement, memberElement: VariableElement)
 
-    open fun finalise(){
+    open fun finalise() {
         /*NO-OP*/
     }
 
@@ -85,7 +86,8 @@ abstract class ModelDescriptor(
     protected fun asTypeElement(types: Types, typeMirror: TypeMirror): TypeElement {
         if (typeMirror.kind != DECLARED) {
             throw ScrudModelProcessorException(
-                    "Method asTypeElement Was expecting TypeKind.DECLARED but was " + typeMirror.kind)
+                "Method asTypeElement Was expecting TypeKind.DECLARED but was " + typeMirror.kind
+            )
         }
         val element = (typeMirror as DeclaredType).asElement()
         if (!(element.kind.isClass || element.kind.isInterface)) {
@@ -120,7 +122,8 @@ abstract class ModelDescriptor(
             }
         } else {
             throw ScrudModelProcessorException(
-                    "Could not process member " + scrudModelMember + ", kind: " + scrudModelMember.kind)
+                "Could not process member " + scrudModelMember + ", kind: " + scrudModelMember.kind
+            )
         }
 
         return typeMirror.asTypeElement().asKotlinClassName().toString()

@@ -5,4 +5,4 @@ import java.io.Serializable
 data class CustomerId(
     val name: String?,
     val phoneNumber: String
-): Serializable
+) : Serializable

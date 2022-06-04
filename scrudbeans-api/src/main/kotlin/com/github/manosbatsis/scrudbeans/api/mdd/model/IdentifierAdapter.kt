@@ -3,7 +3,7 @@ package com.github.manosbatsis.scrudbeans.api.mdd.model
 /**
  * Provides read/write access to the singular identifier of an (entity) type
  */
-interface IdentifierAdapter<T : Any, S: Any> {
+interface IdentifierAdapter<T : Any, S : Any> {
 
     val entityType: Class<T>
     val entityIdType: Class<S>

@@ -18,5 +18,4 @@ open class ScrudBeansDtoMembersStrategy(
     }
 
     override fun useMutableIterables(): Boolean = true
-
 }

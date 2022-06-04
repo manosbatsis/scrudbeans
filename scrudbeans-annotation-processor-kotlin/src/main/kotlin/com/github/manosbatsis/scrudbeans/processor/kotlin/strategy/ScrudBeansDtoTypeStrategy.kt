@@ -9,16 +9,17 @@ import com.squareup.kotlinpoet.TypeSpec
 
 class ScrudBeansDtoTypeStrategy(
     annotatedElementInfo: AnnotatedElementInfo
-): SimpleDtoTypeStrategy(annotatedElementInfo) {
+) : SimpleDtoTypeStrategy(annotatedElementInfo) {
 
     override fun addSuperTypes(typeSpecBuilder: TypeSpec.Builder) {
         super.addSuperTypes(typeSpecBuilder)
         typeSpecBuilder.addSuperinterface(PersistenceHintsDto::class)
         typeSpecBuilder.addFunction(
             FunSpec.builder("isDetachedUpdate")
-            .addModifiers(KModifier.OVERRIDE)
-            .returns(Boolean::class)
-            .addCode("return ${annotatedElementInfo.updateRequiresNewInstance}")
-            .build())
+                .addModifiers(KModifier.OVERRIDE)
+                .returns(Boolean::class)
+                .addCode("return ${annotatedElementInfo.updateRequiresNewInstance}")
+                .build()
+        )
     }
 }

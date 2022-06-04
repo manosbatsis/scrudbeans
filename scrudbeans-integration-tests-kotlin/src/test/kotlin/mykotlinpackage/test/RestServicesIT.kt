@@ -46,12 +46,11 @@ class RestServicesIT(
     @Autowired val identifierAdapterRegistry: IdentifierAdapterRegistry
 ) {
 
-
     companion object {
         val log = LoggerFactory.getLogger(RestServicesIT.javaClass)
     }
     init {
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
     }
 
     val restTemplate: TestRestTemplate by lazy {
@@ -64,7 +63,7 @@ class RestServicesIT(
     fun testScrud() {
         val orderIdAdapter = identifierAdapterRegistry.getServiceFor(Order::class.java).identifierAdapter
         // Test Search
-        //============================
+        // ============================
         // Get the lord of the rings trilogy as a page of results
         // using a prefixed wildcard search
         val products = restTemplate.exchange(
@@ -79,7 +78,7 @@ class RestServicesIT(
         // expecting three books
         assertTrue(products.content.size == 3)
         // Test Create
-        //============================
+        // ============================
         // We have no auth mechanism by default, so we'll
         // create and use an actual order as a shopping basket
         val email = "foo@bar.baz"
@@ -106,7 +105,7 @@ class RestServicesIT(
             it.body!!
         }
         // Test Update
-        //============================
+        // ============================
         order.email = order.email.toString() + "_updated"
         // 1) test update result...
         order = restTemplate.exchange(
@@ -132,7 +131,7 @@ class RestServicesIT(
         assertEquals(email + "_updated", order.email)
 
         // Test Patch
-        //============================
+        // ============================
         // Prepare the patch
         val orderMap: MutableMap<String, Any> = HashMap()
         orderMap.put("id", order.id!!)
@@ -149,7 +148,7 @@ class RestServicesIT(
         }
         assertEquals(email + "_updated_patched", order.email)
         // Test Read
-        //============================
+        // ============================
         // verify order was created and can be retrieved
 
         order = restTemplate.exchange(
@@ -198,11 +197,11 @@ class RestServicesIT(
         var endOfDay = OffsetDateTime.of(localDate.atTime(23, 59, 59), ZoneOffset.UTC).toLocalDateTime()
 
         // Test RSQL Search
-        //============================
+        // ============================
 
         log.debug("Search for orders")
         var ordersOfTheDay = restTemplate.exchange(
-            "/api/rest/orders?filter=created=ge=${startOfDay};created=le=${endOfDay}", HttpMethod.GET,
+            "/api/rest/orders?filter=created=ge=$startOfDay;created=le=$endOfDay", HttpMethod.GET,
             null,
             OrdersPage::class.java
         ).let {
@@ -226,7 +225,7 @@ class RestServicesIT(
         assertEquals(0, ordersOfTheDay.totalElements)
 
         // Test child endpoint
-        //============================
+        // ============================
         val firstOrderLine = orderLines.first()
         val firstOrderLineProduct = restTemplate.exchange(
             "/api/rest/orderLines/${firstOrderLine.id}/product", HttpMethod.GET,
@@ -240,14 +239,14 @@ class RestServicesIT(
         assertEquals(firstOrderLine.product, firstOrderLineProduct)
 
         // Test Service component API
-        //============================
+        // ============================
         val orderInfosPage: Page<OrderInfo> = orderService.findAll(
-            filter = "created=ge=${startOfDay};created=le=${endOfDay}",
+            filter = "created=ge=$startOfDay;created=le=$endOfDay",
             sortBy = "created",
             sortDirection = Sort.Direction.ASC,
             pageNumber = 0,
             pageSize = 10,
-            //projection = OrderInfo::class.java
+            // projection = OrderInfo::class.java
         ).map { OrderInfo(it.email, it.comment) }
         assertThat(orderInfosPage.content).isNotEmpty
         assertEquals(2, orderInfosPage.totalElements)
@@ -255,7 +254,7 @@ class RestServicesIT(
     }
 
     @Test
-    fun testScrudForIdType(){
+    fun testScrudForIdType() {
         for (i in 1..3) {
 
             val customer = Customer(name = "User$i Name$i", phoneNumber = "1234556789$i", address = "Foo Av. $i Bar, Baz")
@@ -284,7 +283,7 @@ class RestServicesIT(
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
-            it.body!!
+            it.body!!.content
         }
         // Create ProductRelationship for each combination
         val relIdAdapter = identifierAdapterRegistry.getServiceFor(ProductRelationship::class.java).identifierAdapter
@@ -299,7 +298,7 @@ class RestServicesIT(
                     var relationship = ProductRelationship(id = id, description = description)
                     try {
                         log.debug("Saving product relationship: $relationship")
-                    }catch (e: Throwable){
+                    } catch (e: Throwable) {
                         e.printStackTrace()
                         throw e
                     }
@@ -320,7 +319,7 @@ class RestServicesIT(
                     val relationshipId = relIdAdapter.getIdAsString(relationship)
                     log.debug("Look up relationship for ID: $relationshipId")
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships/${relationshipId}", HttpMethod.PUT,
+                        "/api/rest/productRelationships/$relationshipId", HttpMethod.PUT,
                         HttpEntity(relationship),
                         ProductRelationship::class.java
                     ).let {
@@ -332,7 +331,7 @@ class RestServicesIT(
                     val patch: MutableMap<String, Any> = HashMap()
                     patch["description"] = "${relationship.description}_patched"
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships/${relationshipId}", HttpMethod.PUT,
+                        "/api/rest/productRelationships/$relationshipId", HttpMethod.PUT,
                         HttpEntity(patch),
                         ProductRelationship::class.java
                     ).let {
@@ -342,7 +341,7 @@ class RestServicesIT(
                     }
                     // Test Read
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships/${relationshipId}", HttpMethod.GET,
+                        "/api/rest/productRelationships/$relationshipId", HttpMethod.GET,
                         null,
                         ProductRelationship::class.java
                     ).let {
@@ -355,7 +354,6 @@ class RestServicesIT(
             }
         }
     }
-
 
     // Help RestAssured's mapping
     class ProductsPage : TestableParamsAwarePage<Product>()

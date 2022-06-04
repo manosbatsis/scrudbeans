@@ -61,8 +61,8 @@ object ClassUtils {
     /**
      * Break input into a pair consisting of the package and classname
      */
-	@JvmStatic
-	fun getPackageAndSimpleName(className: String): Pair<String, String> {
+    @JvmStatic
+    fun getPackageAndSimpleName(className: String): Pair<String, String> {
         val lastDotIndex = className.lastIndexOf(DOT)
         val simpleName = className.substring(lastDotIndex + 1)
         val packageName = className.substring(0, className.length - (simpleName.length + 1))
@@ -76,7 +76,7 @@ object ClassUtils {
         Assert.notNull(clazz, "clazz cannot be null")
         return try {
             clazz.getConstructor()?.newInstance()
-                ?:  throw IllegalArgumentException("No empty constructor found for ${clazz.canonicalName}")
+                ?: throw IllegalArgumentException("No empty constructor found for ${clazz.canonicalName}")
         } catch (e: InstantiationException) {
             throw RuntimeException("Failed instantiating new instance for class: " + clazz.canonicalName, e)
         } catch (e: IllegalAccessException) {
@@ -100,8 +100,8 @@ object ClassUtils {
         try {
             val stepNames: Iterator<String> = Arrays.asList(*steps).listIterator()
             var tmpClass: Class<*>? = clazz
-            var tmpFieldName: String? = null
-            var propertyDescriptors: Array<PropertyDescriptor>? = null
+            var tmpFieldName: String?
+            var propertyDescriptors: Array<PropertyDescriptor>?
             var i = 0
             while (stepNames.hasNext() && tmpClass != null) {
                 tmpFieldName = stepNames.next()
@@ -156,7 +156,7 @@ object ClassUtils {
     fun fieldByName(fieldName: String, container: Class<*>): Field? {
         var clazz: Class<*> = container
         val rootClasses = setOf(java.lang.Object::class.java, Any::class.java)
-        while (!rootClasses.contains(clazz)){
+        while (!rootClasses.contains(clazz)) {
             clazz.declaredFields.find { it.name == fieldName }
                 ?.also { return it }
             clazz = clazz.superclass

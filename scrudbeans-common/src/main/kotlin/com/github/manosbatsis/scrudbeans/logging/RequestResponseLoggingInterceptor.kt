@@ -15,7 +15,6 @@ class RequestResponseLoggingInterceptor : ClientHttpRequestInterceptor {
         private val utf8: Charset = Charset.forName("UTF-8")
     }
 
-
     @Throws(IOException::class)
     override fun intercept(request: HttpRequest, body: ByteArray, execution: ClientHttpRequestExecution): ClientHttpResponse {
         logRequest(request, body)

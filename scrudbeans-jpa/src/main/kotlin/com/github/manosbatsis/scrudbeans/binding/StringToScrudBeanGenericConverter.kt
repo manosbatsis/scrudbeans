@@ -27,10 +27,9 @@ import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
 import org.springframework.core.convert.TypeDescriptor
 import org.springframework.core.convert.converter.GenericConverter
 
-
 class StringToScrudBeanGenericConverter(
     private val identifierAdapterRegistry: IdentifierAdapterRegistry
-): GenericConverter {
+) : GenericConverter {
 
     private val convertibleTypesCache: MutableSet<GenericConverter.ConvertiblePair> by lazy {
         val services = identifierAdapterRegistry.getServices()
@@ -45,15 +44,14 @@ class StringToScrudBeanGenericConverter(
     override fun getConvertibleTypes(): MutableSet<GenericConverter.ConvertiblePair> = convertibleTypesCache
 
     override fun convert(source: Any?, sourceType: TypeDescriptor, targetType: TypeDescriptor): Any? {
-        return if(source == null || source.toString().isNullOrBlank()) null
+        return if (source == null || source.toString().isNullOrBlank()) null
         else loadFromStringId(identifierAdapterRegistry.getServiceFor(targetType.type), source.toString())
     }
 
-    private fun <T: Any, S : Any> loadFromStringId(service: JpaPersistableModelService<T, S>, source: String): T {
+    private fun <T : Any, S : Any> loadFromStringId(service: JpaPersistableModelService<T, S>, source: String): T {
         val identifierAdapter: IdentifierAdapter<T, S> = service.identifierAdapter
         val id = identifierAdapter.buildIdFromString(source)
             ?: throw NotFoundException("No match found for identifier's string representation: $source")
         return service.getById(id)
     }
-
 }

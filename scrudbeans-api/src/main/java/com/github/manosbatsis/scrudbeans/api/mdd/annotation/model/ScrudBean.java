@@ -20,8 +20,6 @@
  */
 package com.github.manosbatsis.scrudbeans.api.mdd.annotation.model;
 
-import com.github.manosbatsis.scrudbeans.api.DtoMapper;
-
 import java.lang.annotation.*;
 
 
@@ -63,16 +61,6 @@ public @interface ScrudBean {
      * Used to disable generation when used in {@link #controllerSuperClass()}
      */
     String NONE = "NONE";
-
-    /**
-     * DTO classes to generate {@link DtoMapper}s for
-     */
-    Class[] dtoTypes() default Object.class;
-
-    /**
-     * DTO class canonical names to generate {@link DtoMapper}s for
-     */
-    String[] dtoTypeNames() default "";
 
     /**
      * The superclass for the generated controller

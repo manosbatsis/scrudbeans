@@ -24,10 +24,9 @@ import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistry
 import org.springframework.core.convert.TypeDescriptor
 import org.springframework.core.convert.converter.GenericConverter
 
-
 class ScrudBeanToStringGenericConverter(
     private val identifierAdapterRegistry: IdentifierAdapterRegistry
-): GenericConverter {
+) : GenericConverter {
 
     private val convertibleTypesCache: MutableSet<GenericConverter.ConvertiblePair> by lazy {
         val services = identifierAdapterRegistry.getServices()
@@ -42,8 +41,7 @@ class ScrudBeanToStringGenericConverter(
     override fun getConvertibleTypes(): MutableSet<GenericConverter.ConvertiblePair> = convertibleTypesCache
 
     override fun convert(source: Any?, sourceType: TypeDescriptor, targetType: TypeDescriptor): Any? {
-        return if(source == null) null
+        return if (source == null) null
         else identifierAdapterRegistry.getServiceFor(source::class.java).identifierAdapter.getIdAsString(source)
     }
-
 }

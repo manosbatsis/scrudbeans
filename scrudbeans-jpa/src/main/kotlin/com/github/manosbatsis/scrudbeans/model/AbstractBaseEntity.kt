@@ -8,8 +8,7 @@ import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 import java.util.*
-import javax.persistence.*
-
+import jakarta.persistence.*
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
@@ -24,17 +23,17 @@ open class AbstractAuditableEntity(
     @Column(name = "updated", nullable = false)
     var updated: LocalDateTime? = null
 
-): AbstractBaseEntity(id){
+) : AbstractBaseEntity(id) {
 
-    override fun equals(obj: Any?): Boolean {
-        if (obj == null) return false
-        if (obj === this) return true
-        if (!AbstractAuditableEntity::class.isInstance(obj)) return false
-        obj as AbstractAuditableEntity
+    override fun equals(other: Any?): Boolean {
+        if (other == null) return false
+        if (other === this) return true
+        if (!AbstractAuditableEntity::class.isInstance(other)) return false
+        other as AbstractAuditableEntity
         return EqualsBuilder()
-            .appendSuper(super.equals(obj))
-            .append(created, obj.created)
-            .append(updated, obj.updated)
+            .appendSuper(super.equals(other))
+            .append(created, other.created)
+            .append(updated, other.updated)
             .isEquals
     }
 
@@ -46,7 +45,7 @@ open class AbstractAuditableEntity(
             .toHashCode()
     }
 
-    override fun toString(): String  {
+    override fun toString(): String {
         return ToStringBuilder(this)
             .appendSuper(super.toString())
             .append("created", created)
@@ -66,7 +65,7 @@ open class AbstractAuditableEntity(
  * See https://docs.spring.io/spring-data/jpa/docs/current-SNAPSHOT/reference/html/#jpa.entity-persistence.saving-entites.strategies
  */
 @MappedSuperclass
-abstract class AbstractBaseEntity(id: UUID? = null): UuidIdEntity {
+abstract class AbstractBaseEntity(id: UUID? = null) : UuidIdEntity {
 
     @Id @Column(name = "id", length = 16, unique = true, nullable = false)
     override var id: UUID = id ?: UUID.randomUUID()
@@ -94,12 +93,11 @@ abstract class AbstractBaseEntity(id: UUID? = null): UuidIdEntity {
             .toHashCode()
     }
 
-    override fun toString(): String  {
+    override fun toString(): String {
         return ToStringBuilder(this)
             .appendSuper(super.toString())
             .append("id", id)
             .append("version", version)
             .build()
     }
-
 }

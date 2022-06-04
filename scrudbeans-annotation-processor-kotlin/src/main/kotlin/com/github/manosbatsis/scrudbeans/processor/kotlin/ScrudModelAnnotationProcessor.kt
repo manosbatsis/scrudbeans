@@ -1,12 +1,12 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin
 
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
-import com.github.manosbatsis.scrudbeans.api.DtoMapper
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
 import com.squareup.kotlinpoet.*
+import jakarta.persistence.Entity
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
@@ -15,7 +15,6 @@ import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Name
 import javax.lang.model.element.TypeElement
-import javax.persistence.Entity
 import javax.tools.Diagnostic
 import javax.tools.StandardLocation
 
@@ -39,7 +38,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     }
 
     private var complete = false
-    private val typeSpecBuilder by lazy { TypeSpecBuilder(processingEnv)}
+    private val typeSpecBuilder by lazy { TypeSpecBuilder(processingEnv) }
     private lateinit var filer: Filer
 
     // Config properties, i.e. "application.properties" from the classpath
@@ -50,7 +49,6 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
         processingEnv
     }
 
-
     val sourceRootFile by lazy {
         val sourceRootFile = File(generatedSourcesRoot)
         sourceRootFile.mkdir()
@@ -58,16 +56,16 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     }
     val generatedSourcesRoot: String by lazy {
         processingEnv.options[KAPT_KOTLIN_SCRUDBEANS_GENERATED_OPTION_NAME]
-                ?: processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
-                ?: defaultGeneratedSourcesDir()
+            ?: processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME]
+            ?: defaultGeneratedSourcesDir()
     }
 
     private fun defaultGeneratedSourcesDir(): String {
-            val path = filer.createSourceFile("ScrudBeansGeneratedSourcesRoot")
-                .let { File(it.toUri().toURL().file).parent }
-            val msg = "No kapt.kotlin.generated option provided. Using $path"
-            this.processingEnv.messager.printMessage(Diagnostic.Kind.MANDATORY_WARNING, msg + "\n")
-            return path
+        val path = filer.createSourceFile("ScrudBeansGeneratedSourcesRoot")
+            .let { File(it.toUri().toURL().file).parent }
+        val msg = "No kapt.kotlin.generated option provided. Using $path"
+        this.processingEnv.messager.printMessage(Diagnostic.Kind.MANDATORY_WARNING, msg + "\n")
+        return path
     }
 
     /**
@@ -85,7 +83,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
         // Load config/properties
         configProps = this.loadProperties()
         // Create JPA query predicate factories for each entity in the source path
-        //generateEntityPredicateFactories(roundEnv)
+        // generateEntityPredicateFactories(roundEnv)
         // Create other SCRUD components for each model annotated with ScrudBean
         generateScrudComponents(roundEnv)
         // Claiming that annotations have been processed by this processor
@@ -109,7 +107,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
                         // Parse model to something more convenient
                         val descriptor = ScrudModelDescriptor(processingEnv, element, configProps)
                         // Mappers for manual DTOs
-                        //generateDtoMappers(descriptor)
+                        // generateDtoMappers(descriptor)
                         generateDto(descriptor)
                         createIdAdapters(descriptor)
                         createRepository(descriptor)
@@ -123,7 +121,6 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
                     e.printStackTrace()
                     throw e
                 }
-
             }
         }
     }
@@ -136,36 +133,35 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     private fun generateDto(descriptor: ScrudModelDescriptor): FileSpec? {
         val typeSpec = typeSpecBuilder.dtoSpecBuilder(descriptor, sourceRootFile)
         return writeKotlinFile(descriptor, typeSpec, descriptor.packageName)
-
     }
 
     /**
      * Create JPA query predicate factories for each entity in the source path
      * @param roundEnv The current compilation round environment
-    private fun generateEntityPredicateFactories(roundEnv: RoundEnvironment) {
-        val entities = roundEnv.getElementsAnnotatedWith(ScrudBean::class.java)
-        for (element in entities) {
-            try {
-                if (element.getAnnotation(Entity::class.java) != null) {
-                    if (element is TypeElement) {
-                        processingEnv.noteMessage { "generateEntityPredicateFactories, processing element: ${element.simpleName}" }
-                        val descriptor = EntityModelDescriptor(processingEnv, element)
-                        createPredicateFactory(descriptor)
-                    } else {
-                        processingEnv.noteMessage { "Not an instance of TypeElement but annotated with ScrudBean: ${element.simpleName}" }
-                    }
-                }
-            } catch (e: RuntimeException) {
-                processingEnv.errorMessage { "Error generating components for element.simpleName ${e.message}: " }
-                throw e
-            } catch (e: ScrudModelProcessorException) {
-                e.printStackTrace()
-                processingEnv.errorMessage { "Error generating components for ${element.simpleName}: " + e.message }
-                throw e
-            }
+     private fun generateEntityPredicateFactories(roundEnv: RoundEnvironment) {
+     val entities = roundEnv.getElementsAnnotatedWith(ScrudBean::class.java)
+     for (element in entities) {
+     try {
+     if (element.getAnnotation(Entity::class.java) != null) {
+     if (element is TypeElement) {
+     processingEnv.noteMessage { "generateEntityPredicateFactories, processing element: ${element.simpleName}" }
+     val descriptor = EntityModelDescriptor(processingEnv, element)
+     createPredicateFactory(descriptor)
+     } else {
+     processingEnv.noteMessage { "Not an instance of TypeElement but annotated with ScrudBean: ${element.simpleName}" }
+     }
+     }
+     } catch (e: RuntimeException) {
+     processingEnv.errorMessage { "Error generating components for element.simpleName ${e.message}: " }
+     throw e
+     } catch (e: ScrudModelProcessorException) {
+     e.printStackTrace()
+     processingEnv.errorMessage { "Error generating components for ${element.simpleName}: " + e.message }
+     throw e
+     }
 
-        }
-    }
+     }
+     }
      */
 
     /**
@@ -183,18 +179,18 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
      * Create [DtoMapper]s for the ScudBeans' target DTOs
      * @param descriptor The target model descriptor
      * @return the mapper files
-    private fun generateDtoMappers(descriptor: ScrudModelDescriptor): List<FileSpec?> {
-        val files = LinkedList<FileSpec?>()
-        log.debug("generateDtoMappers, dtoTypes (${descriptor.dtoTypes.size}): ${descriptor.dtoTypes}")
-        descriptor.dtoTypes.forEach { dtoClass ->
-            val typeSpec = typeSpecBuilder.createDtoMapper(descriptor, dtoClass)
-            files.add(writeKotlinFile(
-                    descriptor,
-                    typeSpec,
-                    descriptor.parentPackageName + ".mapper"))
-        }
-        return files
-    }
+     private fun generateDtoMappers(descriptor: ScrudModelDescriptor): List<FileSpec?> {
+     val files = LinkedList<FileSpec?>()
+     log.debug("generateDtoMappers, dtoTypes (${descriptor.dtoTypes.size}): ${descriptor.dtoTypes}")
+     descriptor.dtoTypes.forEach { dtoClass ->
+     val typeSpec = typeSpecBuilder.createDtoMapper(descriptor, dtoClass)
+     files.add(writeKotlinFile(
+     descriptor,
+     typeSpec,
+     descriptor.parentPackageName + ".mapper"))
+     }
+     return files
+     }
      */
 
     /**
@@ -206,7 +202,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
         val files = LinkedList<FileSpec?>()
         // Ensure a service has not already been created
         val serviceQualifiedName = descriptor.parentPackageName +
-                ".service." + descriptor.simpleName + "Service"
+            ".service." + descriptor.simpleName + "Service"
         val existing = processingEnv.elementUtils.getTypeElement(serviceQualifiedName)
         if (Objects.isNull(existing)) {
             files.add(createServiceInterface(descriptor))
@@ -225,7 +221,6 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     private fun createServiceInterface(descriptor: ScrudModelDescriptor): FileSpec? {
         val typeSpec = typeSpecBuilder.createServiceInterface(descriptor)
         return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".service")
-
     }
 
     /**
@@ -254,21 +249,23 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
      * @return the written file
      */
     private fun createIdAdapters(descriptor: ScrudModelDescriptor): List<FileSpec> {
-        return listOf(ClassName(descriptor.packageName, descriptor.simpleName)/*,
-                ClassName(descriptor.packageName, descriptor.simpleName + "Dto")*/)
-                .mapNotNull {
-                    writeKotlinFile(descriptor, typeSpecBuilder.createIdAdapter(it, descriptor), descriptor.packageName)
-                }
+        return listOf(
+            ClassName(descriptor.packageName, descriptor.simpleName)/*,
+                ClassName(descriptor.packageName, descriptor.simpleName + "Dto")*/
+        )
+            .mapNotNull {
+                writeKotlinFile(descriptor, typeSpecBuilder.createIdAdapter(it, descriptor), descriptor.packageName)
+            }
     }
 
     /**
      * Create a JPA specification predicate factory source file
      * @param descriptor The target model descriptor
      * @return the written file
-    private fun createPredicateFactory(descriptor: EntityModelDescriptor): FileSpec? {
-        val typeSpec = typeSpecBuilder.createPredicateFactory(descriptor)
-        return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".specification")
-    }
+     private fun createPredicateFactory(descriptor: EntityModelDescriptor): FileSpec? {
+     val typeSpec = typeSpecBuilder.createPredicateFactory(descriptor)
+     return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".specification")
+     }
      */
 
     /**
@@ -286,14 +283,14 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
             if (existing == null) {
                 processingEnv.noteMessage { "writeJavaFile for $fileObjectName" }
                 file = FileSpec.builder(packageName, typeSpec.name!!)
-                        .addFileComment("-------------------- DO NOT EDIT -------------------\n")
-                        .addFileComment(" This file is automatically generated by scrudbeans,\n")
-                        .addFileComment(" see https://manosbatsis.github.io/scrudbeans\n")
-                        .addFileComment(" To edit this file, copy it to the appropriate package \n")
-                        .addFileComment(" in your src/main/kotlin folder and edit there. \n")
-                        .addFileComment("----------------------------------------------------")
-                        .addType(typeSpec)
-                        .build()
+                    .addFileComment("-------------------- DO NOT EDIT -------------------\n")
+                    .addFileComment(" This file is automatically generated by scrudbeans,\n")
+                    .addFileComment(" see https://manosbatsis.github.io/scrudbeans\n")
+                    .addFileComment(" To edit this file, copy it to the appropriate package \n")
+                    .addFileComment(" in your src/main/kotlin folder and edit there. \n")
+                    .addFileComment("----------------------------------------------------")
+                    .addType(typeSpec)
+                    .build()
                 file.writeTo(sourceRootFile)
             } else {
                 processingEnv.noteMessage { "writeJavaFile: Skipping for $fileObjectName as it already exists" }
@@ -310,7 +307,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
         var props = Properties()
         try {
             val fileObject = this.filer!!
-                    .getResource(StandardLocation.CLASS_OUTPUT, "", "application.properties")
+                .getResource(StandardLocation.CLASS_OUTPUT, "", "application.properties")
             props.load(fileObject.openInputStream())
             processingEnv.noteMessage { "loadProperties, props: $props" }
         } catch (e: IOException) {
@@ -318,5 +315,4 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
         }
         return props
     }
-
 }

@@ -23,7 +23,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-
 // Remove security and error handling
 @SpringBootApplication(exclude = [SecurityAutoConfiguration::class, ErrorMvcAutoConfiguration::class])
 // Enable transactions and auditing
@@ -77,9 +76,10 @@ class ScrudBeansSampleApplication {
             val order: Order = orderService.save(Order(email = "foo@bar.baz"))
             for (p in productService.findAll()) {
                 var orderLine = OrderLine(
-                        order = order,
-                        product = p,
-                        quantity = 2)
+                    order = order,
+                    product = p,
+                    quantity = 2
+                )
                 orderLine = orderLineService.save(orderLine)
             }
         }

@@ -15,7 +15,7 @@ class ScrudModelDescriptor(
     typeElement: TypeElement,
     val configProperties: Properties
 ) : EntityModelDescriptor(processingEnvironment, typeElement) {
-    companion object{
+    companion object {
         val ignoredClassNameStringValues = setOf(
             java.lang.Object::class.java.canonicalName,
             Any::class.java.canonicalName
@@ -30,31 +30,15 @@ class ScrudModelDescriptor(
         try {
             scrudBean = typeElement.getAnnotation(ScrudBean::class.java)
             className = typeElement.asKotlinClassName()
-            initDtoClassnames(typeElement)
-        }catch (e: Throwable){
+        } catch (e: Throwable) {
             e.printStackTrace()
-            throw e;
+            throw e
         }
     }
-
-
-    /** Initialise the set of DTO classnames for this ScrudBean. Used to create mappers from/to this ScrudBean  */
-    private fun initDtoClassnames(typeElement: TypeElement) {
-        // Get DTO classnames from "dtoTypes"
-        typeElement.findAnnotationValueAsClassNameStrings(ScrudBean::class.java, "dtoTypes")
-                .filterNot { it.isNullOrBlank() || ignoredClassNameStringValues.contains(it) }
-                .forEach { dtoTypes.add(it) }
-        // Add DTO classnames from "dtoTypeNames"
-        scrudBean.dtoTypeNames
-            .filterNot { it.isNullOrBlank() || ignoredClassNameStringValues.contains(it) }
-            .forEach { dtoTypes.add(it) }
-    }
-
 
     fun scrudBeanClassNamesValue(annotationAttributeName: String): String? {
         return typeElement.findAnnotationValueAsClassNameStrings(ScrudBean::class.java, annotationAttributeName)
             .filterNot { it.isNullOrBlank() || ignoredClassNameStringValues.contains(it) }
             .singleOrNull()
     }
-
 }

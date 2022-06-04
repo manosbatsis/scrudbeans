@@ -7,7 +7,7 @@ import mykotlinpackage.repository.OrderLineRepository
 import org.springframework.context.`annotation`.Lazy
 import org.springframework.stereotype.Service
 import java.util.*
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 @Service
 class OrderLineService(
@@ -16,6 +16,4 @@ class OrderLineService(
     @Lazy identifierAdapter: OrderLineIdentifierAdapter
 ) : AbstractJpaPersistableModelServiceImpl<OrderLine, UUID, OrderLineRepository>(
     orderLineRepository, entityManager, identifierAdapter
-) {
-
-}
+)

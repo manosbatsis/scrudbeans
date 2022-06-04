@@ -16,6 +16,4 @@ import java.util.*
 @RestController
 @RequestMapping(value = ["/api/rest/orderLines"])
 @OpenAPIDefinition(tags = [Tag(name = "Order Lines", description = "Search, create and delete order lines")])
-class OrderLineController : AbstractModelServiceBackedController<OrderLine, UUID, OrderLineService, OrderLineDto>() {
-
-}
+class OrderLineController : AbstractModelServiceBackedController<OrderLine, UUID, OrderLineService, OrderLineDto>()

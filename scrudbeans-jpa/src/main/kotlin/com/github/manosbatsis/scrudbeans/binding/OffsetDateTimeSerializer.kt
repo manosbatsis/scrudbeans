@@ -24,7 +24,6 @@ class OffsetDateTimeSerializer : JsonSerializer<OffsetDateTime?>() {
             .ofPattern("yyyy-MM-dd'T'HH:mm:ssxxx")
             .withZone(ZoneId.of("UTC"))
     }
-
 }
 
 class OffsetDateTimeDeserializer : JsonDeserializer<OffsetDateTime?>() {
@@ -36,6 +35,6 @@ class OffsetDateTimeDeserializer : JsonDeserializer<OffsetDateTime?>() {
     }
 
     override fun deserialize(parser: JsonParser, ctxt: DeserializationContext?): OffsetDateTime? {
-        return parser.text?.let{ OffsetDateTime.parse(it, ISO_8601_FORMATTER) }
+        return parser.text?.let { OffsetDateTime.parse(it, ISO_8601_FORMATTER) }
     }
 }

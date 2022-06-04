@@ -22,7 +22,7 @@ package com.github.manosbatsis.scrudbeans.api.exception;
 
 import org.springframework.http.HttpStatus;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 /**
  * Interface for Exceptions that carry {@link ConstraintViolation} errors

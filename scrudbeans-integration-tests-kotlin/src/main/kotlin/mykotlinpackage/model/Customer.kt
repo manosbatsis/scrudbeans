@@ -1,14 +1,14 @@
 package mykotlinpackage.model
 
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.IdClass
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.IdClass
 
 @ScrudBean
 @Entity
 @IdClass(CustomerId::class)
-class Customer (
+class Customer(
     @field:Id
     var name: String? = null,
 

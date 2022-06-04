@@ -7,21 +7,22 @@ import com.github.manosbatsis.kotlin.utils.kapt.dto.strategy.composition.SimpleD
 import com.github.manosbatsis.kotlin.utils.kapt.processor.AnnotatedElementInfo
 
 class ScrudBeansDtoStrategy(
-        annotatedElementInfo: AnnotatedElementInfo,
-        composition: DtoStrategyComposition = annotatedElementInfo.let {
-                val dtoNameStrategy = SimpleDtoNameStrategy(annotatedElementInfo)
-                val dtoTypeStrategy = ScrudBeansDtoTypeStrategy(annotatedElementInfo)
-                CompositeDtoStrategy(
-                        annotatedElementInfo = annotatedElementInfo,
-                        dtoNameStrategy = dtoNameStrategy,
-                        dtoTypeStrategy = dtoTypeStrategy,
-                        dtoMembersStrategy = ScrudBeansDtoMembersStrategy(
-                                annotatedElementInfo, dtoNameStrategy, dtoTypeStrategy)
-                )
-        }
+    annotatedElementInfo: AnnotatedElementInfo,
+    composition: DtoStrategyComposition = annotatedElementInfo.let {
+        val dtoNameStrategy = SimpleDtoNameStrategy(annotatedElementInfo)
+        val dtoTypeStrategy = ScrudBeansDtoTypeStrategy(annotatedElementInfo)
+        CompositeDtoStrategy(
+            annotatedElementInfo = annotatedElementInfo,
+            dtoNameStrategy = dtoNameStrategy,
+            dtoTypeStrategy = dtoTypeStrategy,
+            dtoMembersStrategy = ScrudBeansDtoMembersStrategy(
+                annotatedElementInfo, dtoNameStrategy, dtoTypeStrategy
+            )
+        )
+    }
 
 ) : CompositeDtoStrategy(
-        annotatedElementInfo,composition
-), ProcessingEnvironmentAware, AnnotatedElementInfo by annotatedElementInfo {
-
-}
+    annotatedElementInfo, composition
+),
+    ProcessingEnvironmentAware,
+    AnnotatedElementInfo by annotatedElementInfo

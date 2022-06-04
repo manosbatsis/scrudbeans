@@ -2,10 +2,9 @@ package mykotlinpackage.model
 
 import io.swagger.v3.oas.annotations.media.Schema
 import java.io.Serializable
-import javax.persistence.Embeddable
-import javax.persistence.JoinColumn
-import javax.persistence.ManyToOne
-
+import jakarta.persistence.Embeddable
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
 
 /** Embeddable many2many identifier for [Product] relationships */
 @Embeddable
@@ -20,7 +19,7 @@ class ProductRelationshipIdentifier(
     @field:JoinColumn(name = "right_id", nullable = false, updatable = false)
     @field:ManyToOne(optional = false)
     val right: Product
-): Serializable{
+) : Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

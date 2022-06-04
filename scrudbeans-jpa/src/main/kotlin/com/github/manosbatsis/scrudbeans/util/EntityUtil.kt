@@ -32,14 +32,13 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.type.filter.AnnotationTypeFilter
 import java.util.concurrent.ConcurrentHashMap
 
-
 object EntityUtil {
     private val logger = LoggerFactory.getLogger(EntityUtil::class.java)
     private val scrudBeanTypes: MutableMap<Class<*>, Boolean> = ConcurrentHashMap()
     private val provider = ClassPathScanningCandidateComponentProvider(false)
 
     fun isScrudBean(domainType: Class<*>): Boolean =
-        scrudBeanTypes.getOrPut(domainType){
+        scrudBeanTypes.getOrPut(domainType) {
             domainType.isAnnotationPresent(ScrudBean::class.java)
         }
 

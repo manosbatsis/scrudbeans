@@ -3,13 +3,13 @@ package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.asClassName
+import jakarta.persistence.EmbeddedId
+import jakarta.persistence.Id
+import jakarta.persistence.IdClass
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement
 import javax.lang.model.util.Types
-import javax.persistence.EmbeddedId
-import javax.persistence.Id
-import javax.persistence.IdClass
 import javax.tools.Diagnostic
 
 /**
@@ -21,7 +21,7 @@ open class EntityModelDescriptor(
     typeElement: TypeElement
 ) : ModelDescriptor(processingEnvironment, typeElement), ProcessingEnvironmentAware {
 
-    companion object{
+    companion object {
         val idAnnotations = listOf(Id::class.java, EmbeddedId::class.java)
     }
 
@@ -35,7 +35,7 @@ open class EntityModelDescriptor(
         get() = isEmbeddedId || isIdClass
 
     protected fun checkIfMemberIsId(types: Types, variableElement: VariableElement) {
-        if(!this::compositeIdClassNames.isInitialized) {
+        if (!this::compositeIdClassNames.isInitialized) {
             compositeIdFieldNames = mutableListOf()
             compositeIdClassNames = mutableMapOf()
         }
@@ -44,8 +44,11 @@ open class EntityModelDescriptor(
             val simpleName = classnameStr.substring(classnameStr.lastIndexOf('.') + 1)
             val packageName = classnameStr.substring(0, classnameStr.lastIndexOf('.'))
             val fieldName = variableElement.simpleName.toString()
-            processingEnvironment.messager.printMessage(Diagnostic.Kind.WARNING, "checkIfMemberIsId: classnameStr: $classnameStr, " +
-                    "simpleName: $simpleName, packageName: $packageName, fieldName: $fieldName")
+            processingEnvironment.messager.printMessage(
+                Diagnostic.Kind.WARNING,
+                "checkIfMemberIsId: classnameStr: $classnameStr, " +
+                    "simpleName: $simpleName, packageName: $packageName, fieldName: $fieldName"
+            )
 
             val className = ClassName(packageName, simpleName)
             processingEnvironment.messager.printMessage(Diagnostic.Kind.WARNING, "checkIfMemberIsId: className: $className")
@@ -58,7 +61,7 @@ open class EntityModelDescriptor(
             idClassName = className
             isEmbeddedId = true
             val embeddedIdFields = variableElement.asType().asTypeElement().getFieldsOnlyForHierarchy()
-            for(field in embeddedIdFields){
+            for (field in embeddedIdFields) {
                 val fieldName = field.simpleName.toString()
                 compositeIdFieldNames.add(fieldName)
                 compositeIdClassNames[fieldName] = field.asType().asTypeElement().asKotlinClassName()
@@ -70,8 +73,8 @@ open class EntityModelDescriptor(
         checkIfMemberIsId(types, memberElement)
     }
 
-    override fun finalise(){
-        if(!isEmbeddedId) {
+    override fun finalise() {
+        if (!isEmbeddedId) {
             when {
                 // Only a single @Id was present
                 compositeIdClassNames.isEmpty() -> throw IllegalStateException("No identifier annotations were present in ${typeElement.asClassName().canonicalName} ")
@@ -85,8 +88,11 @@ open class EntityModelDescriptor(
                 // Multiple @Id annotations were present
                 else -> {
 
-                    processingEnvironment.messager.printMessage(Diagnostic.Kind.WARNING, "finalise, type: ${typeElement.asClassName().canonicalName}, compositeIdFieldNames: ${compositeIdFieldNames.joinToString { "," }}, " +
-                            "compositeIdClassNames: ${compositeIdClassNames.values.joinToString { "," }}")
+                    processingEnvironment.messager.printMessage(
+                        Diagnostic.Kind.WARNING,
+                        "finalise, type: ${typeElement.asClassName().canonicalName}, compositeIdFieldNames: ${compositeIdFieldNames.joinToString { "," }}, " +
+                            "compositeIdClassNames: ${compositeIdClassNames.values.joinToString { "," }}"
+                    )
                     isIdClass = true
                     val idClassAnnotation = typeElement.findAnnotationMirror(IdClass::class.java)
                         ?: throw IllegalStateException("Multiple @Id annotations were present but ${typeElement.asClassName().canonicalName} is not annotated with @IdClass")
@@ -94,6 +100,5 @@ open class EntityModelDescriptor(
                 }
             }
         }
-
     }
 }
