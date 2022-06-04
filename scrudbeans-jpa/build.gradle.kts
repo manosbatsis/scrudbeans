@@ -1,6 +1,14 @@
 plugins {
     `java-library`
 }
+
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    enabled = false
+}
+tasks.named<Jar>("jar") {
+    enabled = true
+}
+
 val springdocOpenapiVersion: String by System.getProperties()
 val rsqlJpaSpringBootStarterVersion: String by System.getProperties()
 

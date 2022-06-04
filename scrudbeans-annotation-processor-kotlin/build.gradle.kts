@@ -1,4 +1,7 @@
 
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    enabled = false
+}
 
 val kotlinUtilsVersion: String by System.getProperties()
 val kotlinPoetVersion: String by System.getProperties()

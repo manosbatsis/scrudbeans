@@ -2,6 +2,13 @@ plugins {
     `java-library`
 }
 
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    enabled = false
+}
+tasks.named<Jar>("jar") {
+    enabled = true
+}
+
 dependencies {
     api(project(":scrudbeans-jpa"))
     // implementation("org.springframework.boot:spring-boot-autoconfigure")

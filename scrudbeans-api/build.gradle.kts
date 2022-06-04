@@ -2,6 +2,13 @@ plugins {
     `java-library`
 }
 
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    enabled = false
+}
+tasks.named<Jar>("jar") {
+    enabled = true
+}
+
 val kotlinUtilsVersion: String by System.getProperties()
 val commonsLang3Version: String by System.getProperties()
 

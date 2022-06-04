@@ -25,14 +25,12 @@ subprojects {
 		plugin("org.springframework.boot")
 		plugin("io.spring.dependency-management")
 		plugin("org.jetbrains.kotlin.plugin.spring")
+		plugin("org.jetbrains.kotlin.plugin.jpa")
 	}
 
 	group = "com.github.manosbatsis.scrudbeans"
 	version = "0.0.1-SNAPSHOT"
 
-	tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
-		enabled = false
-	}
 
 	repositories {
 		mavenCentral()
@@ -42,15 +40,8 @@ subprojects {
 
 	dependencies {
 		val implementation by configurations
-		val testImplementation by configurations
 		implementation("org.jetbrains.kotlin:kotlin-reflect")
 		implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-
-		testImplementation("com.ninja-squad:springmockk:3.1.0")
-		testImplementation("org.springframework.boot:spring-boot-starter-test") {
-			exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
-			exclude(module = "mockito-core")
-		}
 	}
 
 	configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {

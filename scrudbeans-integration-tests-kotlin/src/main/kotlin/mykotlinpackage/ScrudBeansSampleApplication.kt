@@ -84,8 +84,8 @@ class ScrudBeansSampleApplication {
             }
         }
     }
+}
 
-    fun main(args: Array<String>) {
-        runApplication<ScrudBeansSampleApplication>(*args)
-    }
+fun main(args: Array<String>) {
+    runApplication<ScrudBeansSampleApplication>(*args)
 }

@@ -38,20 +38,19 @@ import java.util.*
     webEnvironment = RANDOM_PORT
 )
 @EnableJpaAuditing
-class RestServicesIT(
-
-    @Autowired val restTemplateOrig: TestRestTemplate,
-    @Autowired val productService: ProductService,
-    @Autowired val orderService: OrderService,
-    @Autowired val identifierAdapterRegistry: IdentifierAdapterRegistry
-) {
+class RestServicesIT {
 
     companion object {
-        val log = LoggerFactory.getLogger(RestServicesIT.javaClass)
+        val logger = LoggerFactory.getLogger(RestServicesIT::class.java)
     }
     init {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
     }
+
+    @Autowired lateinit var restTemplateOrig: TestRestTemplate
+    @Autowired lateinit var productService: ProductService
+    @Autowired lateinit var orderService: OrderService
+    @Autowired lateinit var identifierAdapterRegistry: IdentifierAdapterRegistry
 
     val restTemplate: TestRestTemplate by lazy {
         restTemplateOrig.restTemplate.requestFactory = BufferingClientHttpRequestFactory(SimpleClientHttpRequestFactory())
@@ -134,7 +133,7 @@ class RestServicesIT(
         // ============================
         // Prepare the patch
         val orderMap: MutableMap<String, Any> = HashMap()
-        orderMap.put("id", order.id!!)
+        orderMap.put("id", order.id)
         orderMap["email"] = order.email.toString() + "_patched"
         // Submit the patch
         order = restTemplate.exchange(
@@ -167,7 +166,7 @@ class RestServicesIT(
         for (p in orderLineProducs) {
 
             val orderLine: OrderLine = OrderLine(order = order, product = p, quantity = quantity)
-            log.debug("Saving order line: $orderLine for order $order")
+            logger.debug("Saving order line: $orderLine for order $order")
 
             restTemplate.exchange(
                 "/api/rest/orderLines", HttpMethod.POST,
@@ -181,7 +180,7 @@ class RestServicesIT(
         }
 
         // Get a page of order lines
-        log.debug("Search for order lines")
+        logger.debug("Search for order lines")
         var orderLines = restTemplate.exchange(
             "/api/rest/orderLines", HttpMethod.GET,
             null,
@@ -199,7 +198,7 @@ class RestServicesIT(
         // Test RSQL Search
         // ============================
 
-        log.debug("Search for orders")
+        logger.debug("Search for orders")
         var ordersOfTheDay = restTemplate.exchange(
             "/api/rest/orders?filter=created=ge=$startOfDay;created=le=$endOfDay", HttpMethod.GET,
             null,
@@ -259,7 +258,7 @@ class RestServicesIT(
 
             val customer = Customer(name = "User$i Name$i", phoneNumber = "1234556789$i", address = "Foo Av. $i Bar, Baz")
 
-            log.debug("Saving customer: $customer")
+            logger.debug("Saving customer: $customer")
 
             restTemplate.exchange(
                 "/api/rest/customers", HttpMethod.POST,
@@ -297,7 +296,7 @@ class RestServicesIT(
                     val description = "Part of LOTR trilogy"
                     var relationship = ProductRelationship(id = id, description = description)
                     try {
-                        log.debug("Saving product relationship: $relationship")
+                        logger.debug("Saving product relationship: $relationship")
                     } catch (e: Throwable) {
                         e.printStackTrace()
                         throw e
@@ -315,9 +314,9 @@ class RestServicesIT(
 
                     // Test Update
                     relationship.description = "${relationship.description}_updated"
-                    log.debug("Look up relationship $relationship")
+                    logger.debug("Look up relationship $relationship")
                     val relationshipId = relIdAdapter.getIdAsString(relationship)
-                    log.debug("Look up relationship for ID: $relationshipId")
+                    logger.debug("Look up relationship for ID: $relationshipId")
                     relationship = restTemplate.exchange(
                         "/api/rest/productRelationships/$relationshipId", HttpMethod.PUT,
                         HttpEntity(relationship),
@@ -330,7 +329,7 @@ class RestServicesIT(
                     // Test Patch
                     val patch: MutableMap<String, Any> = HashMap()
                     patch["description"] = "${relationship.description}_patched"
-                    relationship = restTemplate.exchange(
+                    restTemplate.exchange(
                         "/api/rest/productRelationships/$relationshipId", HttpMethod.PUT,
                         HttpEntity(patch),
                         ProductRelationship::class.java
