@@ -7,7 +7,7 @@ plugins {
 	val springDependencyManagementVersion: String by System.getProperties()
 
 	id("org.springframework.boot") version springBootVersion apply false
-	id("io.spring.dependency-management") version springDependencyManagementVersion //apply false
+	id("io.spring.dependency-management") version springDependencyManagementVersion apply false
 	id("org.jlleitschuh.gradle.ktlint") version ktlintVersion apply false
 
 	kotlin("jvm") version kotlinVersion apply false

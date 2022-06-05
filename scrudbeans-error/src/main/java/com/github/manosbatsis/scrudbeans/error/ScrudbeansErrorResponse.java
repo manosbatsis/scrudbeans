@@ -41,7 +41,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import jakarta.validation.ConstraintViolation;
+import javax.validation.ConstraintViolation;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.Principal;

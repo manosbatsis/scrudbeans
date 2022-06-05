@@ -23,7 +23,7 @@ package com.github.manosbatsis.scrudbeans.binding
 import com.github.manosbatsis.scrudbeans.api.exception.NotFoundException
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistry
-import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
+import com.github.manosbatsis.scrudbeans.service.JpaEntityService
 import org.springframework.core.convert.TypeDescriptor
 import org.springframework.core.convert.converter.GenericConverter
 
@@ -48,7 +48,7 @@ class StringToScrudBeanGenericConverter(
         else loadFromStringId(identifierAdapterRegistry.getServiceFor(targetType.type), source.toString())
     }
 
-    private fun <T : Any, S : Any> loadFromStringId(service: JpaPersistableModelService<T, S>, source: String): T {
+    private fun <T : Any, S : Any> loadFromStringId(service: JpaEntityService<T, S>, source: String): T {
         val identifierAdapter: IdentifierAdapter<T, S> = service.identifierAdapter
         val id = identifierAdapter.buildIdFromString(source)
             ?: throw NotFoundException("No match found for identifier's string representation: $source")

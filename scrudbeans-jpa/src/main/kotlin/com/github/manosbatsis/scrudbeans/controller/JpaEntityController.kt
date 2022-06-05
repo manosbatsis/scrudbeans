@@ -4,7 +4,7 @@ import com.github.manosbatsis.kotlin.utils.api.Dto
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 
-interface IGenericController<T : Any, S, DTO : Dto<T>> {
+interface JpaEntityController<T : Any, S, DTO : Dto<T>> {
     fun find(
         filter: String,
         pn: Int,

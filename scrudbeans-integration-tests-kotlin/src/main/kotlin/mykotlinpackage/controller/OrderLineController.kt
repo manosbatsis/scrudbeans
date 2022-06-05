@@ -1,6 +1,6 @@
 package mykotlinpackage.controller
 
-import com.github.manosbatsis.scrudbeans.controller.AbstractModelServiceBackedController
+import com.github.manosbatsis.scrudbeans.controller.AbstractJpaEntityController
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.tags.Tag
 import mykotlinpackage.model.OrderLine
@@ -16,4 +16,4 @@ import java.util.*
 @RestController
 @RequestMapping(value = ["/api/rest/orderLines"])
 @OpenAPIDefinition(tags = [Tag(name = "Order Lines", description = "Search, create and delete order lines")])
-class OrderLineController : AbstractModelServiceBackedController<OrderLine, UUID, OrderLineService, OrderLineDto>()
+class OrderLineController : AbstractJpaEntityController<OrderLine, UUID, OrderLineService, OrderLineDto>()

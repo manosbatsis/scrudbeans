@@ -1,7 +1,7 @@
 package com.github.manosbatsis.scrudbeans.service
 
 class IdentifierAdapterRegistry(
-    private val entityServices: Map<String, JpaPersistableModelService<*, *>>
+    private val entityServices: Map<String, JpaEntityService<*, *>>
 ) {
 
     private val serviceKeysByEntityType: Map<Class<*>, String> by lazy {
@@ -15,16 +15,16 @@ class IdentifierAdapterRegistry(
 
     fun getServices() = entityServices.values
 
-    fun <T : Any> findServiceFor(entityType: Class<T>): JpaPersistableModelService<T, *>? {
+    fun <T : Any> findServiceFor(entityType: Class<T>): JpaEntityService<T, *>? {
         val service = serviceKeysByEntityType[entityType]
             ?.let {
                 @Suppress("UNCHECKED_CAST")
-                entityServices[it] as JpaPersistableModelService<T, *>
+                entityServices[it] as JpaEntityService<T, *>
             }
         return service
     }
 
-    fun getServiceFor(entityType: Class<*>): JpaPersistableModelService<*, *> =
+    fun getServiceFor(entityType: Class<*>): JpaEntityService<*, *> =
         findServiceFor(entityType)
             ?: throw IllegalArgumentException("No service for entity type ${entityType.canonicalName}")
 }

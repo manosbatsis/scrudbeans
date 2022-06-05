@@ -2,8 +2,8 @@ package com.github.manosbatsis.scrudbeans.autoconfigure
 
 import com.github.manosbatsis.scrudbeans.binding.*
 import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistry
-import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
-import jakarta.validation.Validator
+import com.github.manosbatsis.scrudbeans.service.JpaEntityService
+import javax.validation.Validator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
@@ -19,7 +19,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 class ScrudBeansAutoConfiguration : WebMvcConfigurer {
 
     @Autowired
-    lateinit var entityServices: Map<String, JpaPersistableModelService<*, *>>
+    lateinit var entityServices: Map<String, JpaEntityService<*, *>>
 
     /**
      * Initialized by the `app.format.datetime.with-colon-in-time-zone`

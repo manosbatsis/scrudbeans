@@ -7,14 +7,15 @@ import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBea
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.api.util.Mimes.*
-import com.github.manosbatsis.scrudbeans.controller.AbstractModelServiceBackedController
-import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
+import com.github.manosbatsis.scrudbeans.controller.AbstractJpaEntityController
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.strategy.ScrudBeansDtoStrategy
-import com.github.manosbatsis.scrudbeans.repository.ModelRepository
-import com.github.manosbatsis.scrudbeans.service.AbstractJpaPersistableModelServiceImpl
-import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
-import com.github.manosbatsis.scrudbeans.util.ClassUtils
+import com.github.manosbatsis.scrudbeans.repository.JpaEntityRepository
+import com.github.manosbatsis.scrudbeans.repository.JpaEntityWithIdClassRepository
+import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityService
+import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityWithIdClassService
+import com.github.manosbatsis.scrudbeans.service.JpaEntityService
+import com.github.manosbatsis.scrudbeans.service.JpaEntityWithIdClassService
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.KModifier.*
@@ -39,7 +40,7 @@ import java.io.File
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.VariableElement
-import jakarta.persistence.*
+import javax.persistence.*
 
 /**
  * Utility methods creating [TypeSpec] instances for target SCRUD component types
@@ -57,28 +58,19 @@ internal class TypeSpecBuilder(
 
         val TYPE_PARAMETER_STAR = WildcardTypeName.producerOf(Any::class.asTypeName().copy(nullable = true))
         val ANY_CLASS_TYPENAME = Class::class.asClassName().parameterizedBy(TYPE_PARAMETER_STAR)
-        val CLASSNAME_KEY_REPOSITORY = "repository"
-        val CLASSNAME_KEY_SERVICE_INTERFACE = "service"
+        // val CLASSNAME_KEY_REPOSITORY = "repository"
+        // val CLASSNAME_KEY_SERVICE_INTERFACE = "service"
         val CLASSNAME_KEY_SERVICE_IMPL = "serviceImpl"
         val CLASSNAME_KEY_CONTROLLER = "controller"
         val CLASSNAME_KEY_IDADAPTER = "idadapter"
 
         val multipleSlashesRegex = "/{2,}".toRegex()
-        val componentSuperClassnames: Map<String, String> = mapOf(
-            // Default repos
-            ModelDescriptor.STACK_JPA + CLASSNAME_KEY_REPOSITORY to ModelRepository::class.java.canonicalName,
-            // Default service interface per stack
-            CLASSNAME_KEY_SERVICE_INTERFACE to JpaPersistableModelService::class.java.canonicalName,
-            ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_INTERFACE to JpaPersistableModelService::class.java.canonicalName,
-            // Default service interface per stack
-            CLASSNAME_KEY_SERVICE_IMPL to AbstractJpaPersistableModelServiceImpl::class.java.canonicalName,
-            ModelDescriptor.STACK_JPA + CLASSNAME_KEY_SERVICE_IMPL to AbstractJpaPersistableModelServiceImpl::class.java.canonicalName,
-            // Default service controller per stack
-            CLASSNAME_KEY_CONTROLLER to AbstractModelServiceBackedController::class.java.canonicalName,
-            ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER to AbstractModelServiceBackedController::class.java.canonicalName,
-            // Default ID accessor
-            ModelDescriptor.STACK_JPA + CLASSNAME_KEY_IDADAPTER to IdentifierAdapter::class.java.canonicalName
-        )
+        // val componentSuperClassnames: Map<String, String> = mapOf(
+        // CLASSNAME_KEY_CONTROLLER to AbstractJpaEntityController::class.java.canonicalName,
+        // ModelDescriptor.STACK_JPA + CLASSNAME_KEY_CONTROLLER to AbstractJpaEntityController::class.java.canonicalName,
+        // Default ID accessor
+        // ModelDescriptor.STACK_JPA + CLASSNAME_KEY_IDADAPTER to IdentifierAdapter::class.java.canonicalName
+        // )
     }
 
     fun createController(descriptor: ScrudModelDescriptor): TypeSpec {
@@ -97,12 +89,10 @@ internal class TypeSpecBuilder(
                 ScrudStringUtils.decamelize(descriptor.simpleName) + " entries"
         }
 
-        // Controller superclass package/simple name: get from ScrudBean annotation if exists, fallback to defaults otherwise
-        var controllerSuperClassName = descriptor.scrudBean.controllerSuperClass
-        if (StringUtils.isBlank(controllerSuperClassName)) {
-            controllerSuperClassName = getSuperclassName(descriptor, CLASSNAME_KEY_CONTROLLER)
-        }
-        val pkgAndName = ClassUtils.getPackageAndSimpleName(controllerSuperClassName)
+        val superClassName = getSuperClassName(
+            descriptor, "controllerSuperClass",
+            AbstractJpaEntityController::class.java.asClassName()
+        )
 
         return TypeSpec.classBuilder(className)
             .addAnnotation(
@@ -123,7 +113,7 @@ internal class TypeSpecBuilder(
             //        AnnotationSpec.builder(ExposesResourceFor::class.java)
             //                . addMember("value = %L", descriptor.simpleName + "::class").build())
             .superclass(
-                ClassName(pkgAndName.first, pkgAndName.second).parameterizedBy(
+                superClassName.parameterizedBy(
                     ClassName(descriptor.packageName, descriptor.simpleName),
                     descriptor.idClassName,
                     ClassName(descriptor.parentPackageName + ".service", descriptor.simpleName + "Service"),
@@ -142,9 +132,7 @@ internal class TypeSpecBuilder(
      */
     fun createIdAdapter(modelClassName: ClassName, descriptor: ScrudModelDescriptor): TypeSpec {
         val className: String = modelClassName.simpleName + "IdentifierAdapter"
-        val pkgAndName = ClassUtils.getPackageAndSimpleName(
-            getSuperclassName(descriptor, CLASSNAME_KEY_IDADAPTER)
-        )
+
         return TypeSpec.classBuilder(className)
             .addAnnotation(Component::class.java)
             .addAnnotation(
@@ -154,7 +142,7 @@ internal class TypeSpecBuilder(
             )
             .addModifiers(PUBLIC)
             .addSuperinterface(
-                ClassName(pkgAndName.first, pkgAndName.second)
+                IdentifierAdapter::class.java.asClassName()
                     .parameterizedBy(modelClassName, descriptor.idClassName)
             )
             .primaryConstructor(
@@ -360,43 +348,45 @@ internal class TypeSpecBuilder(
             .build()
     }
 
-    private fun getTargetPackageAndSimpleName(
+    private fun getSuperClassName(
         descriptor: ScrudModelDescriptor,
         scrudBeansPropName: String,
-        defaultPropValueKey: String
+        defaultClassName: ClassName
     ): ClassName {
         val classNameStringOrNull = descriptor.scrudBeanClassNamesValue(scrudBeansPropName)
         return if (classNameStringOrNull.isNullOrBlank() || classNameStringOrNull == Object::class.qualifiedName)
-            ClassName.bestGuess(getSuperclassName(descriptor, defaultPropValueKey))
+            defaultClassName
         else {
             ClassName.bestGuess(classNameStringOrNull)
         }
     }
 
     /**
-     * Create a sub-interface [TypeSpec] of [JpaPersistableModelService]
+     * Create a sub-interface [TypeSpec] of [JpaEntityService]
      *
      * @param descriptor The target model descriptor
      * @return the resulting type spec
      */
     fun createServiceInterface(descriptor: ScrudModelDescriptor): TypeSpec {
         val className: String = descriptor.simpleName + "Service"
-        val superClassName = getTargetPackageAndSimpleName(
-            descriptor, "serviceSuperInterface", CLASSNAME_KEY_SERVICE_INTERFACE
+
+        val superClassName = getSuperClassName(
+            descriptor, "serviceSuperInterface",
+            if (descriptor.isIdClass) JpaEntityWithIdClassService::class.java.asClassName()
+            else JpaEntityService::class.java.asClassName()
+        ).parameterizedBy(
+            ClassName(descriptor.packageName, descriptor.simpleName),
+            descriptor.idClassName
         )
+
         return TypeSpec.interfaceBuilder(className)
-            .addSuperinterface(
-                superClassName.parameterizedBy(
-                    ClassName(descriptor.packageName, descriptor.simpleName),
-                    descriptor.idClassName
-                )
-            )
-            .addModifiers(KModifier.PUBLIC)
+            .addSuperinterface(superClassName)
+            .addModifiers(PUBLIC)
             .build()
     }
 
     /**
-     * Create a subclass [TypeSpec] of [AbstractJpaPersistableModelServiceImpl] or
+     * Create a subclass [TypeSpec] of [AbstractJpaEntityService] or
      * or [AbstractModelServiceImpl]depending on whether
      * the mndel is an [Entity]
      *
@@ -408,12 +398,13 @@ internal class TypeSpecBuilder(
         val interfaceClassName: String = descriptor.simpleName + "Service"
         val entityType = ClassName(descriptor.packageName, descriptor.simpleName)
         val repositoryType = ClassName(descriptor.parentPackageName + ".repository", descriptor.simpleName + "Repository")
-        val superClassNameRaw = getTargetPackageAndSimpleName(
-            descriptor, "serviceImplSuperClass", CLASSNAME_KEY_SERVICE_IMPL
-        )
-        val superClassName = superClassNameRaw.parameterizedBy(
-            entityType, descriptor.idClassName, repositoryType
-        )
+
+        val superClassName = getSuperClassName(
+            descriptor, "serviceImplSuperClass",
+            if (descriptor.isIdClass) AbstractJpaEntityWithIdClassService::class.java.asClassName()
+            else AbstractJpaEntityService::class.java.asClassName()
+        ).parameterizedBy(entityType, descriptor.idClassName, repositoryType)
+
         val identifierAdapterClassName = ClassName(descriptor.packageName, "${descriptor.simpleName}IdentifierAdapter")
         return TypeSpec.classBuilder(className)
             .addAnnotation(
@@ -456,30 +447,31 @@ internal class TypeSpecBuilder(
             .addSuperclassConstructorParameter("repository")
             .addSuperclassConstructorParameter("entityManager")
             .addSuperclassConstructorParameter("identifierAdapter")
-            // .addSuperclassConstructorParameter("conversionService")
             .build()
     }
 
     /**
-     * Create a sub-interface [TypeSpec] of [ModelRepository]
+     * Create a sub-interface [TypeSpec] of [JpaEntityRepository]
      *
      * @param descriptor The target model descriptor
      * @return the resulting type spec
      */
     fun createRepository(descriptor: ScrudModelDescriptor): TypeSpec {
         val className: String = descriptor.simpleName + "Repository"
-        val pkgAndName = ClassUtils.getPackageAndSimpleName(
-            getSuperclassName(descriptor, CLASSNAME_KEY_REPOSITORY)!!
-        )
+
+        val superClassName = if (descriptor.isIdClass)
+            JpaEntityWithIdClassRepository::class.java.asClassName()
+        else JpaEntityRepository::class.java.asClassName()
+
         return TypeSpec.interfaceBuilder(className)
             .addAnnotation(Repository::class.java)
             .addSuperinterface(
-                ClassName(pkgAndName.first, pkgAndName.second).parameterizedBy(
+                superClassName.parameterizedBy(
                     ClassName(descriptor.packageName, descriptor.simpleName),
                     descriptor.idClassName
                 )
             )
-            .addModifiers(KModifier.PUBLIC)
+            .addModifiers(PUBLIC)
             .build()
     }
 
@@ -566,52 +558,5 @@ internal class TypeSpecBuilder(
         )
         val dtoStrategy = ScrudBeansDtoStrategy(elementInfo)
         return dtoStrategy.dtoTypeSpec()
-    }
-
-    /** Create a mapstruct-based mapper for non-generated DTOs
-     fun createDtoMapper(descriptor: ScrudModelDescriptor, dtoClass: String): TypeSpec {
-     log.debug("createDtoMapper, dtoClass: $dtoClass")
-     val dtoSimpleName = dtoClass.substring(dtoClass.lastIndexOf('.') + 1)
-     val dtoPackage = dtoClass.substring(0, dtoClass.lastIndexOf('.'))
-     log.debug("createDtoMapper, dtoPackage: {}, dtoSimpleName: {}", dtoPackage, dtoSimpleName)
-     val className: String = descriptor.simpleName + "To" + dtoSimpleName + "Mapper"
-     log.debug("createDtoMapper, className: {}", className)
-     return TypeSpec.interfaceBuilder(className)
-     //@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
-     .addAnnotation(
-     AnnotationSpec.builder(Mapper::class.java)
-     .addMember("unmappedTargetPolicy = %L", "org.mapstruct.ReportingPolicy.IGNORE")
-     .addMember("componentModel = %S", "spring").build())
-     // extends DtoMapper<EntityClass, DTOClass>
-     .addSuperinterface(
-     ClassName(DtoMapper::class.java.`package`.name, DtoMapper::class.java.simpleName)
-     .parameterizedBy(
-     ClassName(descriptor.packageName, descriptor.simpleName),
-     ClassName(dtoPackage, dtoSimpleName)))
-     .addModifiers(KModifier.PUBLIC)
-     .build()
-     }*/
-
-    /**
-     * Get the superclass type for the given component type.
-     * @param descriptor the model descriptor
-     * @param componentTypeKey the component type key, i.e. one of [TypeSpecBuilder.CLASSNAME_KEY_REPOSITORY], [TypeSpecBuilder.CLASSNAME_KEY_SERVICE_INTERFACE], [TypeSpecBuilder.CLASSNAME_KEY_SERVICE_IMPL], [TypeSpecBuilder.CLASSNAME_KEY_CONTROLLER]
-     */
-    fun getSuperclassName(descriptor: ScrudModelDescriptor, componentTypeKey: String): String {
-        return getSuperclassName(descriptor, componentTypeKey, null)
-    }
-
-    private fun getSuperclassName(
-        descriptor: ScrudModelDescriptor,
-        componentTypeKey: String,
-        defaultClassname: String?
-    ): String {
-        var defaultClassname = defaultClassname
-        // Get a default by stack if missing
-        if (Objects.isNull(defaultClassname))
-            defaultClassname = componentSuperClassnames[descriptor.stack + componentTypeKey]
-        // Return the superclass name if configured, the default otherwise
-        return descriptor.configProperties
-            .getProperty("scrudbeans.processor." + descriptor.stack + "." + componentTypeKey, defaultClassname)
     }
 }

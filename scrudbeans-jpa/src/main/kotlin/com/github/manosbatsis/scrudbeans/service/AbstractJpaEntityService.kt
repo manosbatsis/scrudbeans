@@ -5,7 +5,8 @@ import com.github.manosbatsis.scrudbeans.api.domain.PersistenceHintsDto
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.exceptions.EntityNotFoundException
 import com.github.manosbatsis.scrudbeans.extensions.value
-import com.github.manosbatsis.scrudbeans.repository.ModelRepository
+import com.github.manosbatsis.scrudbeans.repository.JpaEntityRepository
+import com.github.manosbatsis.scrudbeans.repository.JpaEntityWithIdClassRepository
 import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import io.github.perplexhub.rsql.RSQLJPASupport
 import io.github.perplexhub.rsql.RSQLJPASupport.toSpecification
@@ -17,16 +18,40 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import jakarta.persistence.EntityManager
+import javax.persistence.EntityManager
 
-abstract class AbstractJpaPersistableModelServiceImpl<T : Any, S : Any, B : ModelRepository<T, S>>(
+abstract class AbstractJpaEntityService<T : Any, S : Any, B : JpaEntityRepository<T, S>>(
+    repository: B,
+    entityManager: EntityManager,
+    identifierAdapter: IdentifierAdapter<T, S>
+) : AbstractJpaEntityWithIdClassService<T, S, B>(repository, entityManager, identifierAdapter),
+    JpaEntityService<T, S> {
+
+    companion object {
+        val logger = LoggerFactory.getLogger(AbstractJpaEntityService::class.java)
+    }
+
+    @Transactional(readOnly = true)
+    override fun <P> findByIdProjectedBy(id: S, projection: Class<P>): Optional<P> =
+        repository.findById(id, projection)
+
+    @Transactional(readOnly = true)
+    override fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P =
+        findByIdProjectedBy(id, projection).orElseThrow { EntityNotFoundException() }
+
+    @Transactional(readOnly = true)
+    override fun <P> findAllByIdInProjectedBy(ids: Set<S>, projection: Class<P>): Iterable<P> =
+        repository.findAllByIdIn(ids, projection)
+}
+
+abstract class AbstractJpaEntityWithIdClassService<T : Any, S : Any, B : JpaEntityWithIdClassRepository<T, S>>(
     protected val repository: B,
     protected val entityManager: EntityManager,
     override val identifierAdapter: IdentifierAdapter<T, S>
-) : JpaPersistableModelService<T, S> {
+) : JpaEntityWithIdClassService<T, S> {
 
     companion object {
-        val logger = LoggerFactory.getLogger(AbstractJpaPersistableModelServiceImpl::class.java)
+        val logger = LoggerFactory.getLogger(AbstractJpaEntityWithIdClassService::class.java)
     }
 
     @Transactional(readOnly = true)
@@ -57,15 +82,7 @@ abstract class AbstractJpaPersistableModelServiceImpl<T : Any, S : Any, B : Mode
     override fun findById(id: S): Optional<T> = repository.findById(id)
 
     @Transactional(readOnly = true)
-    override fun <P> findByIdProjectedBy(id: S, projection: Class<P>): Optional<P> =
-        repository.findById(id, projection)
-
-    @Transactional(readOnly = true)
     override fun findAllByIdIn(ids: Set<S>): Iterable<T> = repository.findAllById(ids)
-
-    @Transactional(readOnly = true)
-    override fun <P> findAllByIdInProjectedBy(ids: Set<S>, projection: Class<P>): Iterable<P> =
-        repository.findAllByIdIn(ids, projection)
 
     @Transactional(readOnly = true)
     override fun findChildById(id: S, child: String): Any? {
@@ -128,10 +145,6 @@ abstract class AbstractJpaPersistableModelServiceImpl<T : Any, S : Any, B : Mode
 
     @Transactional(readOnly = true)
     override fun getById(id: S): T = findById(id).orElseThrow { EntityNotFoundException() }
-
-    @Transactional(readOnly = true)
-    override fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P =
-        findByIdProjectedBy(id, projection).orElseThrow { EntityNotFoundException() }
 
     @Transactional(readOnly = false, propagation = Propagation.NESTED)
     override fun save(entity: T): T = repository.save(entity)

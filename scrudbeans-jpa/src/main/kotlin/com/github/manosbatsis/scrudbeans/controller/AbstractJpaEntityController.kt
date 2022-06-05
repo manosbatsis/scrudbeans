@@ -2,7 +2,7 @@ package com.github.manosbatsis.scrudbeans.controller
 
 import com.github.manosbatsis.kotlin.utils.api.Dto
 import com.github.manosbatsis.scrudbeans.exceptions.ChildEntityNotFoundException
-import com.github.manosbatsis.scrudbeans.service.JpaPersistableModelService
+import com.github.manosbatsis.scrudbeans.service.JpaEntityWithIdClassService
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
@@ -10,9 +10,9 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
-open class AbstractModelServiceBackedController<
-    T : Any, S : Any, SRV : JpaPersistableModelService<T, S>, DTO : Dto<T>
-    > : IGenericController<T, S, DTO> {
+open class AbstractJpaEntityController<
+    T : Any, S : Any, SRV : JpaEntityWithIdClassService<T, S>, DTO : Dto<T>
+    > : JpaEntityController<T, S, DTO> {
 
     @Autowired
     lateinit var business: SRV

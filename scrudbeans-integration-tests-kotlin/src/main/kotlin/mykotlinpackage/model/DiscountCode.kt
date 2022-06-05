@@ -3,9 +3,9 @@ package mykotlinpackage.model
 import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.model.BaseEntity
 import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.persistence.*
-import jakarta.persistence.GenerationType.IDENTITY
-import jakarta.validation.constraints.NotNull
+import javax.persistence.*
+import javax.persistence.GenerationType.IDENTITY
+import javax.validation.constraints.NotNull
 
 /**
  * Sample entity model to test validation of non-null or unique @field:Column constraints

@@ -6,7 +6,7 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
 import com.squareup.kotlinpoet.*
-import jakarta.persistence.Entity
+import javax.persistence.Entity
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
