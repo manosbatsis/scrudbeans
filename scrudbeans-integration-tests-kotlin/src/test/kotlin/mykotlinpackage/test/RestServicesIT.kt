@@ -2,7 +2,8 @@ package mykotlinpackage.test
 
 import com.github.manosbatsis.scrudbeans.logging.RequestResponseLoggingInterceptor
 import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistry
-import com.github.manosbatsis.scrudbeans.test.TestableParamsAwarePage
+import com.github.manosbatsis.scrudbeans.test.RestResponsePage
+import com.github.manosbatsis.scrudbeans.test.parameterizedTypeReference
 import mykotlinpackage.ScrudBeansSampleApplication
 import mykotlinpackage.model.*
 import mykotlinpackage.service.OrderService
@@ -68,7 +69,7 @@ class RestServicesIT {
         val products = restTemplate.exchange(
             "/api/rest/products?filter=name=like=LOTR ", HttpMethod.GET,
             null,
-            ProductsPage::class.java
+            parameterizedTypeReference<RestResponsePage<Product>>()
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -184,7 +185,7 @@ class RestServicesIT {
         var orderLines = restTemplate.exchange(
             "/api/rest/orderLines", HttpMethod.GET,
             null,
-            OrderLinesPage::class.java
+            parameterizedTypeReference<RestResponsePage<OrderLine>>()
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -202,7 +203,7 @@ class RestServicesIT {
         var ordersOfTheDay = restTemplate.exchange(
             "/api/rest/orders?filter=created=ge=$startOfDay;created=le=$endOfDay", HttpMethod.GET,
             null,
-            OrdersPage::class.java
+            parameterizedTypeReference<RestResponsePage<Order>>()
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -214,7 +215,7 @@ class RestServicesIT {
         ordersOfTheDay = restTemplate.exchange(
             "/api/rest/orders?filter=created=ge=${startOfDay.plusYears(1)};created=le=${endOfDay.plusYears(1)}", HttpMethod.GET,
             null,
-            OrdersPage::class.java
+            parameterizedTypeReference<RestResponsePage<Order>>()
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -278,7 +279,7 @@ class RestServicesIT {
         val products = restTemplate.exchange(
             "/api/rest/products?filter=name=like=LOTR ", HttpMethod.GET,
             null,
-            ProductsPage::class.java
+            parameterizedTypeReference<RestResponsePage<Product>>()
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -353,11 +354,4 @@ class RestServicesIT {
             }
         }
     }
-
-    // Help RestAssured's mapping
-    class ProductsPage : TestableParamsAwarePage<Product>()
-
-    class OrdersPage : TestableParamsAwarePage<Order>()
-
-    class OrderLinesPage : TestableParamsAwarePage<OrderLine>()
 }
