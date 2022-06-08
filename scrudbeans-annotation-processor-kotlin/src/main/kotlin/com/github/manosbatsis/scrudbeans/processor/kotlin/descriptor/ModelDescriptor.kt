@@ -1,7 +1,7 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
-import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
+import com.github.manosbatsis.scrudbeans.api.exception.ScrudModelProcessorException
 import javax.persistence.Entity
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.*
@@ -38,10 +38,6 @@ abstract class ModelDescriptor(
     }
 
     protected fun scanMembers(types: Types, currentTypeElement: Element) {
-        processingEnvironment.noteMessage {
-            "scanMembers, currentTypeElement: ${currentTypeElement.simpleName}, " +
-                "kind: ${currentTypeElement.kind}"
-        }
         when (currentTypeElement.kind) {
             ElementKind.CLASS -> {
                 val typeElement = currentTypeElement as TypeElement
@@ -56,11 +52,6 @@ abstract class ModelDescriptor(
     }
 
     protected fun scanMembers(types: Types, currentTypeElement: TypeElement, fields: List<VariableElement>) {
-
-        processingEnvironment.noteMessage {
-            "scanMembers, currentTypeElement: ${currentTypeElement.simpleName}, " +
-                "fields: ${fields.joinToString(",") { it.simpleName }}"
-        }
         fields.forEach {
             scanMember(types, currentTypeElement, it)
         }

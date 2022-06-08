@@ -16,7 +16,6 @@ import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityProjectorServi
 import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityService
 import com.github.manosbatsis.scrudbeans.service.JpaEntityProjectorService
 import com.github.manosbatsis.scrudbeans.service.JpaEntityService
-import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.KModifier.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
@@ -75,18 +74,23 @@ internal class TypeSpecBuilder(
 
     fun createController(descriptor: ScrudModelDescriptor): TypeSpec {
         val className = descriptor.simpleName + "Controller"
-        val beanName = ScrudStringUtils.withFirstCharToLowercase(className)
+        val beanName = className.replaceFirstChar { it.lowercase(Locale.getDefault()) }
 
         // Content for Swagger annotations
         var apiName = descriptor.scrudBean.apiName
-        if (StringUtils.isBlank(apiName)) {
+        if (apiName.isNullOrBlank()) {
             // To plural, de-camelcase
-            apiName = ScrudStringUtils.decamelize(English.plural(descriptor.simpleName))
+            apiName = English.plural(descriptor.simpleName)
+                .camelToUnderscores()
+                .split("_")
+                .joinToString(" ")
         }
         var apiDescription = descriptor.scrudBean.apiDescription
         if (StringUtils.isBlank(apiDescription)) {
             apiDescription = "Search or manage " +
-                ScrudStringUtils.decamelize(descriptor.simpleName) + " entries"
+                descriptor.simpleName.camelToUnderscores()
+                    .split("_")
+                    .joinToString(" ") + " entries"
         }
 
         val superClassName = getSuperClassName(
@@ -486,7 +490,7 @@ internal class TypeSpecBuilder(
         var modelUriComponent: String? = if (Objects.nonNull(scrudBean)) scrudBean.pathFragment else null
         if (StringUtils.isBlank(modelUriComponent)) { // To plural and with 1st char to low case
             modelUriComponent = English.plural(
-                ScrudStringUtils.withFirstCharToLowercase(descriptor.simpleName)
+                descriptor.simpleName.replaceFirstChar { it.lowercase(Locale.getDefault()) }
             )
         }
         // Construct the base API path

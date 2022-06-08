@@ -44,14 +44,8 @@ open class EntityModelDescriptor(
             val simpleName = classnameStr.substring(classnameStr.lastIndexOf('.') + 1)
             val packageName = classnameStr.substring(0, classnameStr.lastIndexOf('.'))
             val fieldName = variableElement.simpleName.toString()
-            processingEnvironment.messager.printMessage(
-                Diagnostic.Kind.WARNING,
-                "checkIfMemberIsId: classnameStr: $classnameStr, " +
-                    "simpleName: $simpleName, packageName: $packageName, fieldName: $fieldName"
-            )
 
             val className = ClassName(packageName, simpleName)
-            processingEnvironment.messager.printMessage(Diagnostic.Kind.WARNING, "checkIfMemberIsId: className: $className")
             compositeIdFieldNames.add(fieldName)
             compositeIdClassNames[fieldName] = className
         }
