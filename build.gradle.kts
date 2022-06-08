@@ -5,7 +5,6 @@ plugins {
 	val ktlintVersion: String by System.getProperties()
 	val springBootVersion: String by System.getProperties()
 	val springDependencyManagementVersion: String by System.getProperties()
-	val freefairLombokVersion: String by System.getProperties()
 
 	id("org.springframework.boot") version springBootVersion apply false
 	id("io.spring.dependency-management") version springDependencyManagementVersion apply false
