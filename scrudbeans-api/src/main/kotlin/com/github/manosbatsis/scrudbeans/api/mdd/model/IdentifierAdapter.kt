@@ -1,7 +1,8 @@
 package com.github.manosbatsis.scrudbeans.api.mdd.model
 
 /**
- * Provides read/write access to the singular identifier of an (entity) type
+ * Provides information and helper functions
+ * related to the identifier of an entity (type).
  */
 interface IdentifierAdapter<T : Any, S : Any> {
 

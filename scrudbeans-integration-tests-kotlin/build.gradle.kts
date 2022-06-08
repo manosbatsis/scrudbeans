@@ -1,5 +1,10 @@
 plugins {
     kotlin("kapt")
+    kotlin("plugin.noarg")
+}
+
+noArg {
+    annotation("com.github.manosbatsis.scrudbeans.api.annotation.NoArg")
 }
 
 springBoot {

@@ -10,12 +10,12 @@ import com.github.manosbatsis.scrudbeans.api.util.Mimes.*
 import com.github.manosbatsis.scrudbeans.controller.AbstractJpaEntityController
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.strategy.ScrudBeansDtoStrategy
+import com.github.manosbatsis.scrudbeans.repository.JpaEntityProjectorRepository
 import com.github.manosbatsis.scrudbeans.repository.JpaEntityRepository
-import com.github.manosbatsis.scrudbeans.repository.JpaEntityWithIdClassRepository
+import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityProjectorService
 import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityService
-import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityWithIdClassService
+import com.github.manosbatsis.scrudbeans.service.JpaEntityProjectorService
 import com.github.manosbatsis.scrudbeans.service.JpaEntityService
-import com.github.manosbatsis.scrudbeans.service.JpaEntityWithIdClassService
 import com.github.manosbatsis.scrudbeans.util.ScrudStringUtils
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.KModifier.*
@@ -201,13 +201,13 @@ internal class TypeSpecBuilder(
                     .addParameter(ParameterSpec.builder("resource", Any::class.asClassName().copy(nullable = true)).build())
                     .addStatement("if(resource == null) return null")
                     .addStatement(
-                        "if(resource !is %T) throw %T(%S)",
+                        "if(resource !is %T) throw %T(%P)",
                         descriptor.className,
                         IllegalArgumentException::class,
                         buildCodeBlock {
                             add(
-                                "Incompatible type " + '$' + "{resource::class.java.canonicalName}, should be %T",
-                                descriptor.idClassName
+                                "Incompatible type " + "$" + "{resource::class.java.canonicalName} should be %T",
+                                descriptor.className
                             )
                         }
                     )
@@ -362,7 +362,7 @@ internal class TypeSpecBuilder(
     }
 
     /**
-     * Create a sub-interface [TypeSpec] of [JpaEntityService]
+     * Create a sub-interface [TypeSpec] of [JpaEntityProjectorService]
      *
      * @param descriptor The target model descriptor
      * @return the resulting type spec
@@ -372,8 +372,8 @@ internal class TypeSpecBuilder(
 
         val superClassName = getSuperClassName(
             descriptor, "serviceSuperInterface",
-            if (descriptor.isIdClass) JpaEntityWithIdClassService::class.java.asClassName()
-            else JpaEntityService::class.java.asClassName()
+            if (descriptor.isIdClass) JpaEntityService::class.java.asClassName()
+            else JpaEntityProjectorService::class.java.asClassName()
         ).parameterizedBy(
             ClassName(descriptor.packageName, descriptor.simpleName),
             descriptor.idClassName
@@ -386,7 +386,7 @@ internal class TypeSpecBuilder(
     }
 
     /**
-     * Create a subclass [TypeSpec] of [AbstractJpaEntityService] or
+     * Create a subclass [TypeSpec] of [AbstractJpaEntityProjectorService] or
      * or [AbstractModelServiceImpl]depending on whether
      * the mndel is an [Entity]
      *
@@ -401,8 +401,8 @@ internal class TypeSpecBuilder(
 
         val superClassName = getSuperClassName(
             descriptor, "serviceImplSuperClass",
-            if (descriptor.isIdClass) AbstractJpaEntityWithIdClassService::class.java.asClassName()
-            else AbstractJpaEntityService::class.java.asClassName()
+            if (descriptor.isIdClass) AbstractJpaEntityService::class.java.asClassName()
+            else AbstractJpaEntityProjectorService::class.java.asClassName()
         ).parameterizedBy(entityType, descriptor.idClassName, repositoryType)
 
         val identifierAdapterClassName = ClassName(descriptor.packageName, "${descriptor.simpleName}IdentifierAdapter")
@@ -451,7 +451,7 @@ internal class TypeSpecBuilder(
     }
 
     /**
-     * Create a sub-interface [TypeSpec] of [JpaEntityRepository]
+     * Create a sub-interface [TypeSpec] of [JpaEntityProjectorRepository]
      *
      * @param descriptor The target model descriptor
      * @return the resulting type spec
@@ -460,8 +460,8 @@ internal class TypeSpecBuilder(
         val className: String = descriptor.simpleName + "Repository"
 
         val superClassName = if (descriptor.isIdClass)
-            JpaEntityWithIdClassRepository::class.java.asClassName()
-        else JpaEntityRepository::class.java.asClassName()
+            JpaEntityRepository::class.java.asClassName()
+        else JpaEntityProjectorRepository::class.java.asClassName()
 
         return TypeSpec.interfaceBuilder(className)
             .addAnnotation(Repository::class.java)

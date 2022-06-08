@@ -1,6 +1,6 @@
 package mykotlinpackage.service
 
-import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityService
+import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityProjectorService
 import mykotlinpackage.model.OrderLine
 import mykotlinpackage.model.OrderLineIdentifierAdapter
 import mykotlinpackage.repository.OrderLineRepository
@@ -14,6 +14,6 @@ class OrderLineService(
     orderLineRepository: OrderLineRepository,
     entityManager: EntityManager,
     @Lazy identifierAdapter: OrderLineIdentifierAdapter
-) : AbstractJpaEntityService<OrderLine, UUID, OrderLineRepository>(
+) : AbstractJpaEntityProjectorService<OrderLine, UUID, OrderLineRepository>(
     orderLineRepository, entityManager, identifierAdapter
 )

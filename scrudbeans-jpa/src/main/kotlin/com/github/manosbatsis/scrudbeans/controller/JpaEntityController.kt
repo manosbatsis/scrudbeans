@@ -9,7 +9,7 @@ interface JpaEntityController<T : Any, S, DTO : Dto<T>> {
         filter: String,
         pn: Int,
         ps: Int,
-        sortBy: String,
+        sortBy: String? = null,
         sortDirection: Sort.Direction
     ): ResponseEntity<Iterable<T>>
     fun findById(id: S): ResponseEntity<T>

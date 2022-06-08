@@ -7,19 +7,8 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import java.util.*
 
-interface JpaEntityService<T : Any, S : Any> : JpaEntityWithIdClassService<T, S> {
-
-    /** Get the resource matching the given ID, projected as [P], throw an error otherwise */
-    fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P
-
-    /** Find the resource matching the given ID, projected as [P] if it exists */
-    fun <P> findByIdProjectedBy(id: S, projection: Class<P>): Optional<P>
-
-    /** Find resources matching any of the given IDs, projected as [P] */
-    fun <P> findAllByIdInProjectedBy(ids: Set<S>, projection: Class<P>): Iterable<P>
-}
-
-interface JpaEntityWithIdClassService<T : Any, S : Any> {
+/** Basic JPA Search+CRUD service with support for RSQL and [Specification]s */
+interface JpaEntityService<T : Any, S : Any> {
 
     val identifierAdapter: IdentifierAdapter<T, S>
 
@@ -41,9 +30,6 @@ interface JpaEntityWithIdClassService<T : Any, S : Any> {
     /** Find all resources by type */
     fun findAll(): Iterable<T>
 
-    /** Find all resources by type and project results as [P] */
-    fun <P> findAllProjectedBy(projection: Class<P>): Iterable<P>
-
     /** Find the resource matching the given ID if it exists */
     fun findById(id: S): Optional<T>
 
@@ -56,21 +42,11 @@ interface JpaEntityWithIdClassService<T : Any, S : Any> {
     /** Find resources page-by-page using an RSQL filter */
     fun findAll(
         filter: String,
-        sortBy: String,
+        sortBy: String?,
         sortDirection: Sort.Direction,
         pageNumber: Int = 0,
         pageSize: Int = 10,
     ): Page<T>
-
-    /** Find resources page-by-page using an RSQL filter, projected as [P] */
-    fun <P> findAllProjectedBy(
-        filter: String,
-        sortBy: String,
-        sortDirection: Sort.Direction,
-        pageNumber: Int = 0,
-        pageSize: Int = 10,
-        projection: Class<P>
-    ): Page<P>
 
     /** Find resources page-by-page using a JPA specification */
     fun findAll(
@@ -78,14 +54,6 @@ interface JpaEntityWithIdClassService<T : Any, S : Any> {
         pageNumber: Int = 0,
         pageSize: Int = 10,
     ): Page<T>
-
-    /** Find resources page-by-page using a JPA specification, projected as [P] */
-    fun <P> findAllProjectedBy(
-        specification: Specification<T>,
-        pageNumber: Int = 0,
-        pageSize: Int = 10,
-        projection: Class<P>
-    ): Page<P>
 
     /** Get the resource matching the given ID, throw an error if no match is found */
     fun getById(id: S): T

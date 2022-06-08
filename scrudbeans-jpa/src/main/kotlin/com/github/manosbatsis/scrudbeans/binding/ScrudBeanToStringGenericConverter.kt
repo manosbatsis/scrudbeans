@@ -42,6 +42,6 @@ class ScrudBeanToStringGenericConverter(
 
     override fun convert(source: Any?, sourceType: TypeDescriptor, targetType: TypeDescriptor): Any? {
         return if (source == null) null
-        else identifierAdapterRegistry.getServiceFor(source::class.java).identifierAdapter.getIdAsString(source)
+        else identifierAdapterRegistry.getServiceForEntityType(source::class.java).identifierAdapter.getIdAsString(source)
     }
 }

@@ -14,6 +14,7 @@ plugins {
 	kotlin("kapt") version kotlinVersion apply false
 	kotlin("plugin.spring") version kotlinVersion apply false
 	kotlin("plugin.jpa") version kotlinVersion apply false
+	kotlin("plugin.noarg") version kotlinVersion apply false
 }
 
 subprojects {
@@ -26,6 +27,7 @@ subprojects {
 		plugin("io.spring.dependency-management")
 		plugin("org.jetbrains.kotlin.plugin.spring")
 		plugin("org.jetbrains.kotlin.plugin.jpa")
+		//plugin("org.jetbrains.kotlin.plugin.noarg")
 	}
 
 	group = "com.github.manosbatsis.scrudbeans"
@@ -72,5 +74,8 @@ subprojects {
 
 	tasks.withType<Test> {
 		useJUnitPlatform()
+		testLogging {
+			showStandardStreams = true
+		}
 	}
 }

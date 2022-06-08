@@ -2,7 +2,7 @@ package com.github.manosbatsis.scrudbeans.controller
 
 import com.github.manosbatsis.kotlin.utils.api.Dto
 import com.github.manosbatsis.scrudbeans.exceptions.ChildEntityNotFoundException
-import com.github.manosbatsis.scrudbeans.service.JpaEntityWithIdClassService
+import com.github.manosbatsis.scrudbeans.service.JpaEntityService
 import io.swagger.v3.oas.annotations.Parameter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 open class AbstractJpaEntityController<
-    T : Any, S : Any, SRV : JpaEntityWithIdClassService<T, S>, DTO : Dto<T>
+    T : Any, S : Any, SRV : JpaEntityService<T, S>, DTO : Dto<T>
     > : JpaEntityController<T, S, DTO> {
 
     @Autowired
@@ -28,9 +28,9 @@ open class AbstractJpaEntityController<
         @Parameter(description = "The page size, optional with default being 10", required = false, example = "10")
         @RequestParam("ps", required = false, defaultValue = "10")
         ps: Int,
-        @Parameter(description = "The field to use for sorting", required = false, example = "updated")
-        @RequestParam("sort", required = false, defaultValue = "id")
-        sortBy: String,
+        @Parameter(description = "The field to use for sorting", required = false)
+        @RequestParam("sort", required = false)
+        sortBy: String?,
         @Parameter(description = "The sort direction, either ASC or DESC", required = false, example = "DESC")
         @RequestParam("direction", required = false, defaultValue = "DESC")
         sortDirection: Sort.Direction

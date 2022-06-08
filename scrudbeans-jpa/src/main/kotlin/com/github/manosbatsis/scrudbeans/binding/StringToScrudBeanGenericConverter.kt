@@ -45,7 +45,7 @@ class StringToScrudBeanGenericConverter(
 
     override fun convert(source: Any?, sourceType: TypeDescriptor, targetType: TypeDescriptor): Any? {
         return if (source == null || source.toString().isNullOrBlank()) null
-        else loadFromStringId(identifierAdapterRegistry.getServiceFor(targetType.type), source.toString())
+        else loadFromStringId(identifierAdapterRegistry.getServiceForEntityType(targetType.type), source.toString())
     }
 
     private fun <T : Any, S : Any> loadFromStringId(service: JpaEntityService<T, S>, source: String): T {

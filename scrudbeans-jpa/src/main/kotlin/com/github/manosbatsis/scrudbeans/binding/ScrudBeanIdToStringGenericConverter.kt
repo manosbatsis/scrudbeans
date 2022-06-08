@@ -36,13 +36,16 @@ class ScrudBeanIdToStringGenericConverter(
                     GenericConverter.ConvertiblePair(it.identifierAdapter.entityIdType, String::class.java),
                     GenericConverter.ConvertiblePair(it.identifierAdapter.entityIdType, java.lang.String::class.java)
                 )
-            }.flatten().toMutableSet()
+            }
+            .flatten()
+            .toMutableSet()
     }
 
     override fun getConvertibleTypes(): MutableSet<GenericConverter.ConvertiblePair> = convertibleTypesCache
 
     override fun convert(source: Any?, sourceType: TypeDescriptor, targetType: TypeDescriptor): Any? {
         return if (source == null) null
-        else identifierAdapterRegistry.getServiceFor(source::class.java).identifierAdapter.getIdAsString(source)
+        else identifierAdapterRegistry.getServiceForCompositeIdType(source::class.java)
+            .identifierAdapter.getIdAsString(source)
     }
 }

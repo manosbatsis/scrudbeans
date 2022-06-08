@@ -61,7 +61,7 @@ class RestServicesIT {
 
     @Test
     fun testScrud() {
-        val orderIdAdapter = identifierAdapterRegistry.getServiceFor(Order::class.java).identifierAdapter
+        val orderIdAdapter = identifierAdapterRegistry.getServiceForEntityType(Order::class.java).identifierAdapter
         // Test Search
         // ============================
         // Get the lord of the rings trilogy as a page of results
@@ -255,6 +255,7 @@ class RestServicesIT {
 
     @Test
     fun testScrudForIdType() {
+        logger.info("Create some customers")
         for (i in 1..3) {
 
             val customer = Customer(name = "User$i Name$i", phoneNumber = "1234556789$i", address = "Foo Av. $i Bar, Baz")
@@ -271,6 +272,53 @@ class RestServicesIT {
                 it.body!!
             }
         }
+
+        logger.info("Search customers")
+        val customersPage = restTemplate.exchange(
+            "/api/rest/customers?filter=name=like=Name1", HttpMethod.GET,
+            null,
+            parameterizedTypeReference<RestResponsePage<Customer>>()
+        ).let {
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
+            it.body!!
+        }
+        assertThat(customersPage.content.size).isEqualTo(1)
+        var customer1 = customersPage.first()
+        assertThat(customer1.address).isEqualTo("Foo Av. 1 Bar, Baz")
+        val customerIdentifierAdapter = identifierAdapterRegistry.getServiceForEntityType(Customer::class.java)
+        customer1 = restTemplate.exchange(
+            "/api/rest/customers/${customerIdentifierAdapter.identifierAdapter.getIdAsString(customer1)}", HttpMethod.GET,
+            null,
+            Customer::class.java
+        ).let {
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
+            it.body!!
+        }
+        // Update a customer
+        val updatedAddress = "${customer1.address} updated"
+        customer1.address = updatedAddress
+        customer1 = restTemplate.exchange(
+            "/api/rest/customers/${customerIdentifierAdapter.identifierAdapter.getIdAsString(customer1)}", HttpMethod.PUT,
+            HttpEntity(customer1),
+            Customer::class.java
+        ).let {
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
+            it.body!!
+        }
+        // Validate customer update
+        customer1 = restTemplate.exchange(
+            "/api/rest/customers/${customerIdentifierAdapter.identifierAdapter.getIdAsString(customer1)}", HttpMethod.GET,
+            null,
+            Customer::class.java
+        ).let {
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
+            it.body!!
+        }
+        assertThat(customer1.address).isEqualTo(updatedAddress)
     }
 
     @Test
@@ -286,7 +334,7 @@ class RestServicesIT {
             it.body!!.content
         }
         // Create ProductRelationship for each combination
-        val relIdAdapter = identifierAdapterRegistry.getServiceFor(ProductRelationship::class.java).identifierAdapter
+        val relIdAdapter = identifierAdapterRegistry.getServiceForEntityType(ProductRelationship::class.java).identifierAdapter
         for (leftProduct in products) {
             for (rightProduct in products) {
                 if (leftProduct != rightProduct) { // Test Create

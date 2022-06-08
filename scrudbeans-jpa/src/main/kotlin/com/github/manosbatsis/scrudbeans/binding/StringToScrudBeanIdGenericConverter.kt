@@ -43,7 +43,7 @@ class StringToScrudBeanIdGenericConverter(
 
     override fun convert(source: Any?, sourceType: TypeDescriptor, targetType: TypeDescriptor): Any? {
         return if (source == null || source.toString().isNullOrBlank()) null
-        else identifierAdapterRegistry.getServiceFor(targetType.type)
+        else identifierAdapterRegistry.getServiceForCompositeIdType(targetType.type)
             .identifierAdapter.buildIdFromString(source.toString())
     }
 }

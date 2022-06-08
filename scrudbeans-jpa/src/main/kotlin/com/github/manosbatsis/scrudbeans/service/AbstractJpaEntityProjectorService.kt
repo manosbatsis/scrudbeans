@@ -5,12 +5,12 @@ import com.github.manosbatsis.scrudbeans.api.domain.PersistenceHintsDto
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.exceptions.EntityNotFoundException
 import com.github.manosbatsis.scrudbeans.extensions.value
+import com.github.manosbatsis.scrudbeans.logging.contextLogger
+import com.github.manosbatsis.scrudbeans.repository.JpaEntityProjectorRepository
 import com.github.manosbatsis.scrudbeans.repository.JpaEntityRepository
-import com.github.manosbatsis.scrudbeans.repository.JpaEntityWithIdClassRepository
 import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import io.github.perplexhub.rsql.RSQLJPASupport
 import io.github.perplexhub.rsql.RSQLJPASupport.toSpecification
-import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -20,89 +20,20 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import javax.persistence.EntityManager
 
-abstract class AbstractJpaEntityService<T : Any, S : Any, B : JpaEntityRepository<T, S>>(
+abstract class AbstractJpaEntityProjectorService<T : Any, S : Any, B : JpaEntityProjectorRepository<T, S>>(
     repository: B,
     entityManager: EntityManager,
     identifierAdapter: IdentifierAdapter<T, S>
-) : AbstractJpaEntityWithIdClassService<T, S, B>(repository, entityManager, identifierAdapter),
-    JpaEntityService<T, S> {
+) : AbstractJpaEntityService<T, S, B>(repository, entityManager, identifierAdapter),
+    JpaEntityProjectorService<T, S> {
 
     companion object {
-        val logger = LoggerFactory.getLogger(AbstractJpaEntityService::class.java)
+        private val logger = contextLogger()
     }
-
-    @Transactional(readOnly = true)
-    override fun <P> findByIdProjectedBy(id: S, projection: Class<P>): Optional<P> =
-        repository.findById(id, projection)
-
-    @Transactional(readOnly = true)
-    override fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P =
-        findByIdProjectedBy(id, projection).orElseThrow { EntityNotFoundException() }
-
-    @Transactional(readOnly = true)
-    override fun <P> findAllByIdInProjectedBy(ids: Set<S>, projection: Class<P>): Iterable<P> =
-        repository.findAllByIdIn(ids, projection)
-}
-
-abstract class AbstractJpaEntityWithIdClassService<T : Any, S : Any, B : JpaEntityWithIdClassRepository<T, S>>(
-    protected val repository: B,
-    protected val entityManager: EntityManager,
-    override val identifierAdapter: IdentifierAdapter<T, S>
-) : JpaEntityWithIdClassService<T, S> {
-
-    companion object {
-        val logger = LoggerFactory.getLogger(AbstractJpaEntityWithIdClassService::class.java)
-    }
-
-    @Transactional(readOnly = true)
-    override fun count(): Long = repository.count()
-
-    @Transactional(readOnly = true)
-    override fun count(filter: String): Long =
-        if (filter.isBlank()) count() else count(toSpecification(filter))
-
-    @Transactional(readOnly = true)
-    override fun count(specification: Specification<T>): Long =
-        repository.count(specification)
-
-    @Transactional(readOnly = true)
-    override fun existsById(id: S): Boolean = repository.existsById(id)
-
-    @Transactional(readOnly = true)
-    override fun existsByIdAssert(id: S): Unit = if (existsById(id)) Unit else throw EntityNotFoundException()
-
-    @Transactional(readOnly = true)
-    override fun findAll(): Iterable<T> = repository.findAll()
 
     @Transactional(readOnly = true)
     override fun <P> findAllProjectedBy(projection: Class<P>): Iterable<P> =
         repository.findBy(projection)
-
-    @Transactional(readOnly = true)
-    override fun findById(id: S): Optional<T> = repository.findById(id)
-
-    @Transactional(readOnly = true)
-    override fun findAllByIdIn(ids: Set<S>): Iterable<T> = repository.findAllById(ids)
-
-    @Transactional(readOnly = true)
-    override fun findChildById(id: S, child: String): Any? {
-        val entity = getById(id)
-        return ClassUtils.fieldByName(child, entity.javaClass)?.value(entity)
-    }
-
-    @Transactional(readOnly = true)
-    override fun findAll(
-        filter: String,
-        sortBy: String,
-        sortDirection: Sort.Direction,
-        pageNumber: Int,
-        pageSize: Int
-    ): Page<T> =
-        if (filter.isBlank()) repository.findAll(PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy)))
-        else findAll(
-            toSpecification<T>(filter).and(RSQLJPASupport.toSort("$sortBy,${sortDirection.toString().lowercase()}")),
-            pageNumber, pageSize
-        )
 
     @Transactional(readOnly = true)
     override fun <P> findAllProjectedBy(
@@ -129,19 +60,100 @@ abstract class AbstractJpaEntityWithIdClassService<T : Any, S : Any, B : JpaEnti
     }
 
     @Transactional(readOnly = true)
-    override fun findAll(
-        specification: Specification<T>,
-        pageNumber: Int,
-        pageSize: Int
-    ): Page<T> = repository.findAll(specification, PageRequest.of(pageNumber, pageSize))
-
-    @Transactional(readOnly = true)
     override fun <P> findAllProjectedBy(
         specification: Specification<T>,
         pageNumber: Int,
         pageSize: Int,
         projection: Class<P>
     ): Page<P> = repository.findBy(specification, PageRequest.of(pageNumber, pageSize), projection)
+
+    @Transactional(readOnly = true)
+    override fun <P> findByIdProjectedBy(id: S, projection: Class<P>): Optional<P> =
+        repository.findById(id, projection)
+
+    @Transactional(readOnly = true)
+    override fun <P> getByIdProjectedBy(id: S, projection: Class<P>): P =
+        findByIdProjectedBy(id, projection).orElseThrow { EntityNotFoundException() }
+
+    @Transactional(readOnly = true)
+    override fun <P> findAllByIdInProjectedBy(ids: Set<S>, projection: Class<P>): Iterable<P> =
+        repository.findAllByIdIn(ids, projection)
+}
+
+abstract class AbstractJpaEntityService<T : Any, S : Any, B : JpaEntityRepository<T, S>>(
+    protected val repository: B,
+    protected val entityManager: EntityManager,
+    override val identifierAdapter: IdentifierAdapter<T, S>
+) : JpaEntityService<T, S> {
+
+    companion object {
+        private val logger = contextLogger()
+    }
+
+    @Transactional(readOnly = true)
+    override fun count(): Long = repository.count()
+
+    @Transactional(readOnly = true)
+    override fun count(filter: String): Long =
+        if (filter.isBlank()) count() else count(toSpecification(filter))
+
+    @Transactional(readOnly = true)
+    override fun count(specification: Specification<T>): Long =
+        repository.count(specification)
+
+    @Transactional(readOnly = true)
+    override fun existsById(id: S): Boolean = repository.existsById(id)
+
+    @Transactional(readOnly = true)
+    override fun existsByIdAssert(id: S): Unit = if (existsById(id)) Unit else throw EntityNotFoundException()
+
+    @Transactional(readOnly = true)
+    override fun findAll(): Iterable<T> = repository.findAll()
+
+    @Transactional(readOnly = true)
+    override fun findById(id: S): Optional<T> = repository.findById(id)
+
+    @Transactional(readOnly = true)
+    override fun findAllByIdIn(ids: Set<S>): Iterable<T> = repository.findAllById(ids)
+
+    @Transactional(readOnly = true)
+    override fun findChildById(id: S, child: String): Any? {
+        val entity = getById(id)
+        return ClassUtils.fieldByName(child, entity.javaClass)?.value(entity)
+    }
+
+    @Transactional(readOnly = true)
+    override fun findAll(
+        filter: String,
+        sortBy: String?,
+        sortDirection: Sort.Direction,
+        pageNumber: Int,
+        pageSize: Int
+    ): Page<T> {
+        return if (filter.isBlank()) repository.findAll(
+            PageRequest.of(
+                pageNumber, pageSize,
+                sortBy
+                    ?.let { Sort.by(sortDirection, sortBy) }
+                    ?: Sort.unsorted()
+            )
+        )
+        else findAll(
+            toSpecification<T>(filter).let {
+                if (sortBy != null)
+                    it.and(RSQLJPASupport.toSort("$sortBy,${sortDirection.toString().lowercase()}"))
+                else it
+            },
+            pageNumber, pageSize
+        )
+    }
+
+    @Transactional(readOnly = true)
+    override fun findAll(
+        specification: Specification<T>,
+        pageNumber: Int,
+        pageSize: Int
+    ): Page<T> = repository.findAll(specification, PageRequest.of(pageNumber, pageSize))
 
     @Transactional(readOnly = true)
     override fun getById(id: S): T = findById(id).orElseThrow { EntityNotFoundException() }
