@@ -1,0 +1,2 @@
+
+# ScrudBeans Integration Tests

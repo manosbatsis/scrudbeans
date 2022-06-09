@@ -2,7 +2,7 @@ package mykotlinpackage.test
 
 import com.github.manosbatsis.scrudbeans.logging.RequestResponseLoggingInterceptor
 import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistry
-import com.github.manosbatsis.scrudbeans.test.RestResponsePage
+import com.github.manosbatsis.scrudbeans.util.RestResponsePage
 import com.github.manosbatsis.scrudbeans.test.parameterizedTypeReference
 import mykotlinpackage.ScrudBeansSampleApplication
 import mykotlinpackage.model.*

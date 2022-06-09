@@ -27,7 +27,7 @@ import java.lang.annotation.*;
 /**
  * Marks a type as an identifier adapter
  */
-@ScrudBeansModelAnnotation
+@ScrudBeansAnnotation
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Documented

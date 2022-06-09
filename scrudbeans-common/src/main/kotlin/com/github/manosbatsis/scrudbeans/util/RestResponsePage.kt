@@ -1,4 +1,4 @@
-package com.github.manosbatsis.scrudbeans.test
+package com.github.manosbatsis.scrudbeans.util
 
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties

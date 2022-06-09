@@ -10,36 +10,45 @@ plugins {
 	id("io.spring.dependency-management") version springDependencyManagementVersion apply false
 	id("org.jlleitschuh.gradle.ktlint") version ktlintVersion apply false
 
-	kotlin("jvm") version kotlinVersion apply false
+	kotlin("jvm") version kotlinVersion
 	kotlin("kapt") version kotlinVersion apply false
 	kotlin("plugin.spring") version kotlinVersion apply false
 	kotlin("plugin.jpa") version kotlinVersion apply false
 	kotlin("plugin.noarg") version kotlinVersion apply false
+	id("org.jetbrains.dokka") version kotlinVersion
+}
+
+
+
+allprojects{
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		maven { url = uri("https://repo.spring.io/milestone") }
+	}
+}
+
+tasks.dokkaHtmlMultiModule.configure {
+	includes.from("README.md")
+	//outputDirectory.set(buildDir.resolve("dokkaHtmlMultiModule"))
 }
 
 subprojects {
 
 	apply {
 		plugin("kotlin")
-		plugin("org.jlleitschuh.gradle.ktlint")
 		plugin("org.jetbrains.kotlin.jvm")
+		plugin("org.jlleitschuh.gradle.ktlint")
 		plugin("org.springframework.boot")
 		plugin("io.spring.dependency-management")
 		plugin("org.jetbrains.kotlin.plugin.spring")
 		plugin("org.jetbrains.kotlin.plugin.jpa")
+
 		//plugin("org.jetbrains.kotlin.plugin.noarg")
 	}
 
 	group = "com.github.manosbatsis.scrudbeans"
 	version = "0.0.1-SNAPSHOT"
-
-
-	repositories {
-		mavenLocal()
-		mavenCentral()
-		maven { url = uri("https://repo.spring.io/milestone") }
-	}
-
 
 	dependencies {
 		val implementation by configurations
