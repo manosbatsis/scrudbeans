@@ -18,6 +18,7 @@ plugins {
 	id("org.jetbrains.dokka") version kotlinVersion
 }
 
+// TODO: publish, see https://stackoverflow.com/questions/71181790/how-do-you-publish-a-kotlin-artifact-to-maven-central
 
 
 allprojects{
@@ -30,25 +31,19 @@ allprojects{
 
 tasks.dokkaHtmlMultiModule.configure {
 	includes.from("README.md")
-	//outputDirectory.set(buildDir.resolve("dokkaHtmlMultiModule"))
+	outputDirectory.set(buildDir.resolve("dokkaHtmlMultiModule"))
 }
 
 subprojects {
 
 	apply {
-		plugin("kotlin")
 		plugin("org.jetbrains.kotlin.jvm")
 		plugin("org.jlleitschuh.gradle.ktlint")
 		plugin("org.springframework.boot")
 		plugin("io.spring.dependency-management")
 		plugin("org.jetbrains.kotlin.plugin.spring")
 		plugin("org.jetbrains.kotlin.plugin.jpa")
-
-		//plugin("org.jetbrains.kotlin.plugin.noarg")
 	}
-
-	group = "com.github.manosbatsis.scrudbeans"
-	version = "0.0.1-SNAPSHOT"
 
 	dependencies {
 		val implementation by configurations
