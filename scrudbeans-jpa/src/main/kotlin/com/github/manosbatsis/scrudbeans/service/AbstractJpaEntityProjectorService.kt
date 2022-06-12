@@ -37,7 +37,7 @@ abstract class AbstractJpaEntityProjectorService<T : Any, S : Any, B : JpaEntity
         pageNumber: Int,
         pageSize: Int,
         projection: Class<P>
-    ): Page<P> = try {
+    ): Page<P> =
         if (filter.isBlank()) repository.findBy(
             PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy)),
             projection
@@ -48,10 +48,6 @@ abstract class AbstractJpaEntityProjectorService<T : Any, S : Any, B : JpaEntity
             pageSize,
             projection
         )
-    } catch (e: Throwable) {
-        e.printStackTrace()
-        throw e
-    }
 
     @Transactional(readOnly = true)
     override fun <P> findAllProjectedBy(

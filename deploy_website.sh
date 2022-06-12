@@ -12,13 +12,13 @@ REPO="https://github.com/manosbatsis/scrudbeans.git"
 DIR=temp-clone
 
 # Delete any existing temporary website clone
-rm -rf $DIR
+#rm -rf $DIR
 
 # Clone the current repo into temp folder
-git clone $REPO $DIR
+#git clone $REPO $DIR
 
 # Move working directory into temp folder
-cd $DIR
+#cd $DIR
 
 # Generate the API docs
 ./gradlew dokkaHtmlMultiModule
@@ -31,8 +31,8 @@ sed -i 's~](docs/~](~g' docs/index.md
 sed -i 's~.md)~)~g' docs/index.md
 
 # Build the site and push the new files up to GitHub
-mkdocs gh-deploy
+mkdocs serve #gh-deploy
 
 # Delete our temp folder
-cd ..
-rm -rf $DIR
+#cd ..
+#rm -rf $DIR
