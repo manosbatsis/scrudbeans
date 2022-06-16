@@ -12,27 +12,31 @@ REPO="https://github.com/manosbatsis/scrudbeans.git"
 DIR=temp-clone
 
 # Delete any existing temporary website clone
-#rm -rf $DIR
+rm -rf $DIR
 
 # Clone the current repo into temp folder
-#git clone $REPO $DIR
+git clone $REPO $DIR
 
 # Move working directory into temp folder
-#cd $DIR
+cd $DIR
 
 # Generate the API docs
-./gradlew dokkaHtmlMultiModule
+./gradlew dokkaGfmMultiModule
+
+# Copy KDoc to mkdocs sources
+mv ./build/dokka/gfmMultiModule/ ./docs/apidoc/
 
 # Add readme as index
 cat README.md > docs/index.md
+
 # Remove redundant link
-sed -i '/See complete documentation at/d' docs/index.md
+sed -i '/Documentation at/d' docs/index.md
 sed -i 's~](docs/~](~g' docs/index.md
 sed -i 's~.md)~)~g' docs/index.md
 
 # Build the site and push the new files up to GitHub
-mkdocs serve #gh-deploy
+mkdocs gh-deploy
 
 # Delete our temp folder
-#cd ..
-#rm -rf $DIR
+cd ..
+rm -rf $DIR

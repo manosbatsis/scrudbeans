@@ -49,3 +49,4 @@ nav:
   - 'RESTful Services': restfulservices.md
   - 'Custom Components': customcomponents.md
   - 'RSQL Support': rsqlsupport.md
+  - 'API Reference': apidoc/index.md
