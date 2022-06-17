@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull
 
 @Entity
 @Table(name = "products")
-@ScrudBean
+@ScrudBean(controllerSuperClass = "mykotlinpackage.controller.CustomJpaEntityController")
 @Schema(name = "Product", description = "A model representing a single product")
 class Product(
     id: UUID? = null,

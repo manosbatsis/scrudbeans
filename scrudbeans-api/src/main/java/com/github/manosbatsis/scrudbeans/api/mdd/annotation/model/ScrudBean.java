@@ -105,11 +105,4 @@ public @interface ScrudBean {
 	String transactionManager() default "";
 
 
-	/**
-	 * Hint to enable javers auditing
-	 */
-	boolean auditable() default false;
-
-	boolean linkable() default true;
-
 }

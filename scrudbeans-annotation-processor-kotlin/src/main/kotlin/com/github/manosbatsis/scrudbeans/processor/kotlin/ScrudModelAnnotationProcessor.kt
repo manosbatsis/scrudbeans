@@ -176,24 +176,6 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     }
 
     /**
-     * Create [DtoMapper]s for the ScudBeans' target DTOs
-     * @param descriptor The target model descriptor
-     * @return the mapper files
-     private fun generateDtoMappers(descriptor: ScrudModelDescriptor): List<FileSpec?> {
-     val files = LinkedList<FileSpec?>()
-     log.debug("generateDtoMappers, dtoTypes (${descriptor.dtoTypes.size}): ${descriptor.dtoTypes}")
-     descriptor.dtoTypes.forEach { dtoClass ->
-     val typeSpec = typeSpecBuilder.createDtoMapper(descriptor, dtoClass)
-     files.add(writeKotlinFile(
-     descriptor,
-     typeSpec,
-     descriptor.parentPackageName + ".mapper"))
-     }
-     return files
-     }
-     */
-
-    /**
      * Create SCRUD service source files
      * @param descriptor The target model descriptor
      * @return the written files: interface and implementation

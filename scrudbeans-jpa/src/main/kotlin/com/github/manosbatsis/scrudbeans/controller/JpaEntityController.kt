@@ -15,8 +15,8 @@ interface JpaEntityController<T : Any, S, DTO : Dto<T>> {
     fun findById(id: S): ResponseEntity<T>
     fun findChildById(id: S, child: String): ResponseEntity<Any>
     fun save(entity: T): ResponseEntity<T>
-    fun update(dto: DTO, id: S): ResponseEntity<T>
-    fun updateNonNullFields(entity: T, id: S): ResponseEntity<T>
+    fun partialUpdate(dto: DTO, id: S): ResponseEntity<T>
+    fun update(entity: T, id: S): ResponseEntity<T>
     fun deleteById(id: S): ResponseEntity<Void>
-    fun existsById(id: S): ResponseEntity<T>
+    fun head(id: S): ResponseEntity<T>
 }

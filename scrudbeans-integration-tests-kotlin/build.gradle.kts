@@ -18,4 +18,5 @@ dependencies {
     kapt(project(":scrudbeans-annotation-processor-kotlin"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2")
+    testImplementation("com.squareup.okhttp3:okhttp:4.10.0")
 }

@@ -2,8 +2,8 @@ package mykotlinpackage.test
 
 import com.github.manosbatsis.scrudbeans.logging.RequestResponseLoggingInterceptor
 import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistry
-import com.github.manosbatsis.scrudbeans.util.RestResponsePage
 import com.github.manosbatsis.scrudbeans.test.parameterizedTypeReference
+import com.github.manosbatsis.scrudbeans.util.RestResponsePage
 import mykotlinpackage.ScrudBeansSampleApplication
 import mykotlinpackage.model.*
 import mykotlinpackage.service.OrderService
@@ -25,7 +25,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.client.BufferingClientHttpRequestFactory
-import org.springframework.http.client.SimpleClientHttpRequestFactory
+import org.springframework.http.client.OkHttp3ClientHttpRequestFactory
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -54,7 +54,8 @@ class RestServicesIT {
     @Autowired lateinit var identifierAdapterRegistry: IdentifierAdapterRegistry
 
     val restTemplate: TestRestTemplate by lazy {
-        restTemplateOrig.restTemplate.requestFactory = BufferingClientHttpRequestFactory(SimpleClientHttpRequestFactory())
+        // Buffer for logging and add support for PATCH
+        restTemplateOrig.restTemplate.requestFactory = BufferingClientHttpRequestFactory(OkHttp3ClientHttpRequestFactory())
         restTemplateOrig.restTemplate.interceptors.add(RequestResponseLoggingInterceptor())
         restTemplateOrig
     }
@@ -138,7 +139,7 @@ class RestServicesIT {
         orderMap["email"] = order.email.toString() + "_patched"
         // Submit the patch
         order = restTemplate.exchange(
-            "/api/rest/orders/${orderIdAdapter.getId(order)}", HttpMethod.PUT,
+            "/api/rest/orders/${orderIdAdapter.getId(order)}", HttpMethod.PATCH,
             HttpEntity(orderMap),
             Order::class.java
         ).let {
@@ -379,7 +380,7 @@ class RestServicesIT {
                     val patch: MutableMap<String, Any> = HashMap()
                     patch["description"] = "${relationship.description}_patched"
                     restTemplate.exchange(
-                        "/api/rest/productRelationships/$relationshipId", HttpMethod.PUT,
+                        "/api/rest/productRelationships/$relationshipId", HttpMethod.PATCH,
                         HttpEntity(patch),
                         ProductRelationship::class.java
                     ).let {
