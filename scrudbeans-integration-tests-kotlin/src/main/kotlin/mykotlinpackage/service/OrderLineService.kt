@@ -1,25 +1,19 @@
 package mykotlinpackage.service
 
-import com.github.manosbatsis.scrudbeans.repository.ModelRepository
-import com.github.manosbatsis.scrudbeans.service.PersistableModelService
-import com.github.manosbatsis.scrudbeans.service.AbstractPersistableModelServiceImpl
+import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityProjectorService
 import mykotlinpackage.model.OrderLine
-import mykotlinpackage.model.Product
-import org.springframework.beans.factory.annotation.Autowired
+import mykotlinpackage.model.OrderLineIdentifierAdapter
+import mykotlinpackage.repository.OrderLineRepository
+import org.springframework.context.`annotation`.Lazy
 import org.springframework.stereotype.Service
+import java.util.*
+import javax.persistence.EntityManager
 
 @Service
-class OrderLineService : AbstractPersistableModelServiceImpl<OrderLine, String, ModelRepository<OrderLine, String>>(), PersistableModelService<OrderLine, String> {
-
-    @Autowired
-    lateinit var productRepository: ModelRepository<Product, String>
-
-    /**
-     * {@inheritDoc}
-     * @param resource
-     */
-    override fun create(resource: OrderLine): OrderLine {
-        return super.create(resource)!!
-    }
-
-}
+class OrderLineService(
+    orderLineRepository: OrderLineRepository,
+    entityManager: EntityManager,
+    @Lazy identifierAdapter: OrderLineIdentifierAdapter
+) : AbstractJpaEntityProjectorService<OrderLine, UUID, OrderLineRepository>(
+    orderLineRepository, entityManager, identifierAdapter
+)

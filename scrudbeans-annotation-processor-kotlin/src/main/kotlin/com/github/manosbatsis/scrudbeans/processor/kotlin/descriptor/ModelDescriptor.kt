@@ -1,29 +1,25 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
-import com.github.manosbatsis.scrudbeans.api.mdd.ScrudModelProcessorException
+import com.github.manosbatsis.scrudbeans.api.exception.ScrudModelProcessorException
+import javax.persistence.Entity
 import javax.annotation.processing.ProcessingEnvironment
-import javax.lang.model.element.Element
-import javax.lang.model.element.ElementKind
+import javax.lang.model.element.*
 import javax.lang.model.element.ElementKind.FIELD
 import javax.lang.model.element.ElementKind.METHOD
-import javax.lang.model.element.ExecutableElement
-import javax.lang.model.element.TypeElement
-import javax.lang.model.element.VariableElement
 import javax.lang.model.type.DeclaredType
 import javax.lang.model.type.TypeKind.DECLARED
 import javax.lang.model.type.TypeMirror
 import javax.lang.model.type.TypeVariable
 import javax.lang.model.util.Types
-import javax.persistence.Entity
 
 /**
  * Base implementation for classes describing (entity) models
  */
 abstract class ModelDescriptor(
-        override val processingEnvironment: ProcessingEnvironment,
-        val typeElement: TypeElement
-): ProcessingEnvironmentAware {
+    override val processingEnvironment: ProcessingEnvironment,
+    val typeElement: TypeElement
+) : ProcessingEnvironmentAware {
 
     var jpaEntity: Boolean = false
     val qualifiedName: String
@@ -38,6 +34,7 @@ abstract class ModelDescriptor(
         packageName = qualifiedName.substring(0, qualifiedName.length - (simpleName.length + 1))
         parentPackageName = packageName.substring(0, packageName.lastIndexOf("."))
         scanMembers(processingEnvironment.typeUtils, typeElement)
+        finalise()
     }
 
     protected fun scanMembers(types: Types, currentTypeElement: Element) {
@@ -47,7 +44,7 @@ abstract class ModelDescriptor(
                 scanMembers(types, typeElement, typeElement.accessibleConstructorParameterFields())
             }
             ElementKind.CONSTRUCTOR -> {
-                val constructorTypeElement  = currentTypeElement as ExecutableElement
+                val constructorTypeElement = currentTypeElement as ExecutableElement
                 scanMembers(types, constructorTypeElement.enclosingElement as TypeElement, constructorTypeElement.parameters)
             }
             else -> throw IllegalArgumentException("Invalid element type, expected a class or constructor")
@@ -58,14 +55,17 @@ abstract class ModelDescriptor(
         fields.forEach {
             scanMember(types, currentTypeElement, it)
         }
-        val superTypeelement = asTypeElement(types, currentTypeElement.superclass)
-        if (!superTypeelement.qualifiedName.contentEquals(Any::class.java.canonicalName)) {
-            scanMembers(types, superTypeelement)
+        val superTypeElement = asTypeElement(types, currentTypeElement.superclass)
+        if (!superTypeElement.qualifiedName.contentEquals(Any::class.java.canonicalName)) {
+            scanMembers(types, superTypeElement)
         }
     }
 
-
     abstract fun scanMember(types: Types, currentTypeElement: TypeElement, memberElement: VariableElement)
+
+    open fun finalise() {
+        /*NO-OP*/
+    }
 
     /**
      * Convert the given [TypeMirror] to a [TypeElement]
@@ -77,7 +77,8 @@ abstract class ModelDescriptor(
     protected fun asTypeElement(types: Types, typeMirror: TypeMirror): TypeElement {
         if (typeMirror.kind != DECLARED) {
             throw ScrudModelProcessorException(
-                    "Method asTypeElement Was expecting TypeKind.DECLARED but was " + typeMirror.kind)
+                "Method asTypeElement Was expecting TypeKind.DECLARED but was " + typeMirror.kind
+            )
         }
         val element = (typeMirror as DeclaredType).asElement()
         if (!(element.kind.isClass || element.kind.isInterface)) {
@@ -112,10 +113,11 @@ abstract class ModelDescriptor(
             }
         } else {
             throw ScrudModelProcessorException(
-                    "Could not process member " + scrudModelMember + ", kind: " + scrudModelMember.kind)
+                "Could not process member " + scrudModelMember + ", kind: " + scrudModelMember.kind
+            )
         }
 
-        return asTypeElement(types, typeMirror).asKotlinClassName().toString()
+        return typeMirror.asTypeElement().asKotlinClassName().toString()
     }
 
     val stack: String

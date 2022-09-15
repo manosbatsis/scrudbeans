@@ -1,0 +1,52 @@
+  # pip install mkdocs mkdocs-material
+# mkdocs serve
+# mkdocs gh-deploy
+
+site_name: ScrudBeans
+site_url: https://manosbatsis.github.io/scrudbeans/
+repo_name: scrudbeans
+repo_url: https://github.com/manosbatsis/scrudbeans
+site_description: "Model driven development for Spring Boot."
+site_author: Manos Batsis
+remote_branch: gh-pages
+google_analytics: ['UA-131279953-1', 'manosbatsis.github.io']
+copyright: 'Copyright &copy; 2019 Manos Batsis'
+
+theme:
+  name: 'material'
+#  logo: 'images/icon-square.png'
+#  favicon: 'images/icon-square.png'
+#  palette:
+#    primary: 'cyan'
+#    accent: 'deep-purple'
+
+#extra_css:
+#  - 'css/app.css'
+
+markdown_extensions:
+  - smarty
+  - codehilite:
+      guess_lang: false
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.emoji
+  - tables
+  - admonition
+
+nav:
+  - 'Overview': index.md
+  - 'Installation': installation.md
+  - 'Model Mapping': modelmapping.md
+  - 'RESTful Services': restfulservices.md
+  - 'Custom Components': customcomponents.md
+  - 'RSQL Support': rsqlsupport.md
+  - 'API Reference': apidoc/index.md

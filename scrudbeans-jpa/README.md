@@ -1,0 +1,2 @@
+
+# ScrudBeans JPA

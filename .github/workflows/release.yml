@@ -1,0 +1,113 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Bump Version
+        default: 1.0.0
+        required: true
+      tweet:
+        description: extra text for tweet
+        required: false
+
+# This allows a subsequently queued workflow run to interrupt previous runs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Gradle Dependencies Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle', '**/*.gradle.kts') }}
+
+      - name: Setup Gradle Wrapper Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: 8
+          distribution: 'zulu'
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew build
+
+      - name: Identify current version
+        id: current_version
+        uses: christian-draeger/read-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'release_version'
+
+      - name: Write new version
+        uses: christian-draeger/write-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'release_version'
+          value: ${{ github.event.inputs.version }}
+
+      - name: Find and Replace version reference in all readme files of the repo
+        uses: jacobtomlinson/gha-find-replace@v2
+        with:
+          find: ${{ steps.current_version.outputs.value }}
+          replace: ${{ github.event.inputs.version }}
+          include: "README.md" # Will match all README.md files in any nested directory
+
+# deactivate for now since commit action is not able to push changes in workflow files because of missing permission
+#      - name: Update github action release workflow default version
+#        uses: fjogeleit/yaml-update-action@v0.3.0
+#        with:
+#          valueFile: '.github/workflows/release.yml'
+#          propertyPath: 'on.workflow_dispatch.inputs.version.default'
+#          commitChange: 'false'
+#          updateFile: 'true'
+#          value: ${{ github.event.inputs.version }}
+
+      - name: Publish to Maven Central
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGKEY}}
+          ORG_GRADLE_PROJECT_signingKeyId: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGKEYID}}
+          ORG_GRADLE_PROJECT_signingPassword: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD}}
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME}}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD}}
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: master
+          commit_user_name: manosbatsis
+          commit_user_email: manosbatsis@gmail.com
+          commit_author: manosbatsis <manosbatsis@gmail.com>
+          commit_message: bump version ${{ steps.current_version.outputs.value }} --> ${{ github.event.inputs.version }}
+
+      - name: Create Tag
+        uses: negz/create-tag@v1
+        with:
+          version: ${{ github.event.inputs.version }}
+          message: ${{ github.event.inputs.version.description }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: send tweet
+        uses: ethomson/send-tweet-action@v1
+        with:
+          status: |
+              🥳🪒📄 skrape{it} version ${{ github.event.inputs.version }} has just been released! 📢🙆🏻‍
+              ${{ github.event.inputs.tweet }}
+          consumer-key: ${{ secrets.TWITTER_CONSUMER_API_KEY_SKRAPE_IT }}
+          consumer-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET_SKRAPE_IT }}
+          access-token: ${{ secrets.TWITTER_ACCESS_TOKEN_SKRAPE_IT }}
+          access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET_SKRAPE_IT }}
