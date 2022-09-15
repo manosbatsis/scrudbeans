@@ -1,6 +1,6 @@
 package mykotlinpackage.model
 
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
+import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
 import javax.persistence.Entity
 import javax.persistence.Id
 import javax.persistence.IdClass

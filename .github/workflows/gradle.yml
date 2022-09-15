@@ -45,9 +45,10 @@ jobs:
           java-version: ${{ matrix.java-version }}
           distribution: 'zulu'
 
-      - name: Build with Gradle
-        run: |
-          ./gradlew build
+      - uses: gradle/gradle-build-action@v2
+        name: Build with Gradle
+        with:
+          arguments: build
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v2
@@ -64,7 +65,8 @@ jobs:
           property: 'release_version'
           value: 0-SNAPSHOT
 
-      - name: Publish snapshot to Maven Central
+      - uses: gradle/gradle-build-action@v2
+        name: Publish snapshot to Maven Central
         if: ${{ github.event_name == 'push' && matrix.os == 'ubuntu-latest' }}
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGKEY}}
@@ -72,4 +74,5 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD}}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME}}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD}}
-        run: ./gradlew publishToSonatype
+        with:
+          arguments: publishToSonatype

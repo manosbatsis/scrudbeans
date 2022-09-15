@@ -29,8 +29,6 @@ configure<KtlintExtension> {
         setOf(
             "import-ordering",
             "no-wildcard-imports",
-            "final-newline",
-            "insert_final_newline",
             "max_line_length"
         )
     )
@@ -69,9 +67,8 @@ tasks.withType<Test>().configureEach {
         "junit.jupiter.execution.parallel.mode.classes.default" to "concurrent"
     )
 }
-/* TODO?
+
 tasks.named<Jar>("javadocJar") {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from(tasks.dokkaJavadoc)
 }
-
- */

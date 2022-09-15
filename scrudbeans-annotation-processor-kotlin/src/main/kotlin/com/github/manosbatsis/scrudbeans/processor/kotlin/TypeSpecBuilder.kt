@@ -3,10 +3,12 @@ package com.github.manosbatsis.scrudbeans.processor.kotlin
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.kotlin.utils.kapt.processor.SimpleAnnotatedElementInfo
 import com.github.manosbatsis.scrudbeans.api.exception.NotFoundException
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.IdentifierAdapterBean
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
+import com.github.manosbatsis.scrudbeans.api.annotation.IdentifierAdapterBean
+import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
-import com.github.manosbatsis.scrudbeans.api.util.Mimes.*
+import com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATIOM_JSON_VALUE
+import com.github.manosbatsis.scrudbeans.api.util.Mimes.APPLICATION_VND_API_PLUS_JSON_VALUE
+import com.github.manosbatsis.scrudbeans.api.util.Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE
 import com.github.manosbatsis.scrudbeans.controller.AbstractJpaEntityController
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.strategy.ScrudBeansDtoStrategy

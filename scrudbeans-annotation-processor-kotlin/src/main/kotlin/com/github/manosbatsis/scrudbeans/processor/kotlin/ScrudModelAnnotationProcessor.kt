@@ -1,7 +1,7 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin
 
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
+import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
@@ -24,7 +24,7 @@ import javax.tools.StandardLocation
  * and JPA specification predicate factories for models
  * annotated with @[Entity]
  */
-@SupportedAnnotationTypes("com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean")
+@SupportedAnnotationTypes("com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean")
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
 class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironmentAware {
 

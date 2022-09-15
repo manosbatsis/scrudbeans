@@ -16,14 +16,12 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http:></http:>//www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.api.mdd.annotation;
+package com.github.manosbatsis.scrudbeans.api.annotation
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
 
 /**
  * Meta-annotation (annotations used on other annotations)
@@ -32,9 +30,7 @@ import java.lang.annotation.Target;
  * ScrudBeans: Model driven development for Spring Boot annotations generically, and in future also for
  * passing other generic annotation configuration.
  */
-@Target({ElementType.ANNOTATION_TYPE})
+@Target(AnnotationTarget.ANNOTATION_CLASS)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ScrudBeansAnnotation {
-	// for now, a pure tag annotation, no parameters
+annotation class ScrudBeansAnnotation { // for now, a pure tag annotation, no parameters
 }
-

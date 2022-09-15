@@ -16,48 +16,41 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http:></http:>//www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.api.util;
+package com.github.manosbatsis.scrudbeans.api.util
 
-import org.springframework.util.MimeType;
+import org.springframework.util.MimeType
 
-public class Mimes {
+object Mimes {
 
-	/**
-	 * Public constant mime type for {@code application/json}.
-	 */
-	public final static MimeType APPLICATIOM_JSON;
+    /**
+     * A String equivalent of [Mimes.APPLICATIOM_JSON].
+     */
+    const val APPLICATIOM_JSON_VALUE = "application/json"
 
-	/**
-	 * A String equivalent of {@link Mimes#APPLICATIOM_JSON}.
-	 */
-	public final static String APPLICATIOM_JSON_VALUE = "application/json";
+    /**
+     * A String equivalent of [Mimes.APPLICATION_VND_API_PLUS_JSON].
+     */
+    const val APPLICATION_VND_API_PLUS_JSON_VALUE = "application/vnd.api+json"
 
-	/**
-	 * Public constant mime type for {@code application/vnd.api+json}.
-	 */
-	public final static MimeType APPLICATION_VND_API_PLUS_JSON;
+    /**
+     * A String equivalent of [Mimes.MIME_APPLICATIOM_HAL_PLUS_JSON].
+     */
+    const val MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE = "application/hal+json"
 
-	/**
-	 * A String equivalent of {@link Mimes#APPLICATION_VND_API_PLUS_JSON}.
-	 */
-	public final static String APPLICATION_VND_API_PLUS_JSON_VALUE = "application/vnd.api+json";
+    /**
+     * Public constant mime type for `application/json`.
+     */
+    val APPLICATIOM_JSON: MimeType = MimeType.valueOf(APPLICATIOM_JSON_VALUE)
 
-	/**
-	 * Public constant mime type for {@code application/vnd.api+json}.
-	 */
-	public final static MimeType MIME_APPLICATIOM_HAL_PLUS_JSON;
+    /**
+     * Public constant mime type for `application/vnd.api+json`.
+     */
+    val MIME_APPLICATIOM_HAL_PLUS_JSON: MimeType = MimeType.valueOf(MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE)
 
-	/**
-	 * A String equivalent of {@link Mimes#MIME_APPLICATIOM_HAL_PLUS_JSON}.
-	 */
-	public static final String MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE = "application/hal+json";
-
-	static {
-		APPLICATIOM_JSON = MimeType.valueOf(APPLICATIOM_JSON_VALUE);
-		MIME_APPLICATIOM_HAL_PLUS_JSON = MimeType.valueOf(MIME_APPLICATIOM_HAL_PLUS_JSON_VALUE);
-		APPLICATION_VND_API_PLUS_JSON = MimeType.valueOf(APPLICATION_VND_API_PLUS_JSON_VALUE);
-	}
-
+    /**
+     * Public constant mime type for `application/vnd.api+json`.
+     */
+    val APPLICATION_VND_API_PLUS_JSON: MimeType = MimeType.valueOf(APPLICATION_VND_API_PLUS_JSON_VALUE)
 }

@@ -2,7 +2,7 @@ package mykotlinpackage.model
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
+import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.model.AbstractBaseEntity
 import io.swagger.v3.oas.annotations.media.Schema
 import org.apache.commons.lang3.builder.HashCodeBuilder

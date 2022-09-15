@@ -1,6 +1,6 @@
 package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 
-import com.github.manosbatsis.scrudbeans.api.mdd.annotation.model.ScrudBean
+import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
 import com.squareup.kotlinpoet.ClassName
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment

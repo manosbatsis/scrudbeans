@@ -16,68 +16,62 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program. If not, see <http:></http:>//www.gnu.org/licenses/>.
  */
-package com.github.manosbatsis.scrudbeans.api.mdd.annotation.model;
+package com.github.manosbatsis.scrudbeans.api.annotation.model
 
-import java.lang.annotation.*;
-
+import java.lang.annotation.Documented
+import java.lang.annotation.Retention
+import java.lang.annotation.RetentionPolicy
+import kotlin.reflect.KClass
 
 /**
- * <p>Marks a Model as candidate for mdd code generation (Controller, Service, Repository)</p>
+ *
+ * Marks a Model as candidate for mdd code generation (Controller, Service, Repository)
  */
 @ScrudBeansModelAnnotation
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)
 @Documented
-public @interface ScrudBean {
-
-    /**
-     * Used to disable generation when used in {@link #controllerSuperClass()}
-     */
-    String NONE = "NONE";
-
+annotation class ScrudBean(
     /**
      * The superclass for the generated controller
      */
-	String controllerSuperClass() default "";
-
-	Class serviceSuperInterface() default Object.class;
-
-	Class serviceImplSuperClass() default Object.class;
-
-	/**
-	 * The default "parent" mapping part for annotated type
-	 */
-	String basePath() default "";
-
-	/**
-	 * The default "parent" mapping part for annotated type
-	 */
-	String parentPath() default "";
-
-	/**
-	 * The default URI component for the annotated type
-	 */
-	String pathFragment() default "";
-
-	/**
-	 *
-	 * The API (grouping) name for the generated controller. Used for swagger documentation.
-	 */
-	String apiName() default "";
-
-	/**
-	 *
-	 * The API description for the generated controller. Used for swagger documentation.
-	 */
-	String apiDescription() default "";
-
-	/**
-	 * May be used to determine the target transaction manager,
-	 * matching the qualifier value (or the bean name) of a specific TransactionManager bean definition.
-	 */
-	String transactionManager() default "";
-
-
+    val controllerSuperClass: String = "",
+    val serviceSuperInterface: KClass<*> = Any::class,
+    val serviceImplSuperClass: KClass<*> = Any::class,
+    /**
+     * The default "parent" mapping part for annotated type
+     */
+    val basePath: String = "",
+    /**
+     * The default "parent" mapping part for annotated type
+     */
+    val parentPath: String = "",
+    /**
+     * The default URI component for the annotated type
+     */
+    val pathFragment: String = "",
+    /**
+     *
+     * The API (grouping) name for the generated controller. Used for swagger documentation.
+     */
+    val apiName: String = "",
+    /**
+     *
+     * The API description for the generated controller. Used for swagger documentation.
+     */
+    val apiDescription: String = "",
+    /**
+     * May be used to determine the target transaction manager,
+     * matching the qualifier value (or the bean name) of a specific TransactionManager bean definition.
+     */
+    val transactionManager: String = ""
+) {
+    companion object {
+        /**
+         * Used to disable generation when used in [.controllerSuperClass]
+         */
+        var NONE = "NONE"
+    }
 }
