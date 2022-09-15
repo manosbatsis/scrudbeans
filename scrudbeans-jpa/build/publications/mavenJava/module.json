@@ -1,0 +1,172 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.manosbatsis.scrudbeans",
+    "module": "scrudbeans-jpa",
+    "version": "1.0.0-alpha.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.5"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.github.manosbatsis.scrudbeans",
+          "module": "scrudbeans-common",
+          "version": {
+            "requires": "1.0.0-alpha.1"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-autoconfigure"
+        },
+        {
+          "group": "org.springdoc",
+          "module": "springdoc-openapi-kotlin",
+          "version": {
+            "requires": "1.6.9"
+          }
+        },
+        {
+          "group": "io.github.perplexhub",
+          "module": "rsql-jpa-spring-boot-starter",
+          "version": {
+            "requires": "5.0.19"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.7.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "scrudbeans-jpa-1.0.0-alpha.1-plain.jar",
+          "url": "scrudbeans-jpa-1.0.0-alpha.1-plain.jar",
+          "size": 70931,
+          "sha512": "6f8b378fa1d8c62469a50f7d5fed647a0c0ee8b92a861664d0d98830172e283322404efd4a6896fb50f04337546cf24c95b640de5056cb3e75bffcf54256548c",
+          "sha256": "22b6c936342d3e898777ab14185bbbefcb91d65b7bf227096315c0083ba42864",
+          "sha1": "408586527c30ce51bd0195507b445a2f8829fe01",
+          "md5": "135cf4d3a28334bdc3b55f884d2a51b5"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.github.manosbatsis.scrudbeans",
+          "module": "scrudbeans-common",
+          "version": {
+            "requires": "1.0.0-alpha.1"
+          }
+        },
+        {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-autoconfigure"
+        },
+        {
+          "group": "org.springdoc",
+          "module": "springdoc-openapi-kotlin",
+          "version": {
+            "requires": "1.6.9"
+          }
+        },
+        {
+          "group": "io.github.perplexhub",
+          "module": "rsql-jpa-spring-boot-starter",
+          "version": {
+            "requires": "5.0.19"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.7.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "scrudbeans-jpa-1.0.0-alpha.1-plain.jar",
+          "url": "scrudbeans-jpa-1.0.0-alpha.1-plain.jar",
+          "size": 70931,
+          "sha512": "6f8b378fa1d8c62469a50f7d5fed647a0c0ee8b92a861664d0d98830172e283322404efd4a6896fb50f04337546cf24c95b640de5056cb3e75bffcf54256548c",
+          "sha256": "22b6c936342d3e898777ab14185bbbefcb91d65b7bf227096315c0083ba42864",
+          "sha1": "408586527c30ce51bd0195507b445a2f8829fe01",
+          "md5": "135cf4d3a28334bdc3b55f884d2a51b5"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "scrudbeans-jpa-1.0.0-alpha.1-javadoc.jar",
+          "url": "scrudbeans-jpa-1.0.0-alpha.1-javadoc.jar",
+          "size": 572440,
+          "sha512": "a560b4a8d107c7006789b2606a6ef2f813d98d88ad241616162ee7189edb7a9635aebd15f95a26e4927b82ab758bbac6f1df67433cb8ecf88d8d7cb38339f579",
+          "sha256": "cd094df228eb2c1c7de4789336941a320ea69343f02796657f2ff6ddbedced52",
+          "sha1": "6fb3ade19b18d4a5af5d21afabc3cc09e145e5d7",
+          "md5": "1f584dae84ee5d03e0f98eac15b16527"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "scrudbeans-jpa-1.0.0-alpha.1-sources.jar",
+          "url": "scrudbeans-jpa-1.0.0-alpha.1-sources.jar",
+          "size": 20684,
+          "sha512": "f605ba09e897460c5099bd7589b3277a9bdd1a3b784d09afe7d3ef8152c975bbcebb5e55b6b244e544e73f92f3814e75da9df43bf22ce95a191950e0a22e8a17",
+          "sha256": "9a3486dff2098b9ebfb472e9f782e48b6ac29ff353c6fa2fffa016e3a45677c3",
+          "sha1": "2b611c8a5055974126f0799f8864e8dab01ad142",
+          "md5": "659ab96eab7cca10b163318c200d090d"
+        }
+      ]
+    }
+  ]
+}

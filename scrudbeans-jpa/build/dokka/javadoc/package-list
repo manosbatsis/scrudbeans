@@ -1,0 +1,17 @@
+$dokka.format:javadoc-v1
+$dokka.linkExtension:html
+$dokka.location:com.github.manosbatsis.scrudbeans.binding/OffsetDateTimeDeserializer.Companion///PointingToDeclaration/com/github/manosbatsis/scrudbeans/binding/OffsetDateTimeDeserializer.Companion.html
+$dokka.location:com.github.manosbatsis.scrudbeans.binding/OffsetDateTimeSerializer.Companion///PointingToDeclaration/com/github/manosbatsis/scrudbeans/binding/OffsetDateTimeSerializer.Companion.html
+$dokka.location:com.github.manosbatsis.scrudbeans.service/AbstractJpaEntityProjectorService.Companion///PointingToDeclaration/com/github/manosbatsis/scrudbeans/service/AbstractJpaEntityProjectorService.Companion.html
+$dokka.location:com.github.manosbatsis.scrudbeans.service/AbstractJpaEntityService.Companion///PointingToDeclaration/com/github/manosbatsis/scrudbeans/service/AbstractJpaEntityService.Companion.html
+$dokka.location:com.github.manosbatsis.scrudbeans.service/IdentifierAdapterRegistry.Companion///PointingToDeclaration/com/github/manosbatsis/scrudbeans/service/IdentifierAdapterRegistry.Companion.html
+com.github.manosbatsis.scrudbeans.binding
+com.github.manosbatsis.scrudbeans.controller
+com.github.manosbatsis.scrudbeans.exceptions
+com.github.manosbatsis.scrudbeans.extensions
+com.github.manosbatsis.scrudbeans.generics
+com.github.manosbatsis.scrudbeans.model
+com.github.manosbatsis.scrudbeans.repository
+com.github.manosbatsis.scrudbeans.service
+com.github.manosbatsis.scrudbeans.util
+

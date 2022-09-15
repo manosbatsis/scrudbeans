@@ -1,0 +1,8 @@
+$dokka.format:javadoc-v1
+$dokka.linkExtension:html
+$dokka.location:com.github.manosbatsis.scrudbeans.logging/RequestResponseLoggingInterceptor.Companion///PointingToDeclaration/com/github/manosbatsis/scrudbeans/logging/RequestResponseLoggingInterceptor.Companion.html
+com.github.manosbatsis.scrudbeans.domain
+com.github.manosbatsis.scrudbeans.logging
+com.github.manosbatsis.scrudbeans.test
+com.github.manosbatsis.scrudbeans.util
+

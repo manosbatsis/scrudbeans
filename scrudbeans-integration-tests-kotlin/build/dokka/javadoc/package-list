@@ -1,0 +1,9 @@
+$dokka.format:javadoc-v1
+$dokka.linkExtension:html
+$dokka.location:mykotlinpackage/ScrudBeansSampleApplication.Companion///PointingToDeclaration/mykotlinpackage/ScrudBeansSampleApplication.Companion.html
+mykotlinpackage
+mykotlinpackage.controller
+mykotlinpackage.dto
+mykotlinpackage.model
+mykotlinpackage.service
+

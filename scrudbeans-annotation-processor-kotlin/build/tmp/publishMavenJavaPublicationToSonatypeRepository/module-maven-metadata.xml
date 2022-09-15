@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>com.github.manosbatsis.scrudbeans</groupId>
+  <artifactId>scrudbeans-annotation-processor-kotlin</artifactId>
+  <versioning>
+    <latest>1.0.0-alpha.1</latest>
+    <release>1.0.0-alpha.1</release>
+    <versions>
+      <version>1.0.0-alpha.1</version>
+    </versions>
+    <lastUpdated>20220915173548</lastUpdated>
+  </versioning>
+</metadata>

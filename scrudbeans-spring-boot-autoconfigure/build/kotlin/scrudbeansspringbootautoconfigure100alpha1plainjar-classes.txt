@@ -1,0 +1,1 @@
+/home/runner/work/scrudbeans/scrudbeans/scrudbeans-spring-boot-autoconfigure/build/classes/kotlin/main/com/github/manosbatsis/scrudbeans/autoconfigure/ScrudBeansAutoConfiguration.class

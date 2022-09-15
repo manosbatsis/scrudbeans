@@ -1,0 +1,136 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.manosbatsis.scrudbeans",
+    "module": "scrudbeans-spring-boot-autoconfigure",
+    "version": "1.0.0-alpha.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.5"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.github.manosbatsis.scrudbeans",
+          "module": "scrudbeans-jpa",
+          "version": {
+            "requires": "1.0.0-alpha.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.7.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "scrudbeans-spring-boot-autoconfigure-1.0.0-alpha.1-plain.jar",
+          "url": "scrudbeans-spring-boot-autoconfigure-1.0.0-alpha.1-plain.jar",
+          "size": 3721,
+          "sha512": "3f65cb33887cc6d0d7e222573289f97692aad51905f359f71da132c1a632ed8cdac5f3e2023a96ebeda110106fef3c737f9877c64b545faa197d7362b95c5f17",
+          "sha256": "2f94fb2bcdf2559465ed031349e39e11cd4b9cbbd6c1fcb30f2b8bc7f37feb14",
+          "sha1": "4f1ffa456cbe1a21d125ab454e9ba498a1e70937",
+          "md5": "b492ca5e06ca3d5b3689e23d510b67c5"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.environment": "standard-jvm",
+        "org.gradle.jvm.version": 11,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime",
+        "org.jetbrains.kotlin.platform.type": "jvm"
+      },
+      "dependencies": [
+        {
+          "group": "com.github.manosbatsis.scrudbeans",
+          "module": "scrudbeans-jpa",
+          "version": {
+            "requires": "1.0.0-alpha.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.7.0"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "scrudbeans-spring-boot-autoconfigure-1.0.0-alpha.1-plain.jar",
+          "url": "scrudbeans-spring-boot-autoconfigure-1.0.0-alpha.1-plain.jar",
+          "size": 3721,
+          "sha512": "3f65cb33887cc6d0d7e222573289f97692aad51905f359f71da132c1a632ed8cdac5f3e2023a96ebeda110106fef3c737f9877c64b545faa197d7362b95c5f17",
+          "sha256": "2f94fb2bcdf2559465ed031349e39e11cd4b9cbbd6c1fcb30f2b8bc7f37feb14",
+          "sha1": "4f1ffa456cbe1a21d125ab454e9ba498a1e70937",
+          "md5": "b492ca5e06ca3d5b3689e23d510b67c5"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "scrudbeans-spring-boot-autoconfigure-1.0.0-alpha.1-javadoc.jar",
+          "url": "scrudbeans-spring-boot-autoconfigure-1.0.0-alpha.1-javadoc.jar",
+          "size": 418948,
+          "sha512": "f4d41d409bdfea3e64bcdf93681d904f95585b52071b8c3080160631dfd9e84c9e404ddd70eb77eee72831e5e2fc7f101d9226a724fe8e5007c9a0ae26eff037",
+          "sha256": "926b3fc8a2c32b2c1ae4b3fb30b6e87bb8eeb924933af6899400b6411e53f5be",
+          "sha1": "ac03227d54e46e0958de79fca3ae3a8b6b683b8b",
+          "md5": "99c0f2dc829993c06edf923cd6095d66"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "scrudbeans-spring-boot-autoconfigure-1.0.0-alpha.1-sources.jar",
+          "url": "scrudbeans-spring-boot-autoconfigure-1.0.0-alpha.1-sources.jar",
+          "size": 2304,
+          "sha512": "5aec083e3a7c18bd1a749997e6774cb74e96b709b5b4998f2f8c96edd5ddc61bbc59b5850d7a16057d5a6f614d5278cdd8247c13b57f7f56f6445f0012987c43",
+          "sha256": "fbaaa0b99c43252468f2646b8c6f2cff8c4a9375b58ba0d59fd7bf47d79f3e53",
+          "sha1": "f0614b7aa66ad6b86e3dea3b37ebfdf1d1d5785e",
+          "md5": "ceabbad27d314c183828fe9d749b54f0"
+        }
+      ]
+    }
+  ]
+}

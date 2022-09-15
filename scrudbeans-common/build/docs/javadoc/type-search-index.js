@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.github.manosbatsis.scrudbeans.domain","l":"RawJson"}]

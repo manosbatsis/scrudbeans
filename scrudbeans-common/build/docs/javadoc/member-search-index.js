@@ -1,0 +1,1 @@
+memberSearchIndex = [{"p":"com.github.manosbatsis.scrudbeans.domain","c":"RawJson","l":"RawJson(String)","url":"%3Cinit%3E(java.lang.String)"},{"p":"com.github.manosbatsis.scrudbeans.domain","c":"RawJson","l":"value()"}]
