@@ -24,27 +24,16 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup Gradle Dependencies Cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle', '**/*.gradle.kts') }}
-
-      - name: Setup Gradle Wrapper Cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
-
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: 8
+          java-version: 11
           distribution: 'zulu'
 
-      - name: Build with Gradle
-        run: |
-          ./gradlew build
+      - uses: gradle/gradle-build-action@v2
+        name: Build with Gradle
+        with:
+          arguments: build
 
       - name: Identify current version
         id: current_version
@@ -77,14 +66,16 @@ jobs:
 #          updateFile: 'true'
 #          value: ${{ github.event.inputs.version }}
 
-      - name: Publish to Maven Central
+      - uses: gradle/gradle-build-action@v2
+        name: Publish to Maven Central
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGKEY}}
           ORG_GRADLE_PROJECT_signingKeyId: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGKEYID}}
           ORG_GRADLE_PROJECT_signingPassword: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD}}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME}}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD}}
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+        with:
+          arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
