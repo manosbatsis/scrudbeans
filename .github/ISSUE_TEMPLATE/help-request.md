@@ -1,6 +1,6 @@
 ---
 name: Help request
-about: Ask a question about how to use skrape{it}.
+about: Ask a question about how to use ScrudBeans.
 title: "[QUESTION] "
 labels: question
 assignees: manosbatsis
