@@ -96,9 +96,9 @@ jobs:
         uses: ethomson/send-tweet-action@v1
         with:
           status: |
-              🥳🪒📄 skrape{it} version ${{ github.event.inputs.version }} has just been released! 📢🙆🏻‍
+              🥳🪒📄 ScrudBeans version ${{ github.event.inputs.version }} has just been released! 📢🙆🏻‍
               ${{ github.event.inputs.tweet }}
-          consumer-key: ${{ secrets.TWITTER_CONSUMER_API_KEY_SKRAPE_IT }}
-          consumer-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET_SKRAPE_IT }}
-          access-token: ${{ secrets.TWITTER_ACCESS_TOKEN_SKRAPE_IT }}
-          access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET_SKRAPE_IT }}
+          consumer-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
+          consumer-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET }}
+          access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
