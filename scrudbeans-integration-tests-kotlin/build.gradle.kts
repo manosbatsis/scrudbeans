@@ -1,6 +1,5 @@
 plugins {
-    kotlin("kapt")
-    kotlin("plugin.noarg")
+    buildsrc.convention.`kotlin-jvm-spring`
 }
 
 noArg {

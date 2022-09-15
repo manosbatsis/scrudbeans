@@ -1,6 +1,6 @@
 plugins {
-    `java-library`
-    id("org.jetbrains.dokka")
+    buildsrc.convention.`kotlin-jvm-spring`
+    buildsrc.convention.`publish-jvm`
 }
 
 tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {

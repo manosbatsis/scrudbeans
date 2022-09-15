@@ -1,12 +1,5 @@
 
 rootProject.name = "scrudbeans"
-pluginManagement {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-        maven { url = uri("https://repo.spring.io/milestone") }
-    }
-}
 
 include(
     "scrudbeans-annotation-processor-kotlin",
@@ -17,3 +10,12 @@ include(
     "scrudbeans-spring-boot-autoconfigure",
     "scrudbeans-spring-boot-starter"
 )
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+apply(from = "./buildSrc/repositories.settings.gradle.kts")
+
+@Suppress("UnstableApiUsage") // Central declaration of repositories is an incubating feature
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
+}

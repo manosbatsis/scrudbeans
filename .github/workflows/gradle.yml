@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+#    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# This allows a subsequently queued workflow run to interrupt previous runs
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        java-version:
+          - 11
+        os:
+          - ubuntu-latest
+      #    - windows-2019
+      # in case one combination fails, we still want to see results from others
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Gradle Dependencies Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('**/*.gradle', '**/*.gradle.kts') }}
+
+      - name: Setup Gradle Wrapper Cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'zulu'
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew build
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        if: ${{ matrix.java-version == '8' && matrix.os == 'ubuntu-latest' }}
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          files: ./build/reports/kover/report.xml
+
+      - name: Temporarily set snapshot version
+        if: ${{ github.event_name == 'push' && matrix.os == 'ubuntu-latest' }}
+        uses: christian-draeger/write-properties@1.0.1
+        with:
+          path: './gradle.properties'
+          property: 'release_version'
+          value: 0-SNAPSHOT
+
+      - name: Publish snapshot to Maven Central
+        if: ${{ github.event_name == 'push' && matrix.os == 'ubuntu-latest' }}
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGKEY}}
+          ORG_GRADLE_PROJECT_signingKeyId: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGKEYID}}
+          ORG_GRADLE_PROJECT_signingPassword: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD}}
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME}}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD}}
+        run: ./gradlew publishToSonatype

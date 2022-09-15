@@ -25,31 +25,6 @@ import java.lang.annotation.*;
 
 /**
  * <p>Marks a Model as candidate for mdd code generation (Controller, Service, Repository)</p>
- *
- *  <p>For example:</p>
- *
- *  <pre class="code">
- * &#064;ScrudBean(
- * 		pathFragment = "countries",
- * 		apiName = "Countries",
- * 		apiDescription = "Operations about countries",
- * 		controllerSuperClass = AbstractModelController.class
- * 	)
- * </pre>
- *
- *  <p>Will generate the following controller:</p>
- *
- *  <pre class="code">
- *
- *
- * &#064;RestController
- * &#064;Api( tags = "Countries", description = "Operations about countries" )
- * &#064;RequestMapping( pathFragment = "/api/rest/countries" )
- * public class CountryController extends AbstractModelController<Country, String, CountryService> {
- *
- * }
- * </pre>
- *
  */
 @ScrudBeansModelAnnotation
 @Retention(RetentionPolicy.RUNTIME)

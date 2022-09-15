@@ -1,5 +1,6 @@
 plugins {
-    `java-library`
+    buildsrc.convention.`kotlin-jvm-spring`
+    buildsrc.convention.`publish-jvm`
 }
 
 tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {

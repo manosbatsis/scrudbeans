@@ -112,5 +112,5 @@ open class AbstractJpaEntityController<
 
     /** Allows overriding the implementation of [head] */
     open fun doHead(id: S): ResponseEntity<T> =
-        if(service.existsById(id)) ResponseEntity.ok().build() else ResponseEntity.notFound().build()
+        if (service.existsById(id)) ResponseEntity.ok().build() else ResponseEntity.notFound().build()
 }
