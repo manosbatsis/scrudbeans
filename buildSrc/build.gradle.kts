@@ -8,11 +8,11 @@ val kotlinVersion by System.getProperties()
 val springBootVersion: String by System.getProperties()
 val springBootDependencyManagementVersion: String by System.getProperties()
 val ktlintVersion: String by System.getProperties()
-val detektPlugin = "1.19.0"
-val gradleNexusPublishPlugin = "1.1.0"
-val gradleTestLoggerPlugin = "3.1.0"
+val detektPlugin by System.getProperties()
+val gradleNexusPublishPlugin by System.getProperties()
+val gradleTestLoggerPlugin by System.getProperties()
 val gradleVersionsPlugin = "0.39.0"
-val kotlinDokkaPlugin = "1.7.0"
+val kotlinDokkaPlugin by System.getProperties()
 val kotlinxKoverPlugin = "0.5.0"
 val useLatestVersionsPlugin = "0.2.18"
 
