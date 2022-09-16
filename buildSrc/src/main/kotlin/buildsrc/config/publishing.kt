@@ -12,11 +12,14 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 fun MavenPublication.createManosBatsisPom(
+    projectName: String,
+    projectDescription: String,
     configure: MavenPom.() -> Unit = {}
 ): Unit = pom {
-    name.set("scrudbeans")
-    description.set("Hands-free, RESTful, extensible SCRUD for your Kotlin JPA entities in Spring Boot ")
-    url.set("https://manosbatsis.github.io/scrudbeans/")
+
+    name.set(projectName)
+    description.set(projectDescription)
+    url.set("https://manosbatsis.github.io/${projectName}/")
     licenses {
         license {
             name.set("GNU Lesser General Public License")
@@ -30,9 +33,9 @@ fun MavenPublication.createManosBatsisPom(
         }
     }
     scm {
-        connection.set("scm:git:git://github.com/manosbatsis/scrudbeans.git")
-        developerConnection.set("scm:git:ssh://github.com:manosbatsis/scrudbeans.git")
-        url.set("https://github.com/manosbatsis/scrudbeans/tree/master")
+        connection.set("scm:git:git://github.com/manosbatsis/${projectName}.git")
+        developerConnection.set("scm:git:ssh://github.com:manosbatsis/${projectName}.git")
+        url.set("https://github.com/manosbatsis/${projectName}/tree/master")
     }
     configure()
 }
@@ -44,10 +47,10 @@ fun MavenPublication.createManosBatsisPom(
  */
 // https://github.com/gradle/gradle/issues/20925
 fun ProviderFactory.credentialsAction(
-    repositoryName: String
+    repositoryVendor: String
 ): Provider<Action<PasswordCredentials>> = zip(
-    gradleProperty("${repositoryName}Username"),
-    gradleProperty("${repositoryName}Password"),
+    gradleProperty("${repositoryVendor}Username"),
+    gradleProperty("${repositoryVendor}Password"),
 ) { user, pass ->
     Action<PasswordCredentials> {
         username = user

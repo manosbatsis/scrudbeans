@@ -33,9 +33,7 @@ publishing {
     publications.create<MavenPublication>("mavenJava") {
         from(components["java"])
 
-        createManosBatsisPom {
-            name.set("${project.name}")
-        }
+        createManosBatsisPom("${project.name}", "${project.description}")
     }
 }
 
