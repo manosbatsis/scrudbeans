@@ -1,1 +1,0 @@
-var packageSearchIndex = [{"l":"com.github.manosbatsis.scrudbeans.autoconfigure","url":"com/github/manosbatsis/scrudbeans/autoconfigure/package-summary.html"}, {"l":"All packages","url":"index.html"}]

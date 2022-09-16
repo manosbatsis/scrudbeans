@@ -77,6 +77,17 @@ jobs:
         with:
           arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
 
+      - name: Deploy docs
+        uses: mhausenblas/mkdocs-deploy-gh-pages@master
+        # Or use mhausenblas/mkdocs-deploy-gh-pages@nomaterial to build without the mkdocs-material theme
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          #CUSTOM_DOMAIN: optionaldomain.com
+          CONFIG_FILE: mkdocs.yml
+          #EXTRA_PACKAGES: build-base
+          # GITHUB_DOMAIN: github.myenterprise.com
+          #REQUIREMENTS: folder/requirements.txt
+
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           branch: master
