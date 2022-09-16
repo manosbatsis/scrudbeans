@@ -11,7 +11,7 @@ version = release_version
 
 tasks.dokkaHtmlMultiModule.configure {
     includes.from("README.md")
-    outputDirectory.set(buildDir.resolve("dokkaHtmlMultiModule"))
+    outputDirectory.set(buildDir.resolve("docs/apidoc"))
 }
 
 nexusPublishing {

@@ -1,1 +1,0 @@
-var typeSearchIndex = [{"p":"com.github.manosbatsis.scrudbeans.autoconfigure","l":"ScrudBeansAutoConfiguration","url":"com/github/manosbatsis/scrudbeans/autoconfigure/ScrudBeansAutoConfiguration.html"}, {"l":"All classes","url":"allclasses.html"}]

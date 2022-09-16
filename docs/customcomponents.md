@@ -12,7 +12,7 @@ take a note of any optional, pre-existing custom components:
 └── mypackage
     ├── controller
     │   └── OrderLineController
-    └── dto
+    └── model
     │   └── OrderEmailUpdateDTO
     └── model
         ├── OrderLine
