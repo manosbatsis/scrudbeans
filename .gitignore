@@ -25,6 +25,8 @@
 /.nb-gradle/
 
 ### Gradle ###
+.gradle/
+build/
 
 ### Maven ###
 target/
