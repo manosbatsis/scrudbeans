@@ -10,13 +10,8 @@ tasks.named<Jar>("jar") {
     enabled = true
 }
 
-val kotlinUtilsVersion: String by System.getProperties()
-val commonsLang3Version: String by System.getProperties()
-val commonsCollections4Version: String by System.getProperties()
-val commonsFileUploadVersion: String by System.getProperties()
-
 dependencies {
-    api("com.github.manosbatsis.kotlin-utils:kotlin-utils-api:$kotlinUtilsVersion")
+    api("com.github.manosbatsis.kotlin-utils:kotlin-utils-api:${Versions.kotlinUtilsVersion}")
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-data-jpa")
     api("org.springframework.boot:spring-boot-starter-validation")

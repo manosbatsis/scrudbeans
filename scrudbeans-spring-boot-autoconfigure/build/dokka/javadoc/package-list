@@ -1,5 +1,0 @@
-$dokka.format:javadoc-v1
-$dokka.linkExtension:html
-
-com.github.manosbatsis.scrudbeans.autoconfigure
-
