@@ -10,8 +10,9 @@
 .springBeans
 .sts4-cache
 
+### Gradle ###
 .gradle/
-//build/
+build/
 
 ### IntelliJ IDEA ###
 .idea
