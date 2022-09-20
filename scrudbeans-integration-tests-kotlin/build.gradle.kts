@@ -10,10 +10,9 @@ springBoot {
     buildInfo()
 }
 
-val errorHandlingSpringBootStarterVersion: String by System.getProperties()
 dependencies {
     implementation(project(":scrudbeans-spring-boot-starter"))
-    implementation("io.github.wimdeblauwe:error-handling-spring-boot-starter:$errorHandlingSpringBootStarterVersion")
+    implementation("io.github.wimdeblauwe:error-handling-spring-boot-starter:${Versions.errorHandlingSpringBootStarterVersion}")
     kapt(project(":scrudbeans-annotation-processor-kotlin"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("com.h2database:h2")

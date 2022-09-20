@@ -1,6 +1,6 @@
 ---
 name: Help request
-about: Ask a question about how to use ScrudBeans.
+about: Ask a question about how to use scrudbeans.
 title: "[QUESTION] "
 labels: question
 assignees: manosbatsis

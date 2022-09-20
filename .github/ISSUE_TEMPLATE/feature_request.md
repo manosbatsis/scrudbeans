@@ -9,7 +9,7 @@ assignees: manosbatsis
 
 **Is your feature request related to a problem? Please describe.**
 A clear and concise description of what the problem is. 
-e.g. I'm always frustrated when [...] or I think it would be really awesome if ScrudBeans would provide [...]
+e.g. I'm always frustrated when [...] or I think it would be really awesome if scrudbeans would provide [...]
 
 **Describe the solution you'd like**
 A clear and concise description of what you want to happen.

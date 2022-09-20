@@ -1,3 +1,5 @@
+
+
 object Versions {
     const val kotlin = "1.7.0"
     const val coroutines = "1.6.1"
@@ -17,6 +19,21 @@ object Versions {
     const val javaxServlet = "4.0.1"
     const val spring = "5.3.13"
     const val jetbrainsAnnotations = "23.0.0"
+    const val commonsLang3Version="3.12.0"
+    const val commonsCollections4Version="4.4"
+    const val commonsFileUploadVersion="1.4"
+    const val evoInflectorVersion="1.3"
+    const val errorHandlingSpringBootStarterVersion="3.1.0"
+    const val kotlinVersion="1.7.0"
+    const val kotlinUtilsVersion="0.36"
+    const val kotlinPoetVersion="1.11.0"
+    const val lombokVersion="1.18.24"
+    const val springBootVersion="2.7.0"
+    const val springBootDependencyManagementVersion="1.0.13.RELEASE"
+    const val springdocOpenapiVersion="1.6.9"
+    const val springDependencyManagementVersion="1.0.11.RELEASE"
+    const val ktlintVersion="10.3.0"
+    const val rsqlJpaSpringBootStarterVersion="5.0.19"
 }
 
 abstract class DependencyGroup(

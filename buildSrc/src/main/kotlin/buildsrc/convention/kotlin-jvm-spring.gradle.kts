@@ -1,6 +1,5 @@
 package buildsrc.convention
 
-import Deps
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.kotlin
 import org.gradle.kotlin.dsl.version
