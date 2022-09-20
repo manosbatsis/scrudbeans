@@ -19,6 +19,7 @@ build/
 *.iws
 *.iml
 *.ipr
+*.hprof
 
 ### NetBeans ###
 /nbproject/private/
@@ -27,6 +28,10 @@ build/
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### Gradle ###
+.gradle/
+build/
 
 ### Maven ###
 target/
@@ -40,13 +45,6 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
-### Docusaurus: Npm/Yarn etc. ###
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Runtime data
 pids

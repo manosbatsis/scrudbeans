@@ -4,6 +4,7 @@
 dependencyResolutionManagement {
 
     repositories {
+        mavenLocal()
         mavenCentral()
         gradlePluginPortal()
         maven { url = uri("https://repo.spring.io/milestone") }
