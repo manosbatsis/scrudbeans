@@ -8,10 +8,10 @@ import org.apache.commons.lang3.builder.HashCodeBuilder
 import org.apache.commons.lang3.builder.ToStringBuilder
 import java.math.BigDecimal
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.Table
-import javax.validation.constraints.NotNull
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Table
+import jakarta.validation.constraints.NotNull
 
 @Entity
 @Table(name = "products")

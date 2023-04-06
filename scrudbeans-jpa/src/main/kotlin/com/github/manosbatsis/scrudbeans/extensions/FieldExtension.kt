@@ -3,8 +3,8 @@ package com.github.manosbatsis.scrudbeans.extensions
 import org.springframework.util.ReflectionUtils
 import java.lang.reflect.Field
 import java.util.Objects.isNull
-import javax.persistence.Embedded
-import javax.persistence.Entity
+import jakarta.persistence.Embedded
+import jakarta.persistence.Entity
 
 val Field.isEmbedded: Boolean
     get() = this.isAnnotationPresent(Embedded::class.java)

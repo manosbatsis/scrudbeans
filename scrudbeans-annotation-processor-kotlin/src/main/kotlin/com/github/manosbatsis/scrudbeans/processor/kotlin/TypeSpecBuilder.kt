@@ -41,7 +41,7 @@ import java.io.File
 import java.util.*
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.VariableElement
-import javax.persistence.*
+import jakarta.persistence.*
 
 /**
  * Utility methods creating [TypeSpec] instances for target SCRUD component types

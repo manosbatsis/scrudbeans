@@ -3,9 +3,9 @@ package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.asClassName
-import javax.persistence.EmbeddedId
-import javax.persistence.Id
-import javax.persistence.IdClass
+import jakarta.persistence.EmbeddedId
+import jakarta.persistence.Id
+import jakarta.persistence.IdClass
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.TypeElement
 import javax.lang.model.element.VariableElement

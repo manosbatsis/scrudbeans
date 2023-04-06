@@ -6,7 +6,7 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ModelDescriptor
 import com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor.ScrudModelDescriptor
 import com.squareup.kotlinpoet.*
-import javax.persistence.Entity
+import jakarta.persistence.Entity
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
@@ -25,11 +25,11 @@ import javax.tools.StandardLocation
  * annotated with @[Entity]
  */
 @SupportedAnnotationTypes("com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean")
-@SupportedSourceVersion(SourceVersion.RELEASE_11)
+@SupportedSourceVersion(SourceVersion.RELEASE_17)
 class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironmentAware {
 
     companion object {
-        private val log = LoggerFactory.getLogger(ScrudModelAnnotationProcessor.javaClass)
+        private val log = LoggerFactory.getLogger(ScrudModelAnnotationProcessor::class.java)
         const val BLOCK_FUN_NAME = "block"
         const val KAPT_KOTLIN_SCRUDBEANS_GENERATED_OPTION_NAME = "kapt.kotlin.vaultaire.generated"
         const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"

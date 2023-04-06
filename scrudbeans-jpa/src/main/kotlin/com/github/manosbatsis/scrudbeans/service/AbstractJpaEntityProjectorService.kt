@@ -12,7 +12,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 abstract class AbstractJpaEntityProjectorService<T : Any, S : Any, B : JpaEntityProjectorRepository<T, S>>(
     repository: B,

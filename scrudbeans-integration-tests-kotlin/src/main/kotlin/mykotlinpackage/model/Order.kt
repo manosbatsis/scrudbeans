@@ -10,11 +10,11 @@ import org.apache.commons.lang3.builder.HashCodeBuilder
 import org.apache.commons.lang3.builder.ToStringBuilder
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.EntityListeners
-import javax.persistence.Table
-import javax.validation.constraints.NotNull
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EntityListeners
+import jakarta.persistence.Table
+import jakarta.validation.constraints.NotNull
 
 @Entity
 @Table(name = "product_orders")

@@ -3,7 +3,7 @@ package mykotlinpackage.service
 import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import com.github.manosbatsis.scrudbeans.repository.JpaEntityProjectorRepository
 import com.github.manosbatsis.scrudbeans.service.AbstractJpaEntityProjectorService
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 abstract class CustomBaseServiceImpl<T : Any, S : Any, B : JpaEntityProjectorRepository<T, S>>(
     repository: B,

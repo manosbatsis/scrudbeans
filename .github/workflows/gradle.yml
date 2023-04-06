@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         java-version:
-          - 11
+          - 17
         os:
           - ubuntu-latest
       #    - windows-2019

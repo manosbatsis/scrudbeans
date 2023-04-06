@@ -16,7 +16,7 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
-import javax.persistence.EntityManager
+import jakarta.persistence.EntityManager
 
 abstract class AbstractJpaEntityService<T : Any, S : Any, B : JpaEntityRepository<T, S>>(
     protected val repository: B,
@@ -57,7 +57,7 @@ abstract class AbstractJpaEntityService<T : Any, S : Any, B : JpaEntityRepositor
     @Transactional(readOnly = true)
     override fun findChildById(id: S, child: String): Any? {
         val entity = getById(id)
-        return ClassUtils.fieldByName(child, entity.javaClass)?.value(entity)
+        return ClassUtils.fieldByName(child, entity::class.java)?.value(entity)
     }
 
     @Transactional(readOnly = true)

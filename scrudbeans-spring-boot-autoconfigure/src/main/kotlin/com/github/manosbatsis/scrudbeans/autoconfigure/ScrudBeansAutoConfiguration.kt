@@ -3,7 +3,7 @@ package com.github.manosbatsis.scrudbeans.autoconfigure
 import com.github.manosbatsis.scrudbeans.binding.*
 import com.github.manosbatsis.scrudbeans.service.IdentifierAdapterRegistry
 import com.github.manosbatsis.scrudbeans.service.JpaEntityService
-import javax.validation.Validator
+import jakarta.validation.Validator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean

@@ -134,7 +134,7 @@ spring.application.name=Project Name
 # Work around useless errors
 spring.jackson.serialization.FAIL_ON_EMPTY_BEANS=false
 # We do our own validation with ScrudBeans
-spring.jpa.properties.javax.persistence.validation.mode=none
+spring.jpa.properties.jakarta.persistence.validation.mode=none
 
 # Use an H2 database for dev/testing
 spring.h2.console.enabled=true

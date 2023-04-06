@@ -31,7 +31,7 @@ dependencies {
 
     implementation(platform("org.springframework.boot:spring-boot-dependencies:${Versions.springBootVersion}"))
     implementation("org.springframework.boot:spring-boot-gradle-plugin:${Versions.springBootVersion}")
-    implementation("io.spring.gradle:dependency-management-plugin:${Versions.springBootDependencyManagementVersion}")
+    implementation("io.spring.gradle:dependency-management-plugin:${Versions.springDependencyManagementVersion}")
 
     implementation("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detektPlugin")
     implementation("io.github.gradle-nexus:publish-plugin:$gradleNexusPublishPlugin")
