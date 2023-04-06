@@ -23,17 +23,16 @@ object Versions {
     const val commonsCollections4Version="4.4"
     const val commonsFileUploadVersion="1.4"
     const val evoInflectorVersion="1.3"
-    const val errorHandlingSpringBootStarterVersion="3.1.0"
+    const val errorHandlingSpringBootStarterVersion="4.1.0"
     const val kotlinVersion="1.7.0"
     const val kotlinUtilsVersion="0.36"
-    const val kotlinPoetVersion="1.11.0"
+    const val kotlinPoetVersion="1.12.0"
     const val lombokVersion="1.18.24"
-    const val springBootVersion="2.7.0"
-    const val springBootDependencyManagementVersion="1.0.13.RELEASE"
+    const val springBootVersion="3.0.5"
     const val springdocOpenapiVersion="1.6.9"
-    const val springDependencyManagementVersion="1.0.11.RELEASE"
+    const val springDependencyManagementVersion="1.1.0"
     const val ktlintVersion="10.3.0"
-    const val rsqlJpaSpringBootStarterVersion="5.0.19"
+    const val rsqlJpaSpringBootStarterVersion="6.0.4"
 }
 
 abstract class DependencyGroup(
@@ -56,7 +55,7 @@ object Deps {
     const val log4jOverSlf4j = "org.slf4j:log4j-over-slf4j:${Versions.log4jOverSlf4j}"
     const val strikt = "io.strikt:strikt-core:${Versions.strikt}"
     const val jUnit = "org.junit.jupiter:junit-jupiter:${Versions.jUnit}"
-    const val javaxServlet = "javax.servlet:javax.servlet-api:${Versions.javaxServlet}"
+    const val javaxServlet = "jakarta.servlet:jakarta.servlet-api:${Versions.javaxServlet}"
     const val jetbrainsAnnotations = "org.jetbrains:annotations:${Versions.jetbrainsAnnotations}"
     const val restAssured = "io.rest-assured:kotlin-extensions:${Versions.restAssured}"
 

@@ -1,5 +1,6 @@
 plugins {
     buildsrc.convention.`kotlin-jvm-spring`
+    id("org.springframework.boot")
     buildsrc.convention.`publish-jvm`
 }
 

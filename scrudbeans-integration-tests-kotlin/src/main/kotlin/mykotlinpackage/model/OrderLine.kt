@@ -10,8 +10,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder
 import org.hibernate.annotations.Formula
 import java.math.BigDecimal
 import java.util.*
-import javax.persistence.*
-import javax.validation.constraints.NotNull
+import jakarta.persistence.*
+import jakarta.validation.constraints.NotNull
 
 @Entity
 @Table(name = "order_lines")

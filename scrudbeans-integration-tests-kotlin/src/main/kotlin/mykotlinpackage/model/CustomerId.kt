@@ -1,8 +1,8 @@
 package mykotlinpackage.model
 
-import javax.persistence.IdClass
+import jakarta.persistence.IdClass
 import java.io.Serializable
-import javax.persistence.MappedSuperclass
+import jakarta.persistence.MappedSuperclass
 
 /** Used as [IdClass] for the [Customer] entity */
 @MappedSuperclass

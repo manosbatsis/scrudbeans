@@ -9,6 +9,12 @@ plugins {
 val release_version: String by project
 version = release_version
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 tasks.dokkaHtmlMultiModule.configure {
     includes.from("README.md")
     outputDirectory.set(buildDir.resolve("docs/apidoc"))

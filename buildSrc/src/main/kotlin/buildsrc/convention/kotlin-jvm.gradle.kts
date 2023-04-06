@@ -36,7 +36,7 @@ configure<KtlintExtension> {
 kotlin {
     //explicitApi()
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of("11"))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -51,7 +51,7 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.apply {
-        jvmTarget = "11"
+        jvmTarget = "17"
         freeCompilerArgs += listOf("-Xjsr305=strict")
         apiVersion = "1.6"
         languageVersion = "1.6"

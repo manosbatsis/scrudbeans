@@ -11,6 +11,5 @@ plugins {
     kotlin("plugin.jpa")
     kotlin("plugin.noarg")
 
-    id("org.springframework.boot")
     id("io.spring.dependency-management")
 }

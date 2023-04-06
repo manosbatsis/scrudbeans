@@ -2,7 +2,7 @@ package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 
 import com.github.manosbatsis.kotlin.utils.ProcessingEnvironmentAware
 import com.github.manosbatsis.scrudbeans.api.exception.ScrudModelProcessorException
-import javax.persistence.Entity
+import jakarta.persistence.Entity
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.*
 import javax.lang.model.element.ElementKind.FIELD
