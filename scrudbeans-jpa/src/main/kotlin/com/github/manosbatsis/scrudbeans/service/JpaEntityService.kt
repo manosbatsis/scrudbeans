@@ -5,7 +5,7 @@ import com.github.manosbatsis.scrudbeans.api.mdd.model.IdentifierAdapter
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
-import java.util.*
+import java.util.Optional
 
 /** Basic JPA Search+CRUD service with support for RSQL and [Specification]s */
 interface JpaEntityService<T : Any, S : Any> {

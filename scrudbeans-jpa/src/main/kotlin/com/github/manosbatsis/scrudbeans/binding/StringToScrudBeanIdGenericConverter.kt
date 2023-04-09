@@ -25,7 +25,7 @@ import org.springframework.core.convert.TypeDescriptor
 import org.springframework.core.convert.converter.GenericConverter
 
 class StringToScrudBeanIdGenericConverter(
-    private val identifierAdapterRegistry: IdentifierAdapterRegistry
+    private val identifierAdapterRegistry: IdentifierAdapterRegistry,
 ) : GenericConverter {
 
     private val convertibleTypesCache: MutableSet<GenericConverter.ConvertiblePair> by lazy {
@@ -34,7 +34,7 @@ class StringToScrudBeanIdGenericConverter(
             .map {
                 listOf(
                     GenericConverter.ConvertiblePair(String::class.java, it.identifierAdapter.entityIdType),
-                    GenericConverter.ConvertiblePair(java.lang.String::class.java, it.identifierAdapter.entityIdType)
+                    GenericConverter.ConvertiblePair(java.lang.String::class.java, it.identifierAdapter.entityIdType),
                 )
             }.flatten().toMutableSet()
     }
@@ -42,8 +42,11 @@ class StringToScrudBeanIdGenericConverter(
     override fun getConvertibleTypes(): MutableSet<GenericConverter.ConvertiblePair> = convertibleTypesCache
 
     override fun convert(source: Any?, sourceType: TypeDescriptor, targetType: TypeDescriptor): Any? {
-        return if (source == null || source.toString().isNullOrBlank()) null
-        else identifierAdapterRegistry.getServiceForCompositeIdType(targetType.type)
-            .identifierAdapter.buildIdFromString(source.toString())
+        return if (source == null || source.toString().isNullOrBlank()) {
+            null
+        } else {
+            identifierAdapterRegistry.getServiceForCompositeIdType(targetType.type)
+                .identifierAdapter.buildIdFromString(source.toString())
+        }
     }
 }

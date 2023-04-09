@@ -1,7 +1,7 @@
 package com.github.manosbatsis.scrudbeans.model
 
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.UUID
 
 interface BaseEntity<S> {
     var id: S

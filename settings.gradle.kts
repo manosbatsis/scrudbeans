@@ -8,7 +8,7 @@ include(
     "scrudbeans-integration-tests-kotlin",
     "scrudbeans-jpa",
     "scrudbeans-spring-boot-autoconfigure",
-    "scrudbeans-spring-boot-starter"
+    "scrudbeans-spring-boot-starter",
 )
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

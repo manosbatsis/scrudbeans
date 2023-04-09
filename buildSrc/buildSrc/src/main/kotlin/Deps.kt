@@ -1,7 +1,7 @@
 
 
 object Versions {
-    const val kotlin = "1.7.0"
+    const val kotlin = "1.8.20"
     const val coroutines = "1.6.1"
     const val ktor = "2.0.3" //2.0.1
     const val serialization = "1.0.1"
@@ -24,8 +24,8 @@ object Versions {
     const val commonsFileUploadVersion="1.4"
     const val evoInflectorVersion="1.3"
     const val errorHandlingSpringBootStarterVersion="4.1.0"
-    const val kotlinVersion="1.7.0"
-    const val kotlinUtilsVersion="0.36"
+    const val kotlinVersion="1.8.20"
+    const val kotlinUtilsVersion="0.37"
     const val kotlinPoetVersion="1.12.0"
     const val lombokVersion="1.18.24"
     const val springBootVersion="3.0.5"

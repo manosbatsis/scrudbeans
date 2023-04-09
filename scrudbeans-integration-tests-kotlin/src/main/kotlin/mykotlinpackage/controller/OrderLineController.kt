@@ -8,7 +8,7 @@ import mykotlinpackage.model.OrderLineDto
 import mykotlinpackage.service.OrderLineService
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
+import java.util.UUID
 
 /**
  * A controller for order lines that allows search, create and delete but removes support for update and patch.

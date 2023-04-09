@@ -1,18 +1,26 @@
 plugins {
-    buildsrc.convention.`kotlin-jvm-spring`
-    id("org.springframework.boot")
+    `java-library`
+    kotlin("jvm")
+    // id("org.springframework.boot")
     buildsrc.convention.`publish-jvm`
 }
 
-tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
-    enabled = false
-}
-tasks.named<Jar>("jar") {
-    enabled = true
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
+// tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+//     enabled = false
+// }
+//
+// tasks.named<Jar>("jar") {
+//     enabled = true
+// }
+
 dependencies {
-    api("com.github.manosbatsis.kotlin-utils:kotlin-utils-api:${Versions.kotlinUtilsVersion}")
+    implementation(platform(libs.spring.boot.dependencies))
+    api(libs.kotlin.utils.api)
     api("org.springframework.boot:spring-boot-starter-web")
     api("org.springframework.boot:spring-boot-starter-data-jpa")
     api("org.springframework.boot:spring-boot-starter-validation")

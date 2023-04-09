@@ -3,7 +3,7 @@ package com.github.manosbatsis.scrudbeans.service
 import com.github.manosbatsis.scrudbeans.logging.loggerFor
 
 class IdentifierAdapterRegistry(
-    private val entityServices: Map<String, JpaEntityService<*, *>>
+    private val entityServices: Map<String, JpaEntityService<*, *>>,
 ) {
     companion object {
         private val logger = loggerFor<IdentifierAdapterRegistry>()
@@ -39,7 +39,7 @@ class IdentifierAdapterRegistry(
         findServiceForEntityType(entityType)
             ?: throw IllegalArgumentException(
                 "No service for entity type ${entityType.canonicalName}, " +
-                    "known types: ${serviceKeysByEntityType.keys.joinToString(", ")}"
+                    "known types: ${serviceKeysByEntityType.keys.joinToString(", ")}",
             )
 
     fun <T : Any> findServiceForCompositeIdType(idType: Class<T>): JpaEntityService<*, T>? =
@@ -53,6 +53,6 @@ class IdentifierAdapterRegistry(
         findServiceForCompositeIdType(idType)
             ?: throw IllegalArgumentException(
                 "No service for composite ID type ${idType.canonicalName}, " +
-                    "known types: ${serviceKeysByEntityType.keys.joinToString(", ")}"
+                    "known types: ${serviceKeysByEntityType.keys.joinToString(", ")}",
             )
 }

@@ -6,8 +6,8 @@ import com.github.manosbatsis.scrudbeans.service.JpaEntityService
 import jakarta.validation.Validator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -32,6 +32,7 @@ class ScrudBeansAutoConfiguration : WebMvcConfigurer {
      */
     @Value("\${app.format.datetime.skip-colon-in-time-zone:false}")
     lateinit var skipColonInTimeZone: String
+
     @Autowired
     lateinit var wac: WebApplicationContext
 
@@ -39,7 +40,7 @@ class ScrudBeansAutoConfiguration : WebMvcConfigurer {
     @ConditionalOnProperty(
         name = ["scrudbeans.jackson.format-offset-date-time"],
         havingValue = "true",
-        matchIfMissing = true
+        matchIfMissing = true,
     )
     fun offsetDateTimeSerializer(): OffsetDateTimeSerializer {
         return OffsetDateTimeSerializer()
@@ -49,7 +50,7 @@ class ScrudBeansAutoConfiguration : WebMvcConfigurer {
     @ConditionalOnProperty(
         name = ["scrudbeans.jackson.format-offset-date-time"],
         havingValue = "true",
-        matchIfMissing = true
+        matchIfMissing = true,
     )
     fun offsetDateTimeDeserializer(): OffsetDateTimeDeserializer {
         return OffsetDateTimeDeserializer()

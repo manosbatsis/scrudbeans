@@ -6,12 +6,12 @@ import org.springframework.data.auditing.DateTimeProvider
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 import java.time.OffsetDateTime
 import java.time.ZoneOffset.UTC
-import java.util.*
+import java.util.Optional
 
 @Configuration
 @EnableJpaAuditing(
     // TODO auditorAwareRef = "auditorProvider",
-    dateTimeProviderRef = "auditingDateTimeProvider"
+    dateTimeProviderRef = "auditingDateTimeProvider",
 )
 class JpaAuditingConfiguration {
     @Bean(name = ["auditingDateTimeProvider"])

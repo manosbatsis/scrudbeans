@@ -2,6 +2,6 @@
 
 Documentation at https://manosbatsis.github.io/scrudbeans/
 
-Project templates for Java and Kotlin  can be found at 
-[scrudbeans-template-java](https://github.com/manosbatsis/scrudbeans-template-java) and 
+Project templates for Java and Kotlin  can be found at
+[scrudbeans-template-java](https://github.com/manosbatsis/scrudbeans-template-java) and
 [scrudbeans-template-kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin) respectively.

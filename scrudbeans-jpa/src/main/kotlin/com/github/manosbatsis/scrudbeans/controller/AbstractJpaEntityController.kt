@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 open class AbstractJpaEntityController<
-    T : Any, S : Any, SRV : JpaEntityService<T, S>, DTO : Dto<T>
+    T : Any, S : Any, SRV : JpaEntityService<T, S>, DTO : Dto<T>,
     > : JpaEntityController<T, S, DTO> {
 
     @Autowired
@@ -33,7 +33,7 @@ open class AbstractJpaEntityController<
         sortBy: String?,
         @Parameter(description = "The sort direction, either ASC or DESC", required = false, example = "DESC")
         @RequestParam("direction", required = false, defaultValue = "DESC")
-        sortDirection: Sort.Direction
+        sortDirection: Sort.Direction,
     ): ResponseEntity<Iterable<T>> = doFind(filter, pn, ps, sortBy, sortDirection)
 
     /** Allows overriding the implementation of [find] */
@@ -42,10 +42,10 @@ open class AbstractJpaEntityController<
         pn: Int,
         ps: Int,
         sortBy: String?,
-        sortDirection: Sort.Direction
+        sortDirection: Sort.Direction,
     ): ResponseEntity<Iterable<T>> {
         return ResponseEntity.ok(
-            service.findAll(filter, sortBy, sortDirection, pn, ps)
+            service.findAll(filter, sortBy, sortDirection, pn, ps),
         )
     }
 
@@ -60,7 +60,7 @@ open class AbstractJpaEntityController<
     @GetMapping("{id}/{child}")
     override fun findChildById(
         @PathVariable id: S,
-        @PathVariable child: String
+        @PathVariable child: String,
     ): ResponseEntity<Any> = doFindChildById(id, child)
 
     /** Allows overriding the implementation of [findChildById] */
@@ -80,19 +80,21 @@ open class AbstractJpaEntityController<
     @PutMapping("{id}")
     override fun update(
         @RequestBody entity: T,
-        @PathVariable id: S
+        @PathVariable id: S,
     ): ResponseEntity<T> = doUpdate(entity, id)
 
     /** Allows overriding the implementation of [update] */
     open fun doUpdate(entity: T, id: S): ResponseEntity<T> =
-        if (service.identifierAdapter.getId(entity) == id)
+        if (service.identifierAdapter.getId(entity) == id) {
             service.save(entity).let { ResponseEntity.ok(it) }
-        else throw IllegalArgumentException("Matching request body and path variable IDs are required")
+        } else {
+            throw IllegalArgumentException("Matching request body and path variable IDs are required")
+        }
 
     @PatchMapping("{id}")
     override fun partialUpdate(
         @RequestBody dto: DTO,
-        @PathVariable id: S
+        @PathVariable id: S,
     ): ResponseEntity<T> = doPartialUpdate(dto, id)
 
     /** Allows overriding the implementation of [partialUpdate] */

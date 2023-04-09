@@ -25,13 +25,13 @@ class RequestResponseLoggingInterceptor : ClientHttpRequestInterceptor {
 
     @Throws(IOException::class)
     private fun logRequest(request: HttpRequest, body: ByteArray) {
-        logger.info("{} {} {}", request.method, request.uri, request.headers)
-        logger.info(String(body, utf8))
+        logger.info("Request head: {} {} {}", request.method, request.uri, request.headers)
+        logger.info("Request body: {}", String(body, utf8))
     }
 
     @Throws(IOException::class)
     private fun logResponse(response: ClientHttpResponse) {
-        logger.info("{} {} {}", response.statusCode, response.statusText, response.headers)
-        logger.info(StreamUtils.copyToString(response.body, utf8))
+        logger.info("Response head: {} {} {}", response.statusCode, response.statusText, response.headers)
+        logger.info("Response body: {}", StreamUtils.copyToString(response.body, utf8))
     }
 }

@@ -1,5 +1,10 @@
 plugins {
-    buildsrc.convention.`kotlin-jvm-spring`
+    `java-library`
+    kotlin("jvm")
+    kotlin("kapt")
+    kotlin("plugin.spring")
+    kotlin("plugin.jpa")
+    kotlin("plugin.noarg")
     id("org.springframework.boot")
 }
 
@@ -12,8 +17,9 @@ springBoot {
 }
 
 dependencies {
-    implementation(project(":scrudbeans-spring-boot-starter"))
-    implementation("io.github.wimdeblauwe:error-handling-spring-boot-starter:${Versions.errorHandlingSpringBootStarterVersion}")
+    api(project(":scrudbeans-spring-boot-starter"))
+    implementation(platform(libs.spring.boot.dependencies))
+    implementation(libs.error.handling.spring.boot.starter)
     implementation("org.springframework.boot:spring-boot-properties-migrator")
     kapt(project(":scrudbeans-annotation-processor-kotlin"))
     testImplementation("org.springframework.boot:spring-boot-starter-test")

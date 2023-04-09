@@ -28,7 +28,7 @@ import org.springframework.core.convert.TypeDescriptor
 import org.springframework.core.convert.converter.GenericConverter
 
 class StringToScrudBeanGenericConverter(
-    private val identifierAdapterRegistry: IdentifierAdapterRegistry
+    private val identifierAdapterRegistry: IdentifierAdapterRegistry,
 ) : GenericConverter {
 
     private val convertibleTypesCache: MutableSet<GenericConverter.ConvertiblePair> by lazy {
@@ -36,7 +36,7 @@ class StringToScrudBeanGenericConverter(
         services.map {
             listOf(
                 GenericConverter.ConvertiblePair(String::class.java, it.identifierAdapter.entityType),
-                GenericConverter.ConvertiblePair(java.lang.String::class.java, it.identifierAdapter.entityType)
+                GenericConverter.ConvertiblePair(java.lang.String::class.java, it.identifierAdapter.entityType),
             )
         }.flatten().toMutableSet()
     }
@@ -44,8 +44,11 @@ class StringToScrudBeanGenericConverter(
     override fun getConvertibleTypes(): MutableSet<GenericConverter.ConvertiblePair> = convertibleTypesCache
 
     override fun convert(source: Any?, sourceType: TypeDescriptor, targetType: TypeDescriptor): Any? {
-        return if (source == null || source.toString().isNullOrBlank()) null
-        else loadFromStringId(identifierAdapterRegistry.getServiceForEntityType(targetType.type), source.toString())
+        return if (source == null || source.toString().isNullOrBlank()) {
+            null
+        } else {
+            loadFromStringId(identifierAdapterRegistry.getServiceForEntityType(targetType.type), source.toString())
+        }
     }
 
     private fun <T : Any, S : Any> loadFromStringId(service: JpaEntityService<T, S>, source: String): T {

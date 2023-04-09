@@ -3,7 +3,7 @@ package com.github.manosbatsis.scrudbeans.service
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
-import java.util.*
+import java.util.Optional
 
 /** Extends [JpaEntityService] with projection support to query functions */
 interface JpaEntityProjectorService<T : Any, S : Any> : JpaEntityService<T, S> {
@@ -18,7 +18,7 @@ interface JpaEntityProjectorService<T : Any, S : Any> : JpaEntityService<T, S> {
         sortDirection: Sort.Direction,
         pageNumber: Int = 0,
         pageSize: Int = 10,
-        projection: Class<P>
+        projection: Class<P>,
     ): Page<P>
 
     /** Find resources page-by-page using a JPA specification, projected as [P] */
@@ -26,7 +26,7 @@ interface JpaEntityProjectorService<T : Any, S : Any> : JpaEntityService<T, S> {
         specification: Specification<T>,
         pageNumber: Int = 0,
         pageSize: Int = 10,
-        projection: Class<P>
+        projection: Class<P>,
     ): Page<P>
 
     /** Get the resource matching the given ID, projected as [P], throw an error otherwise */

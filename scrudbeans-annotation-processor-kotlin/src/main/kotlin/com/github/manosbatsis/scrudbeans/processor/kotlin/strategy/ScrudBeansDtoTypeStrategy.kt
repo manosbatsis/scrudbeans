@@ -8,7 +8,7 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.TypeSpec
 
 class ScrudBeansDtoTypeStrategy(
-    annotatedElementInfo: AnnotatedElementInfo
+    annotatedElementInfo: AnnotatedElementInfo,
 ) : SimpleDtoTypeStrategy(annotatedElementInfo) {
 
     override fun addSuperTypes(typeSpecBuilder: TypeSpec.Builder) {
@@ -19,7 +19,7 @@ class ScrudBeansDtoTypeStrategy(
                 .addModifiers(KModifier.OVERRIDE)
                 .returns(Boolean::class)
                 .addCode("return ${annotatedElementInfo.updateRequiresNewInstance}")
-                .build()
+                .build(),
         )
     }
 }

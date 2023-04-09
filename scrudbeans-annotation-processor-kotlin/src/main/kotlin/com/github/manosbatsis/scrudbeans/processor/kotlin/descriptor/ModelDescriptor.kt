@@ -18,7 +18,7 @@ import javax.lang.model.util.Types
  */
 abstract class ModelDescriptor(
     override val processingEnvironment: ProcessingEnvironment,
-    val typeElement: TypeElement
+    val typeElement: TypeElement,
 ) : ProcessingEnvironmentAware {
 
     var jpaEntity: Boolean = false
@@ -43,10 +43,16 @@ abstract class ModelDescriptor(
                 val typeElement = currentTypeElement as TypeElement
                 scanMembers(types, typeElement, typeElement.accessibleConstructorParameterFields())
             }
+
             ElementKind.CONSTRUCTOR -> {
                 val constructorTypeElement = currentTypeElement as ExecutableElement
-                scanMembers(types, constructorTypeElement.enclosingElement as TypeElement, constructorTypeElement.parameters)
+                scanMembers(
+                    types,
+                    constructorTypeElement.enclosingElement as TypeElement,
+                    constructorTypeElement.parameters,
+                )
             }
+
             else -> throw IllegalArgumentException("Invalid element type, expected a class or constructor")
         }
     }
@@ -77,7 +83,7 @@ abstract class ModelDescriptor(
     protected fun asTypeElement(types: Types, typeMirror: TypeMirror): TypeElement {
         if (typeMirror.kind != DECLARED) {
             throw ScrudModelProcessorException(
-                "Method asTypeElement Was expecting TypeKind.DECLARED but was " + typeMirror.kind
+                "Method asTypeElement Was expecting TypeKind.DECLARED but was " + typeMirror.kind,
             )
         }
         val element = (typeMirror as DeclaredType).asElement()
@@ -113,7 +119,7 @@ abstract class ModelDescriptor(
             }
         } else {
             throw ScrudModelProcessorException(
-                "Could not process member " + scrudModelMember + ", kind: " + scrudModelMember.kind
+                "Could not process member " + scrudModelMember + ", kind: " + scrudModelMember.kind,
             )
         }
 

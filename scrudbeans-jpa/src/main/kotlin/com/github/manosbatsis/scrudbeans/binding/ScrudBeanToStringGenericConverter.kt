@@ -25,7 +25,7 @@ import org.springframework.core.convert.TypeDescriptor
 import org.springframework.core.convert.converter.GenericConverter
 
 class ScrudBeanToStringGenericConverter(
-    private val identifierAdapterRegistry: IdentifierAdapterRegistry
+    private val identifierAdapterRegistry: IdentifierAdapterRegistry,
 ) : GenericConverter {
 
     private val convertibleTypesCache: MutableSet<GenericConverter.ConvertiblePair> by lazy {
@@ -33,7 +33,7 @@ class ScrudBeanToStringGenericConverter(
         services.map {
             listOf(
                 GenericConverter.ConvertiblePair(it.identifierAdapter.entityType, String::class.java),
-                GenericConverter.ConvertiblePair(it.identifierAdapter.entityType, java.lang.String::class.java)
+                GenericConverter.ConvertiblePair(it.identifierAdapter.entityType, java.lang.String::class.java),
             )
         }.flatten().toMutableSet()
     }
@@ -41,7 +41,10 @@ class ScrudBeanToStringGenericConverter(
     override fun getConvertibleTypes(): MutableSet<GenericConverter.ConvertiblePair> = convertibleTypesCache
 
     override fun convert(source: Any?, sourceType: TypeDescriptor, targetType: TypeDescriptor): Any? {
-        return if (source == null) null
-        else identifierAdapterRegistry.getServiceForEntityType(source::class.java).identifierAdapter.getIdAsString(source)
+        return if (source == null) {
+            null
+        } else {
+            identifierAdapterRegistry.getServiceForEntityType(source::class.java).identifierAdapter.getIdAsString(source)
+        }
     }
 }

@@ -36,21 +36,24 @@ import java.util.*
 @ExtendWith(SpringExtension::class)
 @SpringBootTest(
     classes = [ScrudBeansSampleApplication::class],
-    webEnvironment = RANDOM_PORT
+    webEnvironment = RANDOM_PORT,
 )
 @EnableJpaAuditing
 class RestServicesIT {
 
     companion object {
-        val logger = LoggerFactory.getLogger(RestServicesIT::class.java)
+        private val logger = LoggerFactory.getLogger(RestServicesIT::class.java)
     }
     init {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"))
     }
 
     @Autowired lateinit var restTemplateOrig: TestRestTemplate
+
     @Autowired lateinit var productService: ProductService
+
     @Autowired lateinit var orderService: OrderService
+
     @Autowired lateinit var identifierAdapterRegistry: IdentifierAdapterRegistry
 
     val restTemplate: TestRestTemplate by lazy {
@@ -68,9 +71,10 @@ class RestServicesIT {
         // Get the lord of the rings trilogy as a page of results
         // using a prefixed wildcard search
         val products = restTemplate.exchange(
-            "/api/rest/products?filter=name=like=LOTR ", HttpMethod.GET,
+            "/api/rest/products?filter=name=like=LOTR ",
+            HttpMethod.GET,
             null,
-            parameterizedTypeReference<RestResponsePage<Product>>()
+            parameterizedTypeReference<RestResponsePage<Product>>(),
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -78,102 +82,122 @@ class RestServicesIT {
         }
         // expecting three books
         assertTrue(products.content.size == 3)
+
         // Test Create
         // ============================
         // We have no auth mechanism by default, so we'll
         // create and use an actual order as a shopping basket
         val email = "foo@bar.baz"
-        var order: Order = Order(email = email)
-        val orderId = order.id
-        order = restTemplate.exchange(
-            "/api/rest/orders", HttpMethod.POST,
-            HttpEntity(order),
-            Order::class.java
+        val transientOrder = Order(email = email)
+        restTemplate.exchange(
+            "/api/rest/orders",
+            HttpMethod.POST,
+            HttpEntity(transientOrder),
+            Order::class.java,
         ).let {
+            logger.info("testScrud 1, POST response: {}", it.body)
             assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
             assertThat(it.body).isNotNull
-            assertThat(it.body!!.id).isEqualTo(orderId)
+            assertThat(it.body!!.id).isEqualTo(transientOrder.id)
             it.body!!
         }
-        restTemplate.exchange(
-            "/api/rest/orders/${order.id}", HttpMethod.GET,
+        val createdOrder: Order = restTemplate.exchange(
+            "/api/rest/orders/${transientOrder.id}",
+            HttpMethod.GET,
             null,
-            Order::class.java
+            Order::class.java,
         ).let {
+            logger.info("testScrud 2, GET response: {}", it.body)
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
-            assertThat(it.body!!.version).isEqualTo(order.version)
+            assertThat(it.body!!.version).isEqualTo(0)
             it.body!!
         }
         // Test Update
         // ============================
-        order.email = order.email.toString() + "_updated"
-        // 1) test update result...
-        order = restTemplate.exchange(
-            "/api/rest/orders/${order.id}", HttpMethod.PUT,
-            HttpEntity(order),
-            Order::class.java
+        // 1) Update email and test result
+        createdOrder.email = createdOrder.email + "_updated"
+        restTemplate.exchange(
+            "/api/rest/orders/${createdOrder.id}",
+            HttpMethod.PUT,
+            HttpEntity(createdOrder),
+            Order::class.java,
         ).let {
+            logger.info("testScrud 3, PUT response: {}", it.body)
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
+            assertThat(it.body).isNotNull
+            assertThat(it.body!!.version).isGreaterThan(createdOrder.version)
+            assertThat(it.body!!.created).isEqualTo(createdOrder.created)
+            assertThat(it.body!!.updated).isAfter(createdOrder.updated)
+            assertThat(it.body!!.email).isEqualTo(email + "_updated")
             it.body!!
         }
-        assertEquals(email + "_updated", order.email)
+
         // 1) test reloaded resource...
-        order = restTemplate.exchange(
-            "/api/rest/orders/${order.id}", HttpMethod.GET,
+        val updatedOrder = restTemplate.exchange(
+            "/api/rest/orders/${createdOrder.id}",
+            HttpMethod.GET,
             null,
-            Order::class.java
+            Order::class.java,
         ).let {
+            logger.info("testScrud 4, GET response: {}", it.body)
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
+            assertThat(it.body!!.version).isGreaterThan(createdOrder.version)
+            assertThat(it.body!!.created).isEqualTo(createdOrder.created)
+            assertThat(it.body!!.updated).isAfter(createdOrder.updated)
+            assertThat(it.body!!.email).isEqualTo(email + "_updated")
             it.body!!
         }
-        assertEquals(email + "_updated", order.email)
 
         // Test Patch
         // ============================
         // Prepare the patch
         val orderMap: MutableMap<String, Any> = HashMap()
-        orderMap.put("id", order.id)
-        orderMap["email"] = order.email.toString() + "_patched"
+        orderMap.put("id", updatedOrder.id)
+        orderMap["email"] = updatedOrder.email + "_patched"
         // Submit the patch
-        order = restTemplate.exchange(
-            "/api/rest/orders/${orderIdAdapter.getId(order)}", HttpMethod.PATCH,
+        restTemplate.exchange(
+            "/api/rest/orders/${orderIdAdapter.getId(updatedOrder)}",
+            HttpMethod.PATCH,
             HttpEntity(orderMap),
-            Order::class.java
+            Order::class.java,
         ).let {
+            logger.info("testScrud 5, PATCH response: {}", it.body)
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
+            assertThat(it.body!!.email).isEqualTo(email + "_updated_patched")
             it.body!!
         }
-        assertEquals(email + "_updated_patched", order.email)
         // Test Read
         // ============================
         // verify order was created and can be retrieved
 
-        order = restTemplate.exchange(
-            "/api/rest/orders/${orderIdAdapter.getId(order)}", HttpMethod.GET,
+        val patchedOrder = restTemplate.exchange(
+            "/api/rest/orders/${orderIdAdapter.getId(updatedOrder)}",
+            HttpMethod.GET,
             null,
-            Order::class.java
+            Order::class.java,
         ).let {
+            logger.info("testScrud 6, GET response: {}", it.body)
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
+            assertThat(it.body!!.email).isEqualTo(email + "_updated_patched")
             it.body!!
         }
-        assertEquals(email + "_updated_patched", order.email)
         // Add order items (lines)
         val quantity = 2
         val orderLineProducs = products.content
         for (p in orderLineProducs) {
-
-            val orderLine: OrderLine = OrderLine(order = order, product = p, quantity = quantity)
-            logger.debug("Saving order line: $orderLine for order $order")
+            val orderLine: OrderLine = OrderLine(order = patchedOrder, product = p, quantity = quantity)
+            logger.debug("Saving order line: $orderLine for order $patchedOrder")
 
             restTemplate.exchange(
-                "/api/rest/orderLines", HttpMethod.POST,
+                "/api/rest/orderLines",
+                HttpMethod.POST,
                 HttpEntity(orderLine),
-                OrderLine::class.java
+                OrderLine::class.java,
             ).let {
                 assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
                 assertThat(it.body).isNotNull
@@ -184,9 +208,10 @@ class RestServicesIT {
         // Get a page of order lines
         logger.debug("Search for order lines")
         var orderLines = restTemplate.exchange(
-            "/api/rest/orderLines", HttpMethod.GET,
+            "/api/rest/orderLines",
+            HttpMethod.GET,
             null,
-            parameterizedTypeReference<RestResponsePage<OrderLine>>()
+            parameterizedTypeReference<RestResponsePage<OrderLine>>(),
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -202,9 +227,10 @@ class RestServicesIT {
 
         logger.debug("Search for orders")
         var ordersOfTheDay = restTemplate.exchange(
-            "/api/rest/orders?filter=created=ge=$startOfDay;created=le=$endOfDay", HttpMethod.GET,
+            "/api/rest/orders?filter=created=ge=$startOfDay;created=le=$endOfDay",
+            HttpMethod.GET,
             null,
-            parameterizedTypeReference<RestResponsePage<Order>>()
+            parameterizedTypeReference<RestResponsePage<Order>>(),
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -214,9 +240,10 @@ class RestServicesIT {
         assertEquals(2, ordersOfTheDay.totalElements)
         // try the same dates for the following year
         ordersOfTheDay = restTemplate.exchange(
-            "/api/rest/orders?filter=created=ge=${startOfDay.plusYears(1)};created=le=${endOfDay.plusYears(1)}", HttpMethod.GET,
+            "/api/rest/orders?filter=created=ge=${startOfDay.plusYears(1)};created=le=${endOfDay.plusYears(1)}",
+            HttpMethod.GET,
             null,
-            parameterizedTypeReference<RestResponsePage<Order>>()
+            parameterizedTypeReference<RestResponsePage<Order>>(),
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -229,9 +256,10 @@ class RestServicesIT {
         // ============================
         val firstOrderLine = orderLines.first()
         val firstOrderLineProduct = restTemplate.exchange(
-            "/api/rest/orderLines/${firstOrderLine.id}/product", HttpMethod.GET,
+            "/api/rest/orderLines/${firstOrderLine.id}/product",
+            HttpMethod.GET,
             null,
-            Product::class.java
+            Product::class.java,
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -251,22 +279,22 @@ class RestServicesIT {
         ).map { OrderInfo(it.email, it.comment) }
         assertThat(orderInfosPage.content).isNotEmpty
         assertEquals(2, orderInfosPage.totalElements)
-        assertThat(orderInfosPage.content.last().email).isEqualTo(order.email)
+        assertThat(orderInfosPage.content.last().email).isEqualTo(patchedOrder.email)
     }
 
     @Test
     fun testScrudForIdType() {
         logger.info("Create some customers")
         for (i in 1..3) {
-
             val customer = Customer(name = "User$i Name$i", phoneNumber = "1234556789$i", address = "Foo Av. $i Bar, Baz")
 
             logger.debug("Saving customer: $customer")
 
             restTemplate.exchange(
-                "/api/rest/customers", HttpMethod.POST,
+                "/api/rest/customers",
+                HttpMethod.POST,
                 HttpEntity(customer),
-                Customer::class.java
+                Customer::class.java,
             ).let {
                 assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
                 assertThat(it.body).isNotNull
@@ -276,9 +304,10 @@ class RestServicesIT {
 
         logger.info("Search customers")
         val customersPage = restTemplate.exchange(
-            "/api/rest/customers?filter=name=like=Name1", HttpMethod.GET,
+            "/api/rest/customers?filter=name=like=Name1",
+            HttpMethod.GET,
             null,
-            parameterizedTypeReference<RestResponsePage<Customer>>()
+            parameterizedTypeReference<RestResponsePage<Customer>>(),
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -289,9 +318,10 @@ class RestServicesIT {
         assertThat(customer1.address).isEqualTo("Foo Av. 1 Bar, Baz")
         val customerIdentifierAdapter = identifierAdapterRegistry.getServiceForEntityType(Customer::class.java)
         customer1 = restTemplate.exchange(
-            "/api/rest/customers/${customerIdentifierAdapter.identifierAdapter.getIdAsString(customer1)}", HttpMethod.GET,
+            "/api/rest/customers/${customerIdentifierAdapter.identifierAdapter.getIdAsString(customer1)}",
+            HttpMethod.GET,
             null,
-            Customer::class.java
+            Customer::class.java,
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -301,9 +331,10 @@ class RestServicesIT {
         val updatedAddress = "${customer1.address} updated"
         customer1.address = updatedAddress
         customer1 = restTemplate.exchange(
-            "/api/rest/customers/${customerIdentifierAdapter.identifierAdapter.getIdAsString(customer1)}", HttpMethod.PUT,
+            "/api/rest/customers/${customerIdentifierAdapter.identifierAdapter.getIdAsString(customer1)}",
+            HttpMethod.PUT,
             HttpEntity(customer1),
-            Customer::class.java
+            Customer::class.java,
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -311,9 +342,10 @@ class RestServicesIT {
         }
         // Validate customer update
         customer1 = restTemplate.exchange(
-            "/api/rest/customers/${customerIdentifierAdapter.identifierAdapter.getIdAsString(customer1)}", HttpMethod.GET,
+            "/api/rest/customers/${customerIdentifierAdapter.identifierAdapter.getIdAsString(customer1)}",
+            HttpMethod.GET,
             null,
-            Customer::class.java
+            Customer::class.java,
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -326,9 +358,10 @@ class RestServicesIT {
     fun testScrudForEmbeddedId() {
         // Get LOTR books
         val products = restTemplate.exchange(
-            "/api/rest/products?filter=name=like=LOTR ", HttpMethod.GET,
+            "/api/rest/products?filter=name=like=LOTR ",
+            HttpMethod.GET,
             null,
-            parameterizedTypeReference<RestResponsePage<Product>>()
+            parameterizedTypeReference<RestResponsePage<Product>>(),
         ).let {
             assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
             assertThat(it.body).isNotNull
@@ -341,7 +374,7 @@ class RestServicesIT {
                 if (leftProduct != rightProduct) { // Test Create
                     val id = ProductRelationshipIdentifier(
                         left = leftProduct,
-                        right = rightProduct
+                        right = rightProduct,
                     )
                     val description = "Part of LOTR trilogy"
                     var relationship = ProductRelationship(id = id, description = description)
@@ -353,9 +386,10 @@ class RestServicesIT {
                     }
 
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships", HttpMethod.POST,
+                        "/api/rest/productRelationships",
+                        HttpMethod.POST,
                         HttpEntity(relationship),
-                        ProductRelationship::class.java
+                        ProductRelationship::class.java,
                     ).let {
                         assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
                         assertThat(it.body).isNotNull
@@ -368,9 +402,10 @@ class RestServicesIT {
                     val relationshipId = relIdAdapter.getIdAsString(relationship)
                     logger.debug("Look up relationship for ID: $relationshipId")
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships/$relationshipId", HttpMethod.PUT,
+                        "/api/rest/productRelationships/$relationshipId",
+                        HttpMethod.PUT,
                         HttpEntity(relationship),
-                        ProductRelationship::class.java
+                        ProductRelationship::class.java,
                     ).let {
                         assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
                         assertThat(it.body).isNotNull
@@ -380,9 +415,10 @@ class RestServicesIT {
                     val patch: MutableMap<String, Any> = HashMap()
                     patch["description"] = "${relationship.description}_patched"
                     restTemplate.exchange(
-                        "/api/rest/productRelationships/$relationshipId", HttpMethod.PATCH,
+                        "/api/rest/productRelationships/$relationshipId",
+                        HttpMethod.PATCH,
                         HttpEntity(patch),
-                        ProductRelationship::class.java
+                        ProductRelationship::class.java,
                     ).let {
                         assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
                         assertThat(it.body).isNotNull
@@ -390,9 +426,10 @@ class RestServicesIT {
                     }
                     // Test Read
                     relationship = restTemplate.exchange(
-                        "/api/rest/productRelationships/$relationshipId", HttpMethod.GET,
+                        "/api/rest/productRelationships/$relationshipId",
+                        HttpMethod.GET,
                         null,
-                        ProductRelationship::class.java
+                        ProductRelationship::class.java,
                     ).let {
                         assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
                         assertThat(it.body).isNotNull

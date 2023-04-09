@@ -2,66 +2,66 @@
 title: Model Mapping
 ---
 
-Once you have added ScrudBeans in your project, you can have it process your entity models to  
+Once you have added ScrudBeans in your project, you can have it process your entity models to
 create SCRUD components and services everytime your build runs.
 
-> At the moment, only JPA entities are supported. Future versions may support additional Spring Data sub-projects. 
+> At the moment, only JPA entities are supported. Future versions may support additional Spring Data sub-projects.
 
 ## Mapping Prerequisites
 
 Model driven services are enabled per entity provided two conditions are met:
- 
- - It must be annotated with `@ScrudBean`.
- - It must have a non-primitive id.
+
+- It must be annotated with `@ScrudBean`.
+- It must have a non-primitive id.
 
 ## Mapping Examples
- 
- As an example, consider an `Order` entity in 
- [Java](https://github.com/manosbatsis/scrudbeans-template-java/blob/master/src/main/java/myjavapackage/model/Order.java) or 
- [Kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin/blob/master/src/main/kotlin/mykotlinpackage/model/Order.kt).
- 
- Java example:
- 
- ```java
+
+As an example, consider an `Order` entity in
+[Java](https://github.com/manosbatsis/scrudbeans-template-java/blob/master/src/main/java/myjavapackage/model/Order.java) or
+[Kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin/blob/master/src/main/kotlin/mykotlinpackage/model/Order.kt).
+
+Java example:
+
+```java
 @Entity
 @Table(name = "product_orders")
 @ScrudBean
 public class Order extends AbstractSystemUuidPersistableModel {
 
-	// ScrudBeans will automatically pick-up Bean Validation and Column annotations 
+	// ScrudBeans will automatically pick-up Bean Validation and Column annotations
 	// to validate e.g. for both not-null and unique values
 	@NotNull
 	@Column(nullable = false, unique = true)
 	private String email;
-	
+
 	// other members...
 }
-``` 
- Kotlin example:
- 
- ```kotlin
+```
+Kotlin example:
+
+```kotlin
 @Entity
 @Table(name = "product_orders")
 @ScrudBean
 data class Order(
 
-        @field:Id
-        @field:GeneratedValue(generator = "system-uuid")
-        @field:GenericGenerator(name = "system-uuid", strategy = "uuid2")
-        var id: String? = null,
+		@field:Id
+		@field:GeneratedValue(generator = "system-uuid")
+		@field:GenericGenerator(name = "system-uuid", strategy = "uuid2")
+		var id: String? = null,
 
-        @field:NotNull
-        @field:Column(nullable = false)
-        @field:Schema(title = "The client's email", required = true)
-        var email: String? = null,
+		@field:NotNull
+		@field:Column(nullable = false)
+		@field:Schema(title = "The client's email", required = true)
+		var email: String? = null,
 
-        // other constructor params...
+		// other constructor params...
 
 ) : AbstractHibernateKPersistable<String>()
 ```
 
-That is enough for ScrudBeans to create the appropriate components and expose RESTful services for 
-SCRUD, meaning _Search, Create, Update and Delete_ operations for the entity type. This is explained 
+That is enough for ScrudBeans to create the appropriate components and expose RESTful services for
+SCRUD, meaning _Search, Create, Update and Delete_ operations for the entity type. This is explained
 further in the next chapter.
 
 ## Relevant Annotations
@@ -69,7 +69,7 @@ further in the next chapter.
 ### ScrudBean
 
 The `@ScrudBean` annotation marks the entity model for annotation processing and, optionally, provides relevant metadata.
-The annotation processors have a reasonable strategy for creating those metadata themselves when missing. The following shorthand 
+The annotation processors have a reasonable strategy for creating those metadata themselves when missing. The following shorthand
 for example:
 
 ```java
@@ -80,15 +80,15 @@ Is equivalent to:
 
 ```java
 @ScrudBean(
-	pathFragment = "discountCodes", 
-	apiName = "Discount Codes", 
+	pathFragment = "discountCodes",
+	apiName = "Discount Codes",
 	apiDescription = "Search or manage Discount Code entries")
 public class DiscountCode { //...
 ```
 
 About the annotation members:
 
-- `pathFragment` is the path fragment appended to the API base path (by default `api/rest/`), thus forming the base 
+- `pathFragment` is the path fragment appended to the API base path (by default `api/rest/`), thus forming the base
 `RequestMapping` path for this entity's REST controller.
 - `apiName` and `apiDescription` is used to annotate generated controllers with `io.swagger.v3.oas.annotations.tags.Tag`.
 - `apiDescription` is equivalent to `io.swagger.annotations.Api#description`.
@@ -100,25 +100,25 @@ About the annotation members:
 
 - `jakarta.persistence.Column` for not-null and unique values
 - `jakarta.validation.constraints` annotations
-- Any custom Java Bean Validation annotation. See `Unique` for an 
+- Any custom Java Bean Validation annotation. See `Unique` for an
 example, or create your own.
 
 ### Documentation
 
-Annotating your classes properly per [SpringDoc](https://springdoc.github.io/springdoc-openapi-demos/) and Swagger 3  
+Annotating your classes properly per [SpringDoc](https://springdoc.github.io/springdoc-openapi-demos/) and Swagger 3
 will increase the quality of documentation, e.g. for Swagger UI.
 
 
 ## Java Base Models
 
-__Java only__: As an alternative to implementing `PersistableModel`, you may instead extend the  
-`@MappedSuperclass`annotated type within the `com.github.manosbatsis.scrudbeans.jpa.model` package 
-that matches the target `@Id` type, see bellow. 
+__Java only__: As an alternative to implementing `PersistableModel`, you may instead extend the
+`@MappedSuperclass`annotated type within the `com.github.manosbatsis.scrudbeans.jpa.model` package
+that matches the target `@Id` type, see bellow.
 
-### Hibernate 
+### Hibernate
 
-Extending `AbstractHibernateModel` with your Java entity is the simplest way 
-for Hibernate users to implement Spring's `Persistable`. 
+Extending `AbstractHibernateModel` with your Java entity is the simplest way
+for Hibernate users to implement Spring's `Persistable`.
 
 ```java
 @Entity
@@ -126,12 +126,12 @@ for Hibernate users to implement Spring's `Persistable`.
 @ScrudBean
 public class Order extends AbstractHibernateModel<String> {
 
-    @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid2")
-    private String id;
+	@Id
+	@GeneratedValue(generator = "system-uuid")
+	@GenericGenerator(name = "system-uuid", strategy = "uuid2")
+	private String id;
 
-    //...
+	//...
 }
 ```
 
@@ -160,21 +160,21 @@ public class DiscountCode extends AbstractAutoGeneratedLongIdPersistableModel {/
 
 ### Assigned IDs
 
-To use assigned (i.e. manual) IDs, you can extend `AbstractAssignedIdPersistableModel`. It's generic, 
+To use assigned (i.e. manual) IDs, you can extend `AbstractAssignedIdPersistableModel`. It's generic,
 so you can specify the ID type required. e.g. for `Long`:
 
 ```java
-@Entity 
+@Entity
 @ScrudBean
 @Table(name = "slot")
 public class Slot extends AbstractAssignedIdPersistableModel<Long> {/* ...*/ }
 ```
 
-You can use `@AttributeOverrides` to apply more specific restrictions, for example a string with a 
+You can use `@AttributeOverrides` to apply more specific restrictions, for example a string with a
 maximum length of two characters:
 
 ```java
-@Entity 
+@Entity
 @ScrudBean
 @Table(name = "country")
 @AttributeOverrides({
@@ -185,33 +185,33 @@ public class Country extends AbstractAssignedIdPersistableModel<String> {/* ...*
 
 ## Composite IDs
 
-Some times you need to use composite IDs in your models, e.g. when working with a legacy database design. 
-This introduces some complexity in a number of areas where the ID must be handled in a regular RESTful way, 
+Some times you need to use composite IDs in your models, e.g. when working with a legacy database design.
+This introduces some complexity in a number of areas where the ID must be handled in a regular RESTful way,
 including request mapping bindings of path or query parameters.
 
-This requires using an `@EmbeddedId` with your entity, providing your (`@Embeddable) implementation of an 
+This requires using an `@EmbeddedId` with your entity, providing your (`@Embeddable) implementation of an
 `EmbeddableCompositeIdentifier`.
 
-To help making this easier out of the boxfor Java, ScrudBeans provides a number of embeddable ID 
-implementations you can extend from, depending on the number of columns/fields needed for your composite ID, 
-namely `AbstractEmbeddableManyToManyIdentifier`, `AbstractEmbeddableTripleIdentifier`, 
+To help making this easier out of the boxfor Java, ScrudBeans provides a number of embeddable ID
+implementations you can extend from, depending on the number of columns/fields needed for your composite ID,
+namely `AbstractEmbeddableManyToManyIdentifier`, `AbstractEmbeddableTripleIdentifier`,
 `AbstractEmbeddableQuadrupleIdentifier` and `AbstractEmbeddableQuintupleIdentifier`.
 
 > You can create custom composite IDs by implementing `EmbeddableCompositeIdentifier`.
 
-For an example, consider a case where you need to assign additional attributes to a many-to-many 
-relationship between models, like a `Friendship` between two `User`s, along with the requirement 
-of using their two user keys as a composite ID. For cases like these, you can easily create a mapping 
-that "just works" in two steps. 
+For an example, consider a case where you need to assign additional attributes to a many-to-many
+relationship between models, like a `Friendship` between two `User`s, along with the requirement
+of using their two user keys as a composite ID. For cases like these, you can easily create a mapping
+that "just works" in two steps.
 
-First, begin by extending `AbstractEmbeddableManyToManyIdentifier` 
+First, begin by extending `AbstractEmbeddableManyToManyIdentifier`
 to create a new `@Embeddable` ID type:
- 
+
 
 ```java
 @Embeddable
-public class FriendshipIdentifier 
-	extends AbstractEmbeddableManyToManyIdentifier<User, String, User, String> 
+public class FriendshipIdentifier
+	extends AbstractEmbeddableManyToManyIdentifier<User, String, User, String>
 	implements Serializable {
 
 	@Override
@@ -231,7 +231,7 @@ public class FriendshipIdentifier
 }
 ```
 
-Depending on the identifier superclass, you'll need to implement a number of `buildX` methods as above. 
+Depending on the identifier superclass, you'll need to implement a number of `buildX` methods as above.
 
 Then, use the new `@Embeddable` identifier as the entity ID type of a `PersistableModel`:
 
@@ -240,14 +240,13 @@ Then, use the new `@Embeddable` identifier as the entity ID type of a `Persistab
 @Entity
 @Table(name = "friendship")
 public class Friendship implements PersistableModel<FriendshipIdentifier> {
-	
+
 	@NotNull
 	@ApiModelProperty(required = true)
 	@EmbeddedId
 	private FriendshipIdentifier id;
-	
+
 	// Other members...
-	
+
 }
 ```
-
