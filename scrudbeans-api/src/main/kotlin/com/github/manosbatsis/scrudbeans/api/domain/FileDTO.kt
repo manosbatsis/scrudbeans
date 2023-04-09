@@ -27,7 +27,7 @@ data class FileDTO(
     var contentType: String? = null,
     var `in`: File? = null,
     var path: String? = null,
-    var tmpFile: File? = null
+    var tmpFile: File? = null,
 
 ) {
     class Builder {
@@ -67,7 +67,7 @@ data class FileDTO(
                 contentType = contentType,
                 `in` = `in`,
                 path = path,
-                tmpFile = tmpFile
+                tmpFile = tmpFile,
             )
         }
     }

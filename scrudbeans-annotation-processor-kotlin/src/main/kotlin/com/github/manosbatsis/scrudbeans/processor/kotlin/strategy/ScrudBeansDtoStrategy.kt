@@ -16,13 +16,16 @@ class ScrudBeansDtoStrategy(
             dtoNameStrategy = dtoNameStrategy,
             dtoTypeStrategy = dtoTypeStrategy,
             dtoMembersStrategy = ScrudBeansDtoMembersStrategy(
-                annotatedElementInfo, dtoNameStrategy, dtoTypeStrategy
-            )
+                annotatedElementInfo,
+                dtoNameStrategy,
+                dtoTypeStrategy,
+            ),
         )
-    }
+    },
 
 ) : CompositeDtoStrategy(
-    annotatedElementInfo, composition
+    annotatedElementInfo,
+    composition,
 ),
     ProcessingEnvironmentAware,
     AnnotatedElementInfo by annotatedElementInfo

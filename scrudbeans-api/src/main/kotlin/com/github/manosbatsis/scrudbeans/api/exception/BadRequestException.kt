@@ -29,5 +29,5 @@ class BadRequestException(
     message: String? = null,
     cause: Throwable? = null,
     status: HttpStatus = HttpStatus.BAD_REQUEST,
-    val errors: List<String>? = null
+    val errors: List<String>? = null,
 ) : SystemException(message, cause, status)

@@ -1,17 +1,14 @@
 plugins {
-    buildsrc.convention.`kotlin-jvm-spring`
-    id("org.springframework.boot")
+    `java-library`
+    kotlin("jvm")
     buildsrc.convention.`publish-jvm`
 }
 
-tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
-    enabled = false
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
-
 dependencies {
     api(project(":scrudbeans-spring-boot-autoconfigure"))
-    // implementation("org.springframework.boot:spring-boot-autoconfigure")
-    // implementation("org.springframework.boot:spring-boot-starter-web")
-    // implementation("org.springframework.boot:spring-boot-starter-validation")
-    // implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation(platform(libs.spring.boot.dependencies))
 }

@@ -6,18 +6,18 @@ import com.github.manosbatsis.scrudbeans.logging.contextLogger
 import com.github.manosbatsis.scrudbeans.repository.JpaEntityProjectorRepository
 import io.github.perplexhub.rsql.RSQLJPASupport
 import io.github.perplexhub.rsql.RSQLJPASupport.toSpecification
+import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
-import jakarta.persistence.EntityManager
+import java.util.Optional
 
 abstract class AbstractJpaEntityProjectorService<T : Any, S : Any, B : JpaEntityProjectorRepository<T, S>>(
     repository: B,
     entityManager: EntityManager,
-    identifierAdapter: IdentifierAdapter<T, S>
+    identifierAdapter: IdentifierAdapter<T, S>,
 ) : AbstractJpaEntityService<T, S, B>(repository, entityManager, identifierAdapter),
     JpaEntityProjectorService<T, S> {
 
@@ -36,25 +36,28 @@ abstract class AbstractJpaEntityProjectorService<T : Any, S : Any, B : JpaEntity
         sortDirection: Sort.Direction,
         pageNumber: Int,
         pageSize: Int,
-        projection: Class<P>
+        projection: Class<P>,
     ): Page<P> =
-        if (filter.isBlank()) repository.findBy(
-            PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy)),
-            projection
-        )
-        else findAllProjectedBy(
-            toSpecification<T>(filter).and(RSQLJPASupport.toSort("$sortBy,${sortDirection.toString().lowercase()}")),
-            pageNumber,
-            pageSize,
-            projection
-        )
+        if (filter.isBlank()) {
+            repository.findBy(
+                PageRequest.of(pageNumber, pageSize, Sort.by(sortDirection, sortBy)),
+                projection,
+            )
+        } else {
+            findAllProjectedBy(
+                toSpecification<T>(filter).and(RSQLJPASupport.toSort("$sortBy,${sortDirection.toString().lowercase()}")),
+                pageNumber,
+                pageSize,
+                projection,
+            )
+        }
 
     @Transactional(readOnly = true)
     override fun <P> findAllProjectedBy(
         specification: Specification<T>,
         pageNumber: Int,
         pageSize: Int,
-        projection: Class<P>
+        projection: Class<P>,
     ): Page<P> = repository.findBy(specification, PageRequest.of(pageNumber, pageSize), projection)
 
     @Transactional(readOnly = true)

@@ -1,0 +1,40 @@
+[versions]
+dokka-version = '1.8.10'
+evo-inflector-version = '1.3'
+junit-version = '5.8.2'
+kotlinpoet-version = '1.12.0'
+kotlin-version = '1.8.20'
+kotlin-utils-version = '0.37'
+nexus-publish-version = '1.1.0'
+spring-boot-version = '3.0.5'
+spring-boot-management-version = '1.1.0'
+springdoc-version = '1.6.9'
+spotless-version = '6.18.0'
+strikt-version = '0.33.0'
+perplexhub-rsql-version = '6.0.4'
+wimdeblauwe-error-handling-spring-boot-version = '4.1.0'
+
+[libraries]
+evo-inflector = { module = "org.atteo:evo-inflector", version.ref = "evo-inflector-version" }
+junit = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-version" }
+kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet-version" }
+kotlin-utils-api = { module = "com.github.manosbatsis.kotlin-utils:kotlin-utils-api", version.ref = "kotlin-utils-version" }
+kotlin-utils-kapt = { module = "com.github.manosbatsis.kotlin-utils:kotlin-utils-kapt", version.ref = "kotlin-utils-version" }
+strikt = { module = "io.strikt:strikt-core", version.ref = "strikt-version" }
+spring-boot-dependencies = { module = "org.springframework.boot:spring-boot-dependencies", version.ref = "spring-boot-version" }
+springdoc-openapi-kotlin = { module = "org.springdoc:springdoc-openapi-kotlin", version.ref = "springdoc-version" }
+rsql-jpa-spring-boot-starter = { module = "io.github.perplexhub:rsql-jpa-spring-boot-starter", version.ref = "perplexhub-rsql-version" }
+error-handling-spring-boot-starter = { module = "io.github.wimdeblauwe:error-handling-spring-boot-starter", version.ref = "wimdeblauwe-error-handling-spring-boot-version" }
+
+[bundles]
+
+[plugins]
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka-version" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin-version" }
+kotlin-lang = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
+kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin-version" }
+nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexus-publish-version" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot-version" }
+spring-dependencymanager = { id = "io.spring.dependency-management", version.ref = "spring-boot-management-version" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless-version" }
+

@@ -8,11 +8,11 @@ import jakarta.persistence.EntityManager
 abstract class CustomBaseServiceImpl<T : Any, S : Any, B : JpaEntityProjectorRepository<T, S>>(
     repository: B,
     entityManager: EntityManager,
-    identifierAdapter: IdentifierAdapter<T, S>
+    identifierAdapter: IdentifierAdapter<T, S>,
 ) : AbstractJpaEntityProjectorService<T, S, B>(
     repository,
     entityManager,
-    identifierAdapter
+    identifierAdapter,
 ),
     CustomBaseService<T, S> {
 

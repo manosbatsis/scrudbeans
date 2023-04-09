@@ -66,7 +66,7 @@ annotation class ScrudBean(
      * May be used to determine the target transaction manager,
      * matching the qualifier value (or the bean name) of a specific TransactionManager bean definition.
      */
-    val transactionManager: String = ""
+    val transactionManager: String = "",
 ) {
     companion object {
         /**

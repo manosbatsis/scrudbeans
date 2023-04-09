@@ -7,12 +7,12 @@ import com.github.manosbatsis.kotlin.utils.kapt.processor.AnnotatedElementInfo
 open class ScrudBeansDtoMembersStrategy(
     annotatedElementInfo: AnnotatedElementInfo,
     dtoNameStrategy: DtoNameStrategy,
-    dtoTypeStrategy: DtoTypeStrategy
+    dtoTypeStrategy: DtoTypeStrategy,
 ) : SimpleDtoMembersStrategy(annotatedElementInfo, dtoNameStrategy, dtoTypeStrategy) {
 
     /** Alt constructor using a "root" strategy  */
     constructor(
-        rootDtoStrategy: DtoStrategyLesserComposition
+        rootDtoStrategy: DtoStrategyLesserComposition,
     ) : this(rootDtoStrategy.annotatedElementInfo, rootDtoStrategy, rootDtoStrategy) {
         this.rootDtoStrategy = rootDtoStrategy
     }

@@ -10,7 +10,9 @@ import jakarta.persistence.Entity
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.IOException
-import java.util.*
+import java.util.LinkedList
+import java.util.Objects
+import java.util.Properties
 import javax.annotation.processing.*
 import javax.lang.model.SourceVersion
 import javax.lang.model.element.Name
@@ -34,7 +36,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
         const val KAPT_KOTLIN_SCRUDBEANS_GENERATED_OPTION_NAME = "kapt.kotlin.vaultaire.generated"
         const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
 
-        val TYPE_PARAMETER_STAR = WildcardTypeName.producerOf(Any::class.asTypeName().copy(nullable = true))
+        val typeParameterStar = WildcardTypeName.producerOf(Any::class.asTypeName().copy(nullable = true))
     }
 
     private var complete = false
@@ -136,43 +138,20 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     }
 
     /**
-     * Create JPA query predicate factories for each entity in the source path
-     * @param roundEnv The current compilation round environment
-     private fun generateEntityPredicateFactories(roundEnv: RoundEnvironment) {
-     val entities = roundEnv.getElementsAnnotatedWith(ScrudBean::class.java)
-     for (element in entities) {
-     try {
-     if (element.getAnnotation(Entity::class.java) != null) {
-     if (element is TypeElement) {
-     processingEnv.noteMessage { "generateEntityPredicateFactories, processing element: ${element.simpleName}" }
-     val descriptor = EntityModelDescriptor(processingEnv, element)
-     createPredicateFactory(descriptor)
-     } else {
-     processingEnv.noteMessage { "Not an instance of TypeElement but annotated with ScrudBean: ${element.simpleName}" }
-     }
-     }
-     } catch (e: RuntimeException) {
-     processingEnv.errorMessage { "Error generating components for element.simpleName ${e.message}: " }
-     throw e
-     } catch (e: ScrudModelProcessorException) {
-     e.printStackTrace()
-     processingEnv.errorMessage { "Error generating components for ${element.simpleName}: " + e.message }
-     throw e
-     }
-
-     }
-     }
-     */
-
-    /**
      * Create a SCRUD REST controller source file
      * @param descriptor The target model descriptor
      * @return the written file
      */
     private fun createController(descriptor: ScrudModelDescriptor): FileSpec? {
-        return if (ScrudBean.NONE != descriptor.scrudBean.controllerSuperClass)
-            writeKotlinFile(descriptor, typeSpecBuilder.createController(descriptor), descriptor.parentPackageName + ".controller")
-        else null
+        return if (ScrudBean.NONE != descriptor.scrudBean.controllerSuperClass) {
+            writeKotlinFile(
+                descriptor,
+                typeSpecBuilder.createController(descriptor),
+                descriptor.parentPackageName + ".controller",
+            )
+        } else {
+            null
+        }
     }
 
     /**
@@ -183,8 +162,7 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
     private fun createService(descriptor: ScrudModelDescriptor): List<FileSpec?> {
         val files = LinkedList<FileSpec?>()
         // Ensure a service has not already been created
-        val serviceQualifiedName = descriptor.parentPackageName +
-            ".service." + descriptor.simpleName + "Service"
+        val serviceQualifiedName = descriptor.parentPackageName + ".service." + descriptor.simpleName + "Service"
         val existing = processingEnv.elementUtils.getTypeElement(serviceQualifiedName)
         if (Objects.isNull(existing)) {
             files.add(createServiceInterface(descriptor))
@@ -232,23 +210,12 @@ class ScrudModelAnnotationProcessor : AbstractProcessor(), ProcessingEnvironment
      */
     private fun createIdAdapters(descriptor: ScrudModelDescriptor): List<FileSpec> {
         return listOf(
-            ClassName(descriptor.packageName, descriptor.simpleName)/*,
-                ClassName(descriptor.packageName, descriptor.simpleName + "Dto")*/
+            ClassName(descriptor.packageName, descriptor.simpleName),
         )
             .mapNotNull {
                 writeKotlinFile(descriptor, typeSpecBuilder.createIdAdapter(it, descriptor), descriptor.packageName)
             }
     }
-
-    /**
-     * Create a JPA specification predicate factory source file
-     * @param descriptor The target model descriptor
-     * @return the written file
-     private fun createPredicateFactory(descriptor: EntityModelDescriptor): FileSpec? {
-     val typeSpec = typeSpecBuilder.createPredicateFactory(descriptor)
-     return writeKotlinFile(descriptor, typeSpec, descriptor.parentPackageName + ".specification")
-     }
-     */
 
     /**
      * Write and return a source file for the given [TypeSpec]

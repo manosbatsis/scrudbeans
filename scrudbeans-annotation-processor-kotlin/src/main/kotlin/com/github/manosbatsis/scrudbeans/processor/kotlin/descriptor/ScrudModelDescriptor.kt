@@ -2,7 +2,7 @@ package com.github.manosbatsis.scrudbeans.processor.kotlin.descriptor
 
 import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
 import com.squareup.kotlinpoet.ClassName
-import java.util.*
+import java.util.Properties
 import javax.annotation.processing.ProcessingEnvironment
 import javax.lang.model.element.TypeElement
 
@@ -13,12 +13,12 @@ import javax.lang.model.element.TypeElement
 class ScrudModelDescriptor(
     processingEnvironment: ProcessingEnvironment,
     typeElement: TypeElement,
-    val configProperties: Properties
+    val configProperties: Properties,
 ) : EntityModelDescriptor(processingEnvironment, typeElement) {
     companion object {
         val ignoredClassNameStringValues = setOf(
             java.lang.Object::class.java.canonicalName,
-            Any::class.java.canonicalName
+            Any::class.java.canonicalName,
         )
     }
 

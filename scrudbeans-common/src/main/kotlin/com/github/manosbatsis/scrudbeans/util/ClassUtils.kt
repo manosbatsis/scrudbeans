@@ -22,7 +22,6 @@ package com.github.manosbatsis.scrudbeans.util
 
 import com.github.manosbatsis.scrudbeans.logging.loggerFor
 import java.lang.reflect.Field
-import java.util.*
 
 object ClassUtils {
     private val logger = loggerFor<ClassUtils>()

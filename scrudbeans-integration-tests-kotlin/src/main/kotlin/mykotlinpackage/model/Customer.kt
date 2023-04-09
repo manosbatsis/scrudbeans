@@ -15,5 +15,5 @@ class Customer(
     @field:Id
     var phoneNumber: String? = null,
 
-    var address: String? = null
+    var address: String? = null,
 )

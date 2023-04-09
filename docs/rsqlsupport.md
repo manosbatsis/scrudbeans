@@ -2,7 +2,7 @@
 title: RSQL Support
 ---
 
-ScrudBeans supports search by either URL params or RSQL and a `filter` param. RSQL is a query 
+ScrudBeans supports search by either URL params or RSQL and a `filter` param. RSQL is a query
 language for parametrized filtering of entries in RESTful APIs.
 
 It’s based on <a href="http://tools.ietf.org/html/draft-nottingham-atompub-fiql-00">FIQL</a> (Feed Item Query Language), a URI-friendly syntax for expressing filters across the entries in an Atom Feed.

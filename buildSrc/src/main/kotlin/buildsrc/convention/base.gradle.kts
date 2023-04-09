@@ -17,5 +17,5 @@ if (project != rootProject) {
 testlogger {
     setTheme("mocha-parallel")
     slowThreshold = 1000
-    showStandardStreams = false
+    showStandardStreams = true
 }

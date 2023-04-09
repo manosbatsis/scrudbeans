@@ -62,7 +62,7 @@ class ScrudBeansSampleApplication {
     fun demo(
         orderService: OrderService,
         orderLineService: OrderLineService,
-        productService: ProductService
+        productService: ProductService,
     ): CommandLineRunner {
         return CommandLineRunner { args: Array<String?>? ->
             // save a few products
@@ -78,7 +78,7 @@ class ScrudBeansSampleApplication {
                 var orderLine = OrderLine(
                     order = order,
                     product = p,
-                    quantity = 2
+                    quantity = 2,
                 )
                 orderLine = orderLineService.save(orderLine)
             }

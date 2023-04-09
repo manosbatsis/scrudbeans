@@ -1,6 +1,6 @@
 package mykotlinpackage.dto
 
-import java.util.*
+import java.util.UUID
 
 class OrderUpdateCommentDTO {
     val id: UUID? = null

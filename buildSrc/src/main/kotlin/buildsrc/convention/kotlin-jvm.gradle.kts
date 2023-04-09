@@ -1,6 +1,6 @@
 package buildsrc.convention
 
-import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
+import Deps
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
@@ -11,7 +11,7 @@ plugins {
     id("org.jetbrains.dokka")
 
     id("buildsrc.convention.base")
-    id("org.jlleitschuh.gradle.ktlint")
+    // id("org.jlleitschuh.gradle.ktlint")
     // TODO id("buildsrc.convention.detekt")
 }
 
@@ -21,7 +21,7 @@ dependencies {
     testImplementation(Deps.Mockk.mockk)
     testImplementation(Deps.Mockk.dslJvm)
 }
-
+/*
 configure<KtlintExtension> {
     verbose.set(true)
     disabledRules.set(
@@ -32,6 +32,7 @@ configure<KtlintExtension> {
         )
     )
 }
+ */
 
 kotlin {
     //explicitApi()
@@ -52,9 +53,9 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.apply {
         jvmTarget = "17"
-        freeCompilerArgs += listOf("-Xjsr305=strict")
-        apiVersion = "1.6"
-        languageVersion = "1.6"
+        //freeCompilerArgs += listOf("-Xjsr305=strict")
+        apiVersion = "1.7"
+        languageVersion = "1.7"
     }
 }
 
@@ -66,8 +67,9 @@ tasks.withType<Test>().configureEach {
         "junit.jupiter.execution.parallel.mode.classes.default" to "concurrent"
     )
 }
-
+/*
 tasks.named<Jar>("javadocJar") {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from(tasks.dokkaJavadoc)
 }
+*/

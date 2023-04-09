@@ -9,19 +9,19 @@ import com.github.manosbatsis.scrudbeans.logging.contextLogger
 import com.github.manosbatsis.scrudbeans.repository.JpaEntityRepository
 import com.github.manosbatsis.scrudbeans.util.ClassUtils
 import io.github.perplexhub.rsql.RSQLJPASupport
+import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
-import jakarta.persistence.EntityManager
+import java.util.Optional
 
 abstract class AbstractJpaEntityService<T : Any, S : Any, B : JpaEntityRepository<T, S>>(
     protected val repository: B,
     protected val entityManager: EntityManager,
-    override val identifierAdapter: IdentifierAdapter<T, S>
+    override val identifierAdapter: IdentifierAdapter<T, S>,
 ) : JpaEntityService<T, S> {
 
     companion object {
@@ -66,31 +66,38 @@ abstract class AbstractJpaEntityService<T : Any, S : Any, B : JpaEntityRepositor
         sortBy: String?,
         sortDirection: Sort.Direction,
         pageNumber: Int,
-        pageSize: Int
+        pageSize: Int,
     ): Page<T> {
-        return if (filter.isBlank()) repository.findAll(
-            PageRequest.of(
-                pageNumber, pageSize,
-                sortBy
-                    ?.let { Sort.by(sortDirection, sortBy) }
-                    ?: Sort.unsorted()
+        return if (filter.isBlank()) {
+            repository.findAll(
+                PageRequest.of(
+                    pageNumber,
+                    pageSize,
+                    sortBy
+                        ?.let { Sort.by(sortDirection, sortBy) }
+                        ?: Sort.unsorted(),
+                ),
             )
-        )
-        else findAll(
-            RSQLJPASupport.toSpecification<T>(filter).let {
-                if (sortBy != null)
-                    it.and(RSQLJPASupport.toSort("$sortBy,${sortDirection.toString().lowercase()}"))
-                else it
-            },
-            pageNumber, pageSize
-        )
+        } else {
+            findAll(
+                RSQLJPASupport.toSpecification<T>(filter).let {
+                    if (sortBy != null) {
+                        it.and(RSQLJPASupport.toSort("$sortBy,${sortDirection.toString().lowercase()}"))
+                    } else {
+                        it
+                    }
+                },
+                pageNumber,
+                pageSize,
+            )
+        }
     }
 
     @Transactional(readOnly = true)
     override fun findAll(
         specification: Specification<T>,
         pageNumber: Int,
-        pageSize: Int
+        pageSize: Int,
     ): Page<T> = repository.findAll(specification, PageRequest.of(pageNumber, pageSize))
 
     @Transactional(readOnly = true)
@@ -108,8 +115,9 @@ abstract class AbstractJpaEntityService<T : Any, S : Any, B : JpaEntityRepositor
         val persisted = getById(id)
         val patched = dto.toPatched(persisted)
         // TODO: maybe merge is enough?
-        if (dto is PersistenceHintsDto && dto.isDetachedUpdate())
+        if (dto is PersistenceHintsDto && dto.isDetachedUpdate()) {
             entityManager.detach(persisted)
+        }
         return repository.save(patched)
     }
 

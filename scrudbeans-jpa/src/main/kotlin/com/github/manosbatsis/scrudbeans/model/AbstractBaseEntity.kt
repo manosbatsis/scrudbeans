@@ -1,5 +1,6 @@
 package com.github.manosbatsis.scrudbeans.model
 
+import jakarta.persistence.*
 import org.apache.commons.lang3.builder.EqualsBuilder
 import org.apache.commons.lang3.builder.HashCodeBuilder
 import org.apache.commons.lang3.builder.ToStringBuilder
@@ -8,12 +9,12 @@ import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.time.LocalDateTime
 import java.util.*
-import jakarta.persistence.*
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
 open class AbstractAuditableEntity(
     id: UUID? = null,
+    version: Long? = null,
 
     @CreatedDate
     @Column(name = "created", nullable = false)
@@ -21,9 +22,8 @@ open class AbstractAuditableEntity(
 
     @LastModifiedDate
     @Column(name = "updated", nullable = false)
-    var updated: LocalDateTime? = null
-
-) : AbstractBaseEntity(id) {
+    var updated: LocalDateTime? = null,
+) : AbstractBaseEntity(id, version) {
 
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
@@ -65,13 +65,14 @@ open class AbstractAuditableEntity(
  * See https://docs.spring.io/spring-data/jpa/docs/current-SNAPSHOT/reference/html/#jpa.entity-persistence.saving-entites.strategies
  */
 @MappedSuperclass
-abstract class AbstractBaseEntity(id: UUID? = null) : UuidIdEntity {
+abstract class AbstractBaseEntity(id: UUID? = null, version: Long? = null) : UuidIdEntity {
 
-    @Id @Column(name = "id", length = 16, unique = true, nullable = false)
+    @Id
+    @Column(name = "id", length = 16, unique = true, nullable = false)
     override var id: UUID = id ?: UUID.randomUUID()
 
     @Version
-    var version: Long? = null
+    var version: Long? = version
 
     override fun equals(other: Any?): Boolean {
         return when {

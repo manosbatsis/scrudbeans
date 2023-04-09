@@ -5,13 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY
 import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.model.AbstractBaseEntity
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.persistence.*
+import jakarta.validation.constraints.NotNull
 import org.apache.commons.lang3.builder.HashCodeBuilder
 import org.apache.commons.lang3.builder.ToStringBuilder
 import org.hibernate.annotations.Formula
 import java.math.BigDecimal
 import java.util.*
-import jakarta.persistence.*
-import jakarta.validation.constraints.NotNull
 
 @Entity
 @Table(name = "order_lines")
@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotNull
 class OrderLine(
 
     id: UUID? = null,
+    version: Long? = null,
 
     @field:NotNull
     @field:Column(nullable = false)
@@ -41,8 +42,8 @@ class OrderLine(
     @field:ManyToOne
     @field:JoinColumn(referencedColumnName = "id", nullable = false, updatable = false)
     @field:Schema(title = "The parent order", required = true)
-    var order: Order? = null
-) : AbstractBaseEntity(id) {
+    var order: Order? = null,
+) : AbstractBaseEntity(id, version) {
 
     override fun equals(other: Any?): Boolean {
         return when {

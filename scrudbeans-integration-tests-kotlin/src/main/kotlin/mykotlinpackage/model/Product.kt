@@ -3,15 +3,16 @@ package mykotlinpackage.model
 import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.model.AbstractAuditableEntity
 import io.swagger.v3.oas.annotations.media.Schema
-import org.apache.commons.lang3.builder.EqualsBuilder
-import org.apache.commons.lang3.builder.HashCodeBuilder
-import org.apache.commons.lang3.builder.ToStringBuilder
-import java.math.BigDecimal
-import java.util.*
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
+import org.apache.commons.lang3.builder.EqualsBuilder
+import org.apache.commons.lang3.builder.HashCodeBuilder
+import org.apache.commons.lang3.builder.ToStringBuilder
+import java.math.BigDecimal
+import java.time.LocalDateTime
+import java.util.UUID
 
 @Entity
 @Table(name = "products")
@@ -19,6 +20,11 @@ import jakarta.validation.constraints.NotNull
 @Schema(name = "Product", description = "A model representing a single product")
 class Product(
     id: UUID? = null,
+    version: Long? = null,
+
+    created: LocalDateTime? = null,
+
+    updated: LocalDateTime? = null,
 
     @field:NotNull
     @field:Column(nullable = false)
@@ -33,8 +39,8 @@ class Product(
     @field:NotNull
     @field:Column(nullable = false)
     @field:Schema(type = "float", description = "The product price", required = true, example = "3.05")
-    var price: BigDecimal? = null
-) : AbstractAuditableEntity(id) {
+    var price: BigDecimal? = null,
+) : AbstractAuditableEntity(id, version, created, updated) {
 
     override fun equals(obj: Any?): Boolean {
         if (obj == null) return false

@@ -3,6 +3,11 @@ package mykotlinpackage.model
 import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
 import com.github.manosbatsis.scrudbeans.model.AbstractAuditableEntity
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.EntityListeners
+import jakarta.persistence.Table
+import jakarta.validation.constraints.NotNull
 import mykotlinpackage.service.CustomBaseService
 import mykotlinpackage.service.CustomBaseServiceImpl
 import org.apache.commons.lang3.builder.EqualsBuilder
@@ -10,11 +15,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder
 import org.apache.commons.lang3.builder.ToStringBuilder
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
 import java.util.*
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EntityListeners
-import jakarta.persistence.Table
-import jakarta.validation.constraints.NotNull
 
 @Entity
 @Table(name = "product_orders")

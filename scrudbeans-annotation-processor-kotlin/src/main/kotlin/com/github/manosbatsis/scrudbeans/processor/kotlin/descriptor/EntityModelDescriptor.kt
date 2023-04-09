@@ -18,7 +18,7 @@ import javax.tools.Diagnostic
  */
 open class EntityModelDescriptor(
     processingEnvironment: ProcessingEnvironment,
-    typeElement: TypeElement
+    typeElement: TypeElement,
 ) : ModelDescriptor(processingEnvironment, typeElement), ProcessingEnvironmentAware {
 
     companion object {
@@ -81,11 +81,10 @@ open class EntityModelDescriptor(
                 }
                 // Multiple @Id annotations were present
                 else -> {
-
                     processingEnvironment.messager.printMessage(
                         Diagnostic.Kind.WARNING,
                         "finalise, type: ${typeElement.asClassName().canonicalName}, compositeIdFieldNames: ${compositeIdFieldNames.joinToString { "," }}, " +
-                            "compositeIdClassNames: ${compositeIdClassNames.values.joinToString { "," }}"
+                            "compositeIdClassNames: ${compositeIdClassNames.values.joinToString { "," }}",
                     )
                     isIdClass = true
                     val idClassAnnotation = typeElement.findAnnotationMirror(IdClass::class.java)

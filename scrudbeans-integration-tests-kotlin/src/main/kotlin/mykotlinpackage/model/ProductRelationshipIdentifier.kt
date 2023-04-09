@@ -1,10 +1,10 @@
 package mykotlinpackage.model
 
 import io.swagger.v3.oas.annotations.media.Schema
-import java.io.Serializable
 import jakarta.persistence.Embeddable
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import java.io.Serializable
 
 /** Embeddable many2many identifier for [Product] relationships */
 @Embeddable
@@ -18,7 +18,7 @@ class ProductRelationshipIdentifier(
     @field:Schema(title = "The right part type", required = true)
     @field:JoinColumn(name = "right_id", nullable = false, updatable = false)
     @field:ManyToOne(optional = false)
-    val right: Product
+    val right: Product,
 ) : Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
