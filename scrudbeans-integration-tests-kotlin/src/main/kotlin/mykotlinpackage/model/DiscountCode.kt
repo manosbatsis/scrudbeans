@@ -1,7 +1,7 @@
 package mykotlinpackage.model
 
 import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.model.BaseEntity
+import com.github.manosbatsis.scrudbeans.model.AbstractPersistableEntity
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -18,10 +18,10 @@ import jakarta.validation.constraints.NotNull
 @Table(name = "discount_code")
 @ScrudBean
 @Schema(name = "DiscountCode", description = "A model representing an discount code")
-data class DiscountCode(
-    @field:Id
-    @field:GeneratedValue(strategy = IDENTITY)
-    override var id: Long = 0,
+class DiscountCode(
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    private val id: Long = 0,
 
     @field:NotNull
     @field:Column(nullable = false, unique = true, updatable = false)
@@ -32,4 +32,8 @@ data class DiscountCode(
     @field:Column(nullable = false)
     @field:Schema(title = "The discount percentage", required = true)
     var percentage: Int? = null,
-) : BaseEntity<Long>
+) : AbstractPersistableEntity<Long>() {
+    override fun getId(): Long {
+        return id
+    }
+}

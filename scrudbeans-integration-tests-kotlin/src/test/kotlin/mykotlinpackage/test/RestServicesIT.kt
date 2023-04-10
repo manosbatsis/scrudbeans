@@ -64,14 +64,54 @@ class RestServicesIT {
     }
 
     @Test
-    fun testScrud() {
+    fun testScrudPersistable() {
+        val discountCode = DiscountCode(code = "DISCOUNT_testScrudPersistable", percentage = 10)
+        val persistedDiscountCode = restTemplate.exchange(
+            "/api/rest/discountCodes",
+            HttpMethod.POST,
+            HttpEntity(discountCode),
+            DiscountCode::class.java,
+        ).let {
+            assertThat(it.statusCode).isEqualTo(HttpStatus.CREATED)
+            assertThat(it.body).isNotNull
+            assertThat(it.body!!.id).isNotEqualTo(discountCode.id)
+            it.body!!
+        }
+
+        persistedDiscountCode.percentage = 20
+
+        restTemplate.exchange(
+            "/api/rest/discountCodes/${persistedDiscountCode.id}",
+            HttpMethod.PUT,
+            HttpEntity(persistedDiscountCode),
+            DiscountCode::class.java,
+        ).let {
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
+            assertThat(it.body!!.percentage).isEqualTo(persistedDiscountCode.percentage)
+        }
+
+        restTemplate.exchange(
+            "/api/rest/discountCodes/${persistedDiscountCode.id}",
+            HttpMethod.GET,
+            null,
+            DiscountCode::class.java,
+        ).let {
+            assertThat(it.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(it.body).isNotNull
+            assertThat(it.body!!.percentage).isEqualTo(persistedDiscountCode.percentage)
+        }
+    }
+
+    @Test
+    fun testScrudVersioned() {
         val orderIdAdapter = identifierAdapterRegistry.getServiceForEntityType(Order::class.java).identifierAdapter
         // Test Search
         // ============================
         // Get the lord of the rings trilogy as a page of results
         // using a prefixed wildcard search
         val products = restTemplate.exchange(
-            "/api/rest/products?filter=name=like=LOTR ",
+            "/api/rest/products?filter=name=like=LOTR",
             HttpMethod.GET,
             null,
             parameterizedTypeReference<RestResponsePage<Product>>(),

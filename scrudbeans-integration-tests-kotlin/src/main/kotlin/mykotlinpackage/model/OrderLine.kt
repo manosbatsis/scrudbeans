@@ -3,7 +3,7 @@ package mykotlinpackage.model
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY
 import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.model.AbstractBaseEntity
+import com.github.manosbatsis.scrudbeans.model.AbstractVersionedEntity
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
@@ -19,7 +19,10 @@ import java.util.*
 @Schema(name = "Order Line", description = "A model representing an order line")
 class OrderLine(
 
-    id: UUID? = null,
+    @Id
+    @Column(name = "id", length = 16, unique = true, nullable = false)
+    override var id: UUID = UUID.randomUUID(),
+
     version: Long? = null,
 
     @field:NotNull
@@ -43,7 +46,7 @@ class OrderLine(
     @field:JoinColumn(referencedColumnName = "id", nullable = false, updatable = false)
     @field:Schema(title = "The parent order", required = true)
     var order: Order? = null,
-) : AbstractBaseEntity(id, version) {
+) : AbstractVersionedEntity<UUID>(version) {
 
     override fun equals(other: Any?): Boolean {
         return when {
