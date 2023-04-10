@@ -4,6 +4,7 @@ import com.github.manosbatsis.kotlin.utils.api.Dto
 import com.github.manosbatsis.scrudbeans.exceptions.ChildEntityNotFoundException
 import com.github.manosbatsis.scrudbeans.service.JpaEntityService
 import io.swagger.v3.oas.annotations.Parameter
+import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
@@ -71,7 +72,10 @@ open class AbstractJpaEntityController<
     }
 
     @PostMapping
-    override fun save(@RequestBody entity: T): ResponseEntity<T> = doSave(entity)
+    override fun save(
+        @Valid @RequestBody
+        entity: T,
+    ): ResponseEntity<T> = doSave(entity)
 
     /** Allows overriding the implementation of [save] */
     open fun doSave(entity: T): ResponseEntity<T> =
@@ -79,7 +83,8 @@ open class AbstractJpaEntityController<
 
     @PutMapping("{id}")
     override fun update(
-        @RequestBody entity: T,
+        @Valid @RequestBody
+        entity: T,
         @PathVariable id: S,
     ): ResponseEntity<T> = doUpdate(entity, id)
 

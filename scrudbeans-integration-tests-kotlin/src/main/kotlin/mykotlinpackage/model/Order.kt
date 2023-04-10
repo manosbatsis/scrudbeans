@@ -1,12 +1,9 @@
 package mykotlinpackage.model
 
 import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.model.AbstractAuditableEntity
+import com.github.manosbatsis.scrudbeans.model.AbstractAuditableVersionedEntity
 import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EntityListeners
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import jakarta.validation.constraints.NotNull
 import mykotlinpackage.service.CustomBaseService
 import mykotlinpackage.service.CustomBaseServiceImpl
@@ -25,7 +22,10 @@ import java.util.*
 )
 @Schema(name = "Order", description = "A model representing an order of product items")
 class Order(
-    id: UUID? = null,
+    @Id
+    @Column(name = "id", length = 16, unique = true, nullable = false)
+    override var id: UUID = UUID.randomUUID(),
+
     @field:NotNull
     @field:Column(nullable = false)
     @field:Schema(title = "The client's email", required = true)
@@ -34,7 +34,7 @@ class Order(
     @field:Column(length = 512)
     @field:Schema(title = "Order comment", required = false)
     var comment: String? = null,
-) : AbstractAuditableEntity(id) {
+) : AbstractAuditableVersionedEntity<UUID>() {
     override fun equals(obj: Any?): Boolean {
         if (obj == null) return false
         if (obj === this) return true

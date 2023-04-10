@@ -1,10 +1,11 @@
 package mykotlinpackage.model
 
 import com.github.manosbatsis.scrudbeans.api.annotation.model.ScrudBean
-import com.github.manosbatsis.scrudbeans.model.AbstractAuditableEntity
+import com.github.manosbatsis.scrudbeans.model.AbstractAuditableVersionedEntity
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.Id
 import jakarta.persistence.Table
 import jakarta.validation.constraints.NotNull
 import org.apache.commons.lang3.builder.EqualsBuilder
@@ -19,7 +20,9 @@ import java.util.UUID
 @ScrudBean(controllerSuperClass = "mykotlinpackage.controller.CustomJpaEntityController")
 @Schema(name = "Product", description = "A model representing a single product")
 class Product(
-    id: UUID? = null,
+    @Id
+    @Column(name = "id", length = 16, unique = true, nullable = false)
+    override var id: UUID = UUID.randomUUID(),
     version: Long? = null,
 
     created: LocalDateTime? = null,
@@ -40,7 +43,7 @@ class Product(
     @field:Column(nullable = false)
     @field:Schema(type = "float", description = "The product price", required = true, example = "3.05")
     var price: BigDecimal? = null,
-) : AbstractAuditableEntity(id, version, created, updated) {
+) : AbstractAuditableVersionedEntity<UUID>(version, created, updated) {
 
     override fun equals(obj: Any?): Boolean {
         if (obj == null) return false

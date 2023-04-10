@@ -20,6 +20,7 @@
  */
 package com.github.manosbatsis.scrudbeans.api.annotation.model
 
+import com.github.manosbatsis.scrudbeans.api.annotation.ScrudBeansAnnotation
 import java.lang.annotation.Documented
 import java.lang.annotation.Retention
 import java.lang.annotation.RetentionPolicy
@@ -29,7 +30,7 @@ import kotlin.reflect.KClass
  *
  * Marks a Model as candidate for mdd code generation (Controller, Service, Repository)
  */
-@ScrudBeansModelAnnotation
+@ScrudBeansAnnotation
 @Retention(RetentionPolicy.RUNTIME)
 @Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.CLASS)
 @Documented
