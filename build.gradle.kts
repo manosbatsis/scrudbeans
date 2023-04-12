@@ -84,7 +84,6 @@ subprojects {
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions.apply {
             jvmTarget = "17"
-            //freeCompilerArgs += listOf("-Xjsr305=strict")
             apiVersion = "1.7"
             languageVersion = "1.7"
         }
