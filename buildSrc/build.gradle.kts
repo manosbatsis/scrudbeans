@@ -3,7 +3,7 @@ import org.gradle.kotlin.dsl.java
 import org.gradle.kotlin.dsl.kotlin
 
 plugins {
-    kotlin("jvm") version "1.8.20"//kotlinVersion
+    kotlin("jvm") version "1.8.10"
     `kotlin-dsl`
 }
 
