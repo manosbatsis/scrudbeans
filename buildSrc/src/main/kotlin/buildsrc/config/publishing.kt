@@ -7,9 +7,6 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.publish.maven.MavenPom
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.kotlin.dsl.findByType
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 fun MavenPublication.createManosBatsisPom(
     projectName: String,
@@ -56,18 +53,4 @@ fun ProviderFactory.credentialsAction(
         username = user
         password = pass
     }
-}
-
-/**
- * Check if a Kotlin Mutliplatform project also has Java enabled.
- *
- * Logic from [KotlinJvmTarget.withJava]
- */
-fun Project.isKotlinMultiplatformJavaEnabled(): Boolean {
-    val multiplatformExtension: KotlinMultiplatformExtension? =
-        extensions.findByType(KotlinMultiplatformExtension::class)
-
-    return multiplatformExtension?.targets
-        ?.any { target -> target is KotlinJvmTarget && target.withJavaEnabled }
-        ?: false
 }

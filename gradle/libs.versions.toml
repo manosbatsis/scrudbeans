@@ -30,8 +30,10 @@ error-handling-spring-boot-starter = { module = "io.github.wimdeblauwe:error-han
 
 [plugins]
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka-version" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin-version" }
-kotlin-lang = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
+kotlin-noarg = { id = "org.jetbrains.kotlin.plugin.noarg", version.ref = "kotlin-version" }
+kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin-version" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin-version" }
 nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version.ref = "nexus-publish-version" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot-version" }

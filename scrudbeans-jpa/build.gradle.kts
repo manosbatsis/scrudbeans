@@ -1,8 +1,8 @@
 plugins {
     `java-library`
-    kotlin("jvm")
-    kotlin("plugin.spring")
-    kotlin("plugin.jpa")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.jpa)
     buildsrc.convention.`publish-jvm`
 }
 

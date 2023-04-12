@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
     buildsrc.convention.`publish-jvm`
 }
 

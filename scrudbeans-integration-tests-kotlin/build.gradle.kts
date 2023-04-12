@@ -1,11 +1,11 @@
 plugins {
     `java-library`
-    kotlin("jvm")
-    kotlin("kapt")
-    kotlin("plugin.spring")
-    kotlin("plugin.jpa")
-    kotlin("plugin.noarg")
-    id("org.springframework.boot")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.noarg)
+    alias(libs.plugins.kotlin.jpa)
+    alias(libs.plugins.spring.boot)
 }
 
 noArg {

@@ -1,7 +1,7 @@
 plugins {
     `java-library`
-    kotlin("jvm")
-    kotlin("plugin.spring")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
     buildsrc.convention.`publish-jvm`
 }
 

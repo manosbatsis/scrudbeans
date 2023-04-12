@@ -5,13 +5,13 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
     `java-library`
-    kotlin("jvm")
-    kotlin("kapt")
-    id("org.springframework.boot") apply false
-    id("org.jetbrains.dokka")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.spring.boot) apply false
+    alias(libs.plugins.nexus.publish)
     buildsrc.convention.`publish-jvm`
-    id("io.github.gradle-nexus.publish-plugin")
-    id("com.diffplug.spotless")
+    alias(libs.plugins.spotless)
+    alias(libs.plugins.dokka)
 
 }
 
@@ -53,6 +53,9 @@ tasks.wrapper {
 
 subprojects {
     apply(plugin = "com.diffplug.spotless")
+
+    group = rootProject.group
+    version = rootProject.version
 
     spotless {
         format("misc") {
