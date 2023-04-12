@@ -26,7 +26,6 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
-
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -36,6 +35,7 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         name: Build with Gradle
         with:
+          gradle-version: 8.0.2
           arguments: build
 
       - name: Upload coverage to Codecov
@@ -63,6 +63,9 @@ jobs:
 
       - uses: gradle/gradle-build-action@v2
         name: Publish snapshot to Maven Central
+        with:
+            arguments: publishToSonatype
+            gradle-version: 8.0.2
         if: ${{ github.event_name == 'push' && matrix.os == 'ubuntu-latest' }}
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGKEY}}
@@ -70,5 +73,3 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD}}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME}}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD}}
-        with:
-          arguments: publishToSonatype

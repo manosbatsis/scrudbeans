@@ -33,7 +33,8 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         name: Build with Gradle
         with:
-          arguments: build
+            gradle-version: 8.0.2
+            arguments: build
 
       - name: Identify current version
         id: current_version
@@ -68,14 +69,15 @@ jobs:
 
       - uses: gradle/gradle-build-action@v2
         name: Publish to Maven Central
+        with:
+            arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
+            gradle-version: 8.0.2
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGKEY}}
           ORG_GRADLE_PROJECT_signingKeyId: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGKEYID}}
           ORG_GRADLE_PROJECT_signingPassword: ${{secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD}}
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEUSERNAME}}
           ORG_GRADLE_PROJECT_sonatypePassword: ${{secrets.ORG_GRADLE_PROJECT_SONATYPEPASSWORD}}
-        with:
-          arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
 
       - name: Deploy docs
         uses: mhausenblas/mkdocs-deploy-gh-pages@master
