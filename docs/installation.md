@@ -4,34 +4,10 @@ title: Installation
 
 This document will help you get a quick start with ScrudBeans and Spring Boot.
 
-## Using the Project Templates
-
-The [scrudbeans-template-java](https://github.com/manosbatsis/scrudbeans-template-java) and
-[scrudbeans-template-kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin) projects
-replicates this quick tutorial and can help you get started with ScrudBeans right away.
-> Both Maven and Gradle build scripts are included in the above samples.
-
-For Kotlin:
-
-```bash
-git clone https://github.com/manosbatsis/scrudbeans-template-kotlin.git
-```
-
-For Java:
-
-```bash
-git clone https://github.com/manosbatsis/scrudbeans-template-java.git
-```
-
-## Using a Custom Project
-
-Alternatively, you can use an existing Spring Boot project or create a new one with
-[Spring Initializr](https://start.spring.io/).
-
 ## ScrudBeans Starter
 
-If you are not using scrudbeans-template, the ScrudBeans autoconfiguration starter for
-Spring Boot is all your project needs in terms of dependencies.
+The `scrudbeans-spring-boot-starter` and `scrudbeans-annotation-processor-kotlin`
+are all your project needs in terms of dependencies.
 
 ### Using Maven
 
@@ -42,26 +18,7 @@ __Starter__: To add the dependencies with Maven, begin with the Spring Boot star
 <dependency>
 	<groupId>com.github.manosbatsis.scrudbeans</groupId>
 	<artifactId>scrudbeans-spring-boot-starter</artifactId>
-	<version>${scrudbeans.version}</version>
-</dependency>
-<!-- Test Starter -->
-<dependency>
-	<groupId>com.github.manosbatsis.scrudbeans</groupId>
-	<artifactId>scrudbeans-spring-boot-starter-test</artifactId>
-	<version>${scrudbeans.version}</version>
-	<scope>test</scope>
-</dependency>
-```
-
-__Java Processor__: If you use Java, add this annotation processor:
-
-```xml
-<!-- Provided/code generation Dependencies for Java -->
-<dependency>
-	<groupId>com.github.manosbatsis.scrudbeans</groupId>
-	<artifactId>scrudbeans-annotation-processor-java</artifactId>
-	<version>${project.version}</version>
-	<scope>provided</scope>
+	<version>${scrudbeans_version}</version>
 </dependency>
 ```
 
@@ -73,42 +30,31 @@ __Kotlin Processor__: If you use Kotlin, add this annotation processor:
 <dependency>
 	<groupId>com.github.manosbatsis.scrudbeans</groupId>
 	<artifactId>scrudbeans-annotation-processor-kotlin</artifactId>
-	<version>${project.version}</version>
+	<version>${scrudbeans_version}</version>
 	<scope>provided</scope>
 </dependency>
 ```
 
-> You may have to setup apt or kapt for Java or Kotlin respectively,
-> see [scrudbeans-template-java](https://github.com/manosbatsis/scrudbeans-template-java)
-> and [scrudbeans-template-kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin)
-> for examples.
+> You may have to setup apt or kapt for Kotlin,
+> see [scrudbeans-template-kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin)
+> for an example.
 
 ### Using Gradle
 
-If you use Java:
+
+Add the starter and annotation processor as an implementation and kapt dependency respectively:
 
 ```groovy
 dependencies {
 	//...
-	implementation 'com.github.manosbatsis.scrudbeans:scrudbeans-spring-boot-starter:$scrudbeans_version'
-	implementation("com.github.manosbatsis.scrudbeans:scrudbeans-annotation-processor-java:$scrudbeans_version")
-}
-```
-
-If you use Kotlin:
-
-```groovy
-dependencies {
-	//...
-	implementation 'com.github.manosbatsis.scrudbeans:scrudbeans-spring-boot-starter:$scrudbeans_version'
+	implementation("com.github.manosbatsis.scrudbeans:scrudbeans-spring-boot-starter:$scrudbeans_version")
 	kapt("com.github.manosbatsis.scrudbeans:scrudbeans-annotation-processor-kotlin:$scrudbeans_version")
 }
 ```
 
-> You may have to setup apt or kapt for Java or Kotlin respectively,
-> see [scrudbeans-template-java](https://github.com/manosbatsis/scrudbeans-template-java)
-> and [scrudbeans-template-kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin)
-> for examples.
+> You may have to setup the Gradle kapt plugin if you have not already,
+> see [scrudbeans-template-kotlin](https://github.com/manosbatsis/scrudbeans-template-kotlin)
+> for an example.
 
 ## Application Properties
 

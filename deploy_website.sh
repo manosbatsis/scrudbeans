@@ -10,7 +10,7 @@ cp -R ./docs/ ./build/docs/
 ./gradlew dokkaGfmMultiModule
 
 # Add readme as index
-cat README.md > docs/index.md
+cat README.md > ./build/docs/index.md
 
 # Remove redundant link
 sed -i '/Documentation at/d' ./build/docs/index.md
