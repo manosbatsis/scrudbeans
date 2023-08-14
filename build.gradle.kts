@@ -12,7 +12,16 @@ plugins {
     buildsrc.convention.`publish-jvm`
     alias(libs.plugins.spotless)
     alias(libs.plugins.dokka)
+    id("org.sonarqube") version "4.2.1.3168"
+}
 
+
+sonar {
+    properties {
+        property("sonar.projectKey", "manosbatsis_scrudbeans")
+        property("sonar.organization", "manosbatsis")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 }
 
 @Suppress("PropertyName")
