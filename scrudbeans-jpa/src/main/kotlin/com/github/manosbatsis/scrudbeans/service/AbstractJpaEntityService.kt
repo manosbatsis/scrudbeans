@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
-import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 import java.util.Optional
 
@@ -103,14 +102,14 @@ abstract class AbstractJpaEntityService<T : Any, S : Any, B : JpaEntityRepositor
     @Transactional(readOnly = true)
     override fun getById(id: S): T = findById(id).orElseThrow { EntityNotFoundException() }
 
-    @Transactional(readOnly = false, propagation = Propagation.NESTED)
+    @Transactional(readOnly = false)
     override fun save(entity: T): T = repository.save(entity)
 
-    @Transactional(readOnly = false, propagation = Propagation.NESTED)
+    @Transactional(readOnly = false)
     override fun saveAll(resources: Iterable<T>): Iterable<T> =
         repository.saveAll(resources)
 
-    @Transactional(readOnly = false, propagation = Propagation.NESTED)
+    @Transactional(readOnly = false)
     override fun partialUpdate(dto: Dto<T>, id: S): T {
         val persisted = getById(id)
         val patched = dto.toPatched(persisted)
@@ -121,16 +120,16 @@ abstract class AbstractJpaEntityService<T : Any, S : Any, B : JpaEntityRepositor
         return repository.save(patched)
     }
 
-    @Transactional(readOnly = false, propagation = Propagation.NESTED)
+    @Transactional(readOnly = false)
     override fun delete(resource: T) = repository.delete(resource)
 
-    @Transactional(readOnly = false, propagation = Propagation.NESTED)
+    @Transactional(readOnly = false)
     override fun deleteById(id: S) {
         existsByIdAssert(id)
         repository.deleteById(id)
     }
 
-    @Transactional(readOnly = false, propagation = Propagation.NESTED)
+    @Transactional(readOnly = false)
     override fun deleteAllById(ids: Iterable<S>) {
         repository.deleteAllById(ids)
     }
